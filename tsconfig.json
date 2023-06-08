@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "es2021",
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "outDir": "dist",
+    "declaration": true,
+    "allowJs": false
+  },
+  "include": [
+    "./tasks",
+    "./test",
+    "./typechain-types",
+  ],
+  "files": [
+    "hardhat.config.ts"
+  ]
+}
