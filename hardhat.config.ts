@@ -8,6 +8,10 @@ import './tasks';
 
 const config: HardhatUserConfig = {
   solidity: '0.8.18',
+  docgen: {
+    pages: 'files',
+    templates: 'docsBlueprint',
+  },
 };
 
 export default config;
