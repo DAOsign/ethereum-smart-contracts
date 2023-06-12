@@ -12,6 +12,7 @@
     "prettier:ts": "npx prettier --write \"**/*.ts\"",
     "typechain": "npx hardhat typechain",
     "build": "yarn hardhat compile",
+    "cleanup": "rm -rf artifacts/ cache/ coverage/ typechain-types/ coverage.json",
     "test": "npx hardhat test",
     "size": "yarn hardhat size-contracts",
     "coverage": "yarn hardhat coverage",
