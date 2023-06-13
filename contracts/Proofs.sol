@@ -7,6 +7,9 @@ import { IERC165 } from '@openzeppelin/contracts/utils/introspection/IERC165.sol
 import { ERC165Checker } from '@openzeppelin/contracts/utils/introspection/ERC165Checker.sol';
 import { IProofsMetadata } from './interfaces/IProofsMetadata.sol';
 
+/**
+ * Stores DAOsign proofs.
+ */
 contract Proofs {
     address public proofsMetadata;
 

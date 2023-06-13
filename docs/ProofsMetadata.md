@@ -1,5 +1,8 @@
 ## ProofsMetadata
 
+Stores metadata for Proof-of-Authority, Proof-of-Signature, Proof-of-Agreement. Has an owner who
+can update this metadata.
+
 ### proofsMetadata
 
 ```solidity

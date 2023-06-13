@@ -8,6 +8,10 @@ import { ERC165 } from '@openzeppelin/contracts/utils/introspection/ERC165.sol';
 import { Strings } from './libs/Strings.sol';
 import { IProofsMetadata } from './interfaces/IProofsMetadata.sol';
 
+/**
+ * Stores metadata for Proof-of-Authority, Proof-of-Signature, Proof-of-Agreement. Has an owner who
+ * can update this metadata.
+ */
 contract ProofsMetadata is IProofsMetadata, Ownable, ERC165 {
     using Strings for string;
 

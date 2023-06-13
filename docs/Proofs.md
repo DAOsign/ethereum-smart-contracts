@@ -1,5 +1,7 @@
 ## Proofs
 
+Stores DAOsign proofs.
+
 ### proofsMetadata
 
 ```solidity
