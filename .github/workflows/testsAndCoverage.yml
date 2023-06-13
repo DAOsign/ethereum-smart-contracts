@@ -1,4 +1,4 @@
-name: Run Solidity tests and coverage for the whole project
+name: Run Solidity tests and coverage
 
 on:
   pull_request:

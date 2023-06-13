@@ -2,15 +2,19 @@ import { time, loadFixture } from '@nomicfoundation/hardhat-toolbox/network-help
 import { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs';
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
-import { ProofsMetadata } from '../typechain-types';
 
-describe.only('Proofs Metadata', () => {
+describe('Proofs Metadata', () => {
   // We define a fixture to reuse the same setup in every test.
   // We use loadFixture to run this setup once, snapshot that state,
   // and reset Hardhat Network to that snapshot in every test.
   async function deployProofsMetadataFixture() {
     const [owner, anyone] = await ethers.getSigners();
-    const proofsMetadata = await (await ethers.getContractFactory('ProofsMetadata')).deploy();
+    const strings = await (await ethers.getContractFactory('Strings')).deploy();
+    const proofsMetadata = await (
+      await ethers.getContractFactory('ProofsMetadata', {
+        libraries: { Strings: await strings.getAddress() },
+      })
+    ).deploy();
 
     return { proofsMetadata, owner, anyone };
   }

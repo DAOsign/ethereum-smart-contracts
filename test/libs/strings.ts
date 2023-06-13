@@ -7,15 +7,13 @@ describe('Strings library', () => {
   // We use loadFixture to run this setup once, snapshot that state,
   // and reset Hardhat Network to that snapshot in every test.
   async function deployStringsFixture() {
-    const strings = await (await ethers.getContractFactory('StringsLibTest')).deploy();
+    const strings = await (await ethers.getContractFactory('Strings')).deploy();
 
     return { strings };
   }
 
   it('length', async () => {
     const { strings } = await loadFixture(deployStringsFixture);
-
-    console.log(strings);
 
     expect(await strings.length('')).to.equal(0);
     expect(await strings.length(' _ ')).to.equal(3);

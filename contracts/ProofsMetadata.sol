@@ -3,11 +3,11 @@ pragma solidity ^0.8.18;
 
 // import "hardhat/console.sol";
 
-import { StringsLib } from './libs/StringsLib.sol';
+import { Strings } from './libs/Strings.sol';
 import { Ownable } from '@openzeppelin/contracts/access/Ownable.sol';
 
 contract ProofsMetadata is Ownable {
-    using StringsLib for string;
+    using Strings for string;
 
     event MetadataAdded(string indexed name, string indexed version, string metadata);
     event MetadataUpdated(string indexed name, string indexed version, string metadata);
