@@ -1,17 +1,5 @@
 ## ProofsMetadata
 
-### MetadataAdded
-
-```solidity
-event MetadataAdded(string name, string version, string metadata)
-```
-
-### MetadataUpdated
-
-```solidity
-event MetadataUpdated(string name, string version, string metadata)
-```
-
 ### proofsMetadata
 
 ```solidity
@@ -23,6 +11,14 @@ mapping(string => mapping(string => string)) proofsMetadata
 ```solidity
 mapping(string => string[]) metadataVersions
 ```
+
+### supportsInterface
+
+```solidity
+function supportsInterface(bytes4 interfaceId) public view virtual returns (bool)
+```
+
+_See {IERC165-supportsInterface}._
 
 ### getMetadataNumOfVersions
 

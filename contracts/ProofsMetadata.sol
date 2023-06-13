@@ -3,19 +3,26 @@ pragma solidity ^0.8.18;
 
 // import "hardhat/console.sol";
 
-import { Strings } from './libs/Strings.sol';
 import { Ownable } from '@openzeppelin/contracts/access/Ownable.sol';
+import { ERC165 } from '@openzeppelin/contracts/utils/introspection/ERC165.sol';
+import { Strings } from './libs/Strings.sol';
+import { IProofsMetadata } from './interfaces/IProofsMetadata.sol';
 
-contract ProofsMetadata is Ownable {
+contract ProofsMetadata is IProofsMetadata, Ownable, ERC165 {
     using Strings for string;
-
-    event MetadataAdded(string indexed name, string indexed version, string metadata);
-    event MetadataUpdated(string indexed name, string indexed version, string metadata);
 
     // proof name -> version -> metadata itself
     mapping(string => mapping(string => string)) public proofsMetadata;
     // proof name -> history of versions
     mapping(string => string[]) public metadataVersions;
+
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view virtual override(ERC165) returns (bool) {
+        return
+            interfaceId == type(IProofsMetadata).interfaceId ||
+            super.supportsInterface(interfaceId);
+    }
 
     /**
      * Get number of versions that exist for metadata by its name
@@ -36,9 +43,9 @@ contract ProofsMetadata is Ownable {
      * @param metadata Metadata in JSON format.
      */
     function addMetadata(
-        string memory name,
-        string memory version,
-        string memory metadata
+        string calldata name,
+        string calldata version,
+        string calldata metadata
     ) public onlyOwner {
         require(
             name.length() > 0 && version.length() > 0 && metadata.length() > 0,
@@ -65,9 +72,9 @@ contract ProofsMetadata is Ownable {
      * @param metadata Metadata in JSON format.
      */
     function forceUpdateMetadata(
-        string memory name,
-        string memory version,
-        string memory metadata
+        string calldata name,
+        string calldata version,
+        string calldata metadata
     ) public onlyOwner {
         require(
             name.length() > 0 && version.length() > 0 && metadata.length() > 0,
