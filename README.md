@@ -1,10 +1,10 @@
-# Daosign Smart Contracts
+# DAOsign Smart Contracts
 
 This repository houses a collection of Ethereum smart contracts, developed as part of the DAOsign project. DAOsign leverages blockchain technology to generate, store, and validate Agreement Proofs.
 
 ## Overview
 
-Daosign aims to transition the generation, storage, and validation of Agreement Proofs from IPFS to the blockchain. This shift carries numerous benefits:
+DAOsign aims to transition the generation, storage, and validation of Agreement Proofs from IPFS to the blockchain. This shift carries numerous benefits:
 
 - **Longevity**: Unlike data on IPFS, which may disappear if no nodes are interested in storing it, blockchain data is immutable and perpetually accessible.
 - **Immutability**: Tampering with data on blockchains like Ethereum or Polygon is considerably more challenging than on IPFS.
@@ -52,7 +52,7 @@ For detailed information about individual contracts, refer to the [documentation
 
 ## Contributions
 
-Contributions to Daosign smart contracts are welcomed. Feel free to submit issues, fork the repository, and send pull requests.
+Contributions to DAOsign smart contracts are welcomed. Feel free to submit issues, fork the repository, and send pull requests.
 
 ## Contact
 
