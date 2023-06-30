@@ -43,6 +43,11 @@ contract Proofs {
         string calldata agreementFileCID,
         string calldata version
     ) public view returns (string memory) {
+        require(creator != address(0), 'No creator');
+        require(signers.length > 0, 'No signers');
+        require(agreementFileCID.length() > 0, 'No Agreement File CID');
+        require(version.length() > 0, 'No version');
+
         return
             string(
                 abi.encodePacked(

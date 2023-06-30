@@ -62,6 +62,55 @@ describe('Proofs', () => {
   });
 
   describe('getProofOfAuthorityData', () => {
+    it('no creator error', async () => {
+      const { proofs, signer1, signer2, signer3 } = await loadFixture(deployProofsFixture);
+      const signers = [signer1.address, signer2.address, signer3.address];
+      const agreementFileCID = 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp';
+
+      await expect(
+        proofs.getProofOfAuthorityData.staticCall(
+          ethers.ZeroAddress,
+          signers,
+          agreementFileCID,
+          '0.1.0'
+        )
+      ).revertedWith('No creator');
+    });
+
+    it('no signers error', async () => {
+      const { proofs, signer1, signer2, signer3 } = await loadFixture(deployProofsFixture);
+      const signers = [signer1.address, signer2.address, signer3.address];
+      const agreementFileCID = 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp';
+
+      await expect(
+        proofs.getProofOfAuthorityData.staticCall(
+          ethers.ZeroAddress,
+          signers,
+          agreementFileCID,
+          '0.1.0'
+        )
+      ).revertedWith('No creator');
+    });
+
+    it('no Agreement File CID error', async () => {
+      const { proofs, creator, signer1, signer2, signer3 } = await loadFixture(deployProofsFixture);
+      const signers = [signer1.address, signer2.address, signer3.address];
+
+      await expect(
+        proofs.getProofOfAuthorityData.staticCall(creator, signers, '', '0.1.0')
+      ).revertedWith('No Agreement File CID');
+    });
+
+    it('no version error', async () => {
+      const { proofs, creator, signer1, signer2, signer3 } = await loadFixture(deployProofsFixture);
+      const signers = [signer1.address, signer2.address, signer3.address];
+      const agreementFileCID = 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp';
+
+      await expect(
+        proofs.getProofOfAuthorityData.staticCall(creator, signers, agreementFileCID, '')
+      ).revertedWith('No version');
+    });
+
     it('success', async () => {
       const { proofs, creator, signer1, signer2, signer3 } = await loadFixture(deployProofsFixture);
       const signers = [signer1.address, signer2.address, signer3.address];
