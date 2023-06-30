@@ -17,14 +17,21 @@ contract Proofs {
     using Strings for address;
 
     address public proofsMetadata;
+    address public proofsVerificationLib;
 
-    constructor(address _proofsMetadata) {
+    // Agreement File CID -> Proof type -> Proof CID
+    mapping(string => mapping(string => string)) public signedProofs;
+    // Agreement File CID -> Proof type -> Proof Data
+    mapping(string => mapping(string => string)) public proofsData;
+
+    constructor(address _proofsMetadata, address _proofsVerificationLib) {
         require(
             ERC165Checker.supportsERC165(_proofsMetadata) &&
                 IERC165(_proofsMetadata).supportsInterface(type(IProofsMetadata).interfaceId),
             'Must support IProofsMetadata'
         );
         proofsMetadata = _proofsMetadata;
+        proofsVerificationLib = _proofsVerificationLib;
     }
 
     /**
@@ -38,41 +45,76 @@ contract Proofs {
      */
 
     function getProofOfAuthorityData(
-        address creator,
-        address[] calldata signers,
-        string calldata agreementFileCID,
-        string calldata version
+        address _creator,
+        address[] calldata _signers,
+        string calldata _agreementFileCID,
+        string calldata _version
     ) public view returns (string memory) {
-        require(creator != address(0), 'No creator');
-        require(signers.length > 0, 'No signers');
-        require(agreementFileCID.length() > 0, 'No Agreement File CID');
-        require(version.length() > 0, 'No version');
+        require(_creator != address(0), 'No creator');
+        require(_signers.length > 0, 'No signers');
+        require(_agreementFileCID.length() > 0, 'No Agreement File CID');
+        require(_version.length() > 0, 'No version');
 
         return
             string(
                 abi.encodePacked(
-                    IProofsMetadata(proofsMetadata).proofsMetadata('Proof-of-Authority', version),
+                    IProofsMetadata(proofsMetadata).proofsMetadata('Proof-of-Authority', _version),
                     ',"message":',
-                    getProofOfAuthorityDataMessage(creator, signers, agreementFileCID),
+                    _getProofOfAuthorityDataMessage(_creator, _signers, _agreementFileCID),
                     '}'
                 )
             );
     }
 
-    // TODO: make internal
-    function getProofOfAuthorityDataMessage(
-        address creator,
-        address[] calldata signers,
-        string calldata agreementFileCID
+    function getProofOfSignatureData(
+        address _signer,
+        string calldata _proofOfAuthorityCID,
+        string calldata _version
     ) public view returns (string memory) {
+        require(_signer != address(0), 'No signer');
+        require(_proofOfAuthorityCID.length() > 0, 'No Proof-of-Authority CID');
+        require(_version.length() > 0, 'No version');
+
+        return
+            string(
+                abi.encodePacked(
+                    IProofsMetadata(proofsMetadata).proofsMetadata('Proof-of-Signature', _version),
+                    ',"message":',
+                    _getProofOfSignatureDataMessage(_signer, _proofOfAuthorityCID),
+                    '}'
+                )
+            );
+    }
+
+    function storeProofOfAuthority(
+        string calldata _signature,
+        address _creator,
+        address[] calldata _signers,
+        string calldata _agreementFileCID,
+        string calldata _version
+    ) public {
+        /**
+        {
+            "address": "<User's address>",
+            "sig": "<User's signature of Agreement File Proof Data>",
+            "data": <Agreement File Proof Data object>
+        }
+         */
+    }
+
+    function _getProofOfAuthorityDataMessage(
+        address _creator,
+        address[] calldata _signers,
+        string calldata _agreementFileCID
+    ) internal view returns (string memory) {
         string memory message = string(
             abi.encodePacked(
                 '{"from":"',
-                creator.toString(),
+                _creator.toString(),
                 '","agreementFileCID":"',
-                agreementFileCID,
+                _agreementFileCID,
                 '","signers":',
-                generateSignersJSON(signers),
+                _generateSignersJSON(_signers),
                 ',"app":"daosign","timestamp":',
                 block.timestamp.toString(),
                 ',"metadata":{}}'
@@ -82,15 +124,35 @@ contract Proofs {
         return message;
     }
 
-    // TODO: make internal
-    function generateSignersJSON(address[] calldata signers) public pure returns (string memory) {
+    function _getProofOfSignatureDataMessage(
+        address _signer,
+        string calldata _proofOfAuthorityCID
+    ) internal view returns (string memory) {
+        string memory message = string(
+            abi.encodePacked(
+                '{"signer":"',
+                _signer.toString(),
+                '","agreementFileProofCID":"',
+                _proofOfAuthorityCID,
+                '","app":"daosign","timestamp":',
+                block.timestamp.toString(),
+                ',"metadata":{}}'
+            )
+        );
+
+        return message;
+    }
+
+    function _generateSignersJSON(
+        address[] calldata _signers
+    ) internal pure returns (string memory) {
         string memory res = '[';
 
-        for (uint256 i = 0; i < signers.length; i++) {
+        for (uint256 i = 0; i < _signers.length; i++) {
             res = res.concat(
-                string(abi.encodePacked('{"address":"', signers[i].toString(), '","metadata":{}}'))
+                string(abi.encodePacked('{"address":"', _signers[i].toString(), '","metadata":{}}'))
             );
-            if (i != signers.length - 1) {
+            if (i != _signers.length - 1) {
                 res = res.concat(',');
             }
         }

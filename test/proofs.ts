@@ -2,7 +2,7 @@ import { loadFixture, time } from '@nomicfoundation/hardhat-toolbox/network-help
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { deployProofs, deployProofsMetadata } from '../scripts/deployForTest';
-import { proofOfAuthorityData } from './data/proofs';
+import { proofOfAuthorityData, proofOfSignatureData } from './data/proofs';
 
 describe('Proofs', () => {
   async function deployProofsFixture() {
@@ -13,6 +13,11 @@ describe('Proofs', () => {
       'Proof-of-Authority',
       '0.1.0',
       JSON.stringify(proofOfAuthorityData).slice(0, -1)
+    );
+    await proofsMetadata.addMetadata(
+      'Proof-of-Signature',
+      '0.1.0',
+      JSON.stringify(proofOfSignatureData).slice(0, -1)
     );
 
     return { proofs, strings, owner, creator, signer1, signer2, signer3, anyone };
@@ -61,7 +66,7 @@ describe('Proofs', () => {
     });
   });
 
-  describe('getProofOfAuthorityData', () => {
+  describe('Get Proof-of-Authority data', () => {
     it('no creator error', async () => {
       const { proofs, signer1, signer2, signer3 } = await loadFixture(deployProofsFixture);
       const signers = [signer1.address, signer2.address, signer3.address];
@@ -127,6 +132,59 @@ describe('Proofs', () => {
         from: '0x70997970c51812dc3a010c7d01b50e0d17dc79c8',
         agreementFileCID: 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp',
         signers: signers.map((signer) => ({ address: signer, metadata: {} })),
+        app: 'daosign',
+        timestamp: await time.latest(),
+        metadata: {},
+      };
+
+      expect(JSON.parse(res)).to.deep.equal(expectedRes);
+    });
+  });
+
+  describe('Get Proof-of-Signature data', () => {
+    it('no signer error', async () => {
+      const { proofs } = await loadFixture(deployProofsFixture);
+      const agreementFileProofCID = 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp';
+
+      await expect(
+        proofs.getProofOfSignatureData.staticCall(
+          ethers.ZeroAddress,
+          agreementFileProofCID,
+          '0.1.0'
+        )
+      ).revertedWith('No signer');
+    });
+
+    it('no Proof-of-Authority CID error', async () => {
+      const { proofs, signer1 } = await loadFixture(deployProofsFixture);
+
+      await expect(
+        proofs.getProofOfSignatureData.staticCall(signer1.address, '', '0.1.0')
+      ).revertedWith('No Proof-of-Authority CID');
+    });
+
+    it('no version error', async () => {
+      const { proofs, signer1 } = await loadFixture(deployProofsFixture);
+      const agreementFileProofCID = 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp';
+
+      await expect(
+        proofs.getProofOfSignatureData.staticCall(signer1.address, agreementFileProofCID, '')
+      ).revertedWith('No version');
+    });
+
+    it('success', async () => {
+      const { proofs, signer1 } = await loadFixture(deployProofsFixture);
+      const agreementFileProofCID = 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp';
+      const res = await proofs.getProofOfSignatureData.staticCall(
+        signer1.address,
+        agreementFileProofCID,
+        '0.1.0'
+      );
+
+      const expectedRes: any = proofOfSignatureData;
+      expectedRes.message = {
+        signer: signer1.address,
+        agreementFileProofCID,
         app: 'daosign',
         timestamp: await time.latest(),
         metadata: {},

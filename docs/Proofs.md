@@ -8,16 +8,34 @@ Stores DAOsign proofs.
 address proofsMetadata
 ```
 
+### proofsVerificationLib
+
+```solidity
+address proofsVerificationLib
+```
+
+### signedProofs
+
+```solidity
+mapping(string => mapping(string => string)) signedProofs
+```
+
+### proofsData
+
+```solidity
+mapping(string => mapping(string => string)) proofsData
+```
+
 ### constructor
 
 ```solidity
-constructor(address _proofsMetadata) public
+constructor(address _proofsMetadata, address _proofsVerificationLib) public
 ```
 
 ### getProofOfAuthorityData
 
 ```solidity
-function getProofOfAuthorityData(address creator, address[] signers, string agreementFileCID, string version) public view returns (string)
+function getProofOfAuthorityData(address _creator, address[] _signers, string _agreementFileCID, string _version) public view returns (string)
 ```
 
 Public:
@@ -28,15 +46,33 @@ Public:
     System:
     - autogenereate Proof-of-Agreement
 
-### getProofOfAuthorityDataMessage
+### getProofOfSignatureData
 
 ```solidity
-function getProofOfAuthorityDataMessage(address creator, address[] signers, string agreementFileCID) public view returns (string)
+function getProofOfSignatureData(address _signer, string _proofOfAuthorityCID, string _version) public view returns (string)
 ```
 
-### generateSignersJSON
+### storeProofOfAuthority
 
 ```solidity
-function generateSignersJSON(address[] signers) public pure returns (string)
+function storeProofOfAuthority(string _signature, address _creator, address[] _signers, string _agreementFileCID, string _version) public
+```
+
+### _getProofOfAuthorityDataMessage
+
+```solidity
+function _getProofOfAuthorityDataMessage(address _creator, address[] _signers, string _agreementFileCID) internal view returns (string)
+```
+
+### _getProofOfSignatureDataMessage
+
+```solidity
+function _getProofOfSignatureDataMessage(address _signer, string _proofOfAuthorityCID) internal view returns (string)
+```
+
+### _generateSignersJSON
+
+```solidity
+function _generateSignersJSON(address[] _signers) internal pure returns (string)
 ```
 
