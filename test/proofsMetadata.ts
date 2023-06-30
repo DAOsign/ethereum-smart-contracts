@@ -1,8 +1,8 @@
-import { time, loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers';
-import { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs';
+import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers';
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
-import { deployProofsMetadata } from '../scripts/deploy';
+import { deployProofsMetadata } from '../scripts/deployForTest';
+import { ProofsMetadata } from '../typechain-types';
 
 describe('Proofs Metadata', () => {
   // We define a fixture to reuse the same setup in every test.
@@ -10,7 +10,7 @@ describe('Proofs Metadata', () => {
   // and reset Hardhat Network to that snapshot in every test.
   async function deployProofsMetadataFixture() {
     const [owner, anyone] = await ethers.getSigners();
-    const proofsMetadata = await deployProofsMetadata();
+    const { proofsMetadata } = await deployProofsMetadata();
 
     return { proofsMetadata, owner, anyone };
   }
