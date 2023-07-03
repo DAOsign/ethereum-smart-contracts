@@ -10,6 +10,12 @@ export const deployStringsLibrary = async () => {
   return { strings };
 };
 
+export const deployProofsVerificationLibrary = async () => {
+  const proofsVerification = await (await ethers.getContractFactory('ProofsVerification')).deploy();
+
+  return { proofsVerification };
+};
+
 export const deployProofsMetadata = async () => {
   const { strings } = await deployStringsLibrary();
   const proofsMetadata = await (
