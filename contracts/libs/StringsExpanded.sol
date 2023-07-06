@@ -4,7 +4,7 @@ pragma solidity ^0.8.18;
 /**
  * Enhances operation with strings that are not possible in the current Solidity version (v0.8.18)
  */
-library Strings {
+library StringsExpanded {
     /**
      * Gets length of the string
      * @param s Input string
@@ -66,5 +66,30 @@ library Strings {
             str[i * 2 + 3] = HEX[uint8(_bytes[i + 12] & 0x0f)];
         }
         return string(str);
+    }
+
+    function toHexString(bytes memory _bytes) internal pure returns (string memory) {
+        bytes memory hexString = new bytes(_bytes.length * 2);
+
+        uint256 index = 0;
+        for (uint256 i = 0; i < _bytes.length; i++) {
+            uint256 value = uint256(uint8(_bytes[i]));
+
+            bytes1 highNibble = bytes1(uint8((value & 0xf0) >> 4));
+            bytes1 lowNibble = bytes1(uint8(value & 0x0f));
+
+            hexString[index++] = charToHex(highNibble);
+            hexString[index++] = charToHex(lowNibble);
+        }
+
+        return string(abi.encodePacked('0x', string(hexString)));
+    }
+
+    function charToHex(bytes1 _char) private pure returns (bytes1) {
+        if (uint8(_char) < 10) {
+            return bytes1(uint8(_char) + 0x30); // '0' to '9'
+        } else {
+            return bytes1(uint8(_char) + 0x57); // 'a' to 'f'
+        }
     }
 }

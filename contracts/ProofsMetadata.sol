@@ -5,7 +5,8 @@ pragma solidity ^0.8.18;
 
 import { Ownable } from '@openzeppelin/contracts/access/Ownable.sol';
 import { ERC165 } from '@openzeppelin/contracts/utils/introspection/ERC165.sol';
-import { Strings } from './libs/Strings.sol';
+import { StringsExpanded } from './libs/StringsExpanded.sol';
+import { ProofTypes } from './libs/common/ProofTypes.sol';
 import { IProofsMetadata } from './interfaces/IProofsMetadata.sol';
 
 /**
@@ -13,12 +14,12 @@ import { IProofsMetadata } from './interfaces/IProofsMetadata.sol';
  * can update this metadata.
  */
 contract ProofsMetadata is IProofsMetadata, Ownable, ERC165 {
-    using Strings for string;
+    using StringsExpanded for string;
 
-    // proof name -> version -> metadata itself
-    mapping(string => mapping(string => string)) public proofsMetadata;
-    // proof name -> history of versions
-    mapping(string => string[]) public metadataVersions;
+    // proof type -> version -> metadata itself
+    mapping(ProofTypes.Proofs => mapping(string => string)) public proofsMetadata;
+    // proof type -> history of versions
+    mapping(ProofTypes.Proofs => string[]) public metadataVersions;
 
     function supportsInterface(
         bytes4 interfaceId
@@ -30,37 +31,32 @@ contract ProofsMetadata is IProofsMetadata, Ownable, ERC165 {
 
     /**
      * Get number of versions that exist for metadata by its name
-     * @param name Name of metadata. As for now, it's Proof-of-Authority, Proof-of-Signature, and
-     *             Proof-of-Agreement.
+     * @param _type Type of the proof metadata. Declared in {ProofTypes} library
      * @return numVersions Number of versions.
      */
-    function getMetadataNumOfVersions(string memory name) public view returns (uint256) {
-        return metadataVersions[name].length;
+    function getMetadataNumOfVersions(ProofTypes.Proofs _type) public view returns (uint256) {
+        return metadataVersions[_type].length;
     }
 
     /**
      * Add metadata by the contract administrator.
-     * @param name Name of metadata. As for now, it's Proof-of-Authority, Proof-of-Signature, and
-     *             Proof-of-Agreement.
-     * @param version Protocol version of the metadata. The version should be increased every time
+     * @param _type Type of the proof metadata. Declared in {ProofTypes} library
+     * @param _version Protocol version of the metadata. The version should be increased every time
      *                there is a change in the metadata.
-     * @param metadata Metadata in JSON format.
+     * @param _metadata Metadata in JSON format.
      */
     function addMetadata(
-        string calldata name,
-        string calldata version,
-        string calldata metadata
+        ProofTypes.Proofs _type,
+        string calldata _version,
+        string calldata _metadata
     ) public onlyOwner {
-        require(
-            name.length() > 0 && version.length() > 0 && metadata.length() > 0,
-            'Input params cannot be empty'
-        );
-        require(proofsMetadata[name][version].length() == 0, 'Metadata already exists');
+        require(_version.length() > 0 && _metadata.length() > 0, 'Input params cannot be empty');
+        require(proofsMetadata[_type][_version].length() == 0, 'Metadata already exists');
 
-        proofsMetadata[name][version] = metadata;
-        metadataVersions[name].push(version);
+        proofsMetadata[_type][_version] = _metadata;
+        metadataVersions[_type].push(_version);
 
-        emit MetadataAdded(name, version, metadata);
+        emit MetadataAdded(_type, _version, _metadata);
     }
 
     /**
@@ -68,26 +64,22 @@ contract ProofsMetadata is IProofsMetadata, Ownable, ERC165 {
      * Note: This has to be done ONLY in the event of incorrect data entry in `addMetadata`
      *       function. Update of metadata on the protocol level should be done by adding another
      *       metadata with newer version.
-     * @param name Name of metadata. As for now, it's Proof-of-Authority, Proof-of-Signature, and
-     *             Proof-of-Agreement.
-     * @param version Protocol version of the metadata. The version should be increased every time
+     * @param _type Type of the proof metadata. Declared in {ProofTypes} library
+     * @param _version Protocol version of the metadata. The version should be increased every time
      *                there is a change in the metadata. This function is only to adjusting the
      *                inconsistency of metadata in smart contract and the one, used on the website.
-     * @param metadata Metadata in JSON format.
+     * @param _metadata Metadata in JSON format.
      */
     function forceUpdateMetadata(
-        string calldata name,
-        string calldata version,
-        string calldata metadata
+        ProofTypes.Proofs _type,
+        string calldata _version,
+        string calldata _metadata
     ) public onlyOwner {
-        require(
-            name.length() > 0 && version.length() > 0 && metadata.length() > 0,
-            'Input params cannot be empty'
-        );
-        require(proofsMetadata[name][version].length() > 0, 'Metadata does not exist');
+        require(_version.length() > 0 && _metadata.length() > 0, 'Input params cannot be empty');
+        require(proofsMetadata[_type][_version].length() > 0, 'Metadata does not exist');
 
-        proofsMetadata[name][version] = metadata;
+        proofsMetadata[_type][_version] = _metadata;
 
-        emit MetadataUpdated(name, version, metadata);
+        emit MetadataUpdated(_type, _version, _metadata);
     }
 }

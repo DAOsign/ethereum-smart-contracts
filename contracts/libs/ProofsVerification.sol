@@ -3,7 +3,7 @@ pragma solidity ^0.8.18;
 
 import { ECDSA } from '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
 
-// import "hardhat/console.sol";
+// import 'hardhat/console.sol';
 
 /**
  * Verifies Proof-of-Authority and Proof-of-Signature validity. May be used to verify any Ethereum
@@ -16,11 +16,11 @@ library ProofsVerification {
      * Verify Proof-of-Authority signature
      * @param _signer Signer of the data
      * @param _data Raw Proof-of-Authority stringified JSON object that the signer signs.
-     *              Note: it may be the output of Proofs.getProofOfSignatureData function
+     *              Note: it may be the output of Proofs.getPoSiData function
      * @param _signature Signature of the {_data}
      * @return isValid Is signature valid or not
      */
-    function verifyProofOfAuthority(
+    function verifyPoAu(
         address _signer,
         string memory _data,
         bytes calldata _signature

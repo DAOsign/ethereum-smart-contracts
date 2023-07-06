@@ -4,7 +4,7 @@ import { ethers } from 'hardhat';
 import { deployProofsVerificationLibrary } from '../../scripts/deployForTest';
 import { proofOfAuthorityData } from '../data/proofs';
 
-describe.only('Proofs Verification', () => {
+describe('Proofs Verification', () => {
   async function deployProofsVerificationFixture() {
     const [owner, creator, signer1, signer2, signer3, anyone] = await ethers.getSigners();
     const { proofsVerification } = await deployProofsVerificationLibrary();
@@ -44,8 +44,8 @@ describe.only('Proofs Verification', () => {
     );
   });
 
-  it.only('verify Proof-of-Authority', async () => {
-    const { proofsVerification, signer1, signer2, anyone } = await loadFixture(
+  it('verify Proof-of-Authority', async () => {
+    const { proofsVerification, signer1, signer2 } = await loadFixture(
       deployProofsVerificationFixture
     );
     const agreementFileProofCID = 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp';
@@ -60,10 +60,15 @@ describe.only('Proofs Verification', () => {
     };
     const rawData = JSON.stringify(data);
     const dataHash = ethers.keccak256(ethers.toUtf8Bytes(rawData));
-    const signature = await signer1.signMessage(ethers.getBytes(dataHash));
+    const signature1 = await signer1.signMessage(ethers.getBytes(dataHash));
+    const signature2 = await signer2.signMessage(ethers.getBytes(dataHash));
 
-    expect(
-      await proofsVerification.verifyProofOfAuthority(signer1.address, rawData, signature)
-    ).equal(true);
+    // correct signer of the proof
+    expect(await proofsVerification.verifyPoAu(signer1.address, rawData, signature1)).equal(true);
+    expect(await proofsVerification.verifyPoAu(signer2.address, rawData, signature2)).equal(true);
+    // wrong signer of the proof
+    expect(await proofsVerification.verifyPoAu(signer2.address, rawData, signature1)).equal(false);
+    // wrong signature
+    expect(await proofsVerification.verifyPoAu(signer1.address, rawData, signature2)).equal(false);
   });
 });

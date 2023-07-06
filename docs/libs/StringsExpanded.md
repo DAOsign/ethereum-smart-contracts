@@ -1,4 +1,4 @@
-## Strings
+## StringsExpanded
 
 Enhances operation with strings that are not possible in the current Solidity version (v0.8.18)
 
@@ -85,4 +85,10 @@ Converts an Ethereum address to a string
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | [0] | string | res The string representation of the Ethereum address, including the '0x' prefix |
+
+### toHexString
+
+```solidity
+function toHexString(bytes _bytes) internal pure returns (string)
+```
 

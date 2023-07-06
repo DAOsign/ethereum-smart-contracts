@@ -4,8 +4,8 @@ import { ethers } from 'hardhat';
  * Deploy all project smart contracts for testing purposes
  */
 
-export const deployStringsLibrary = async () => {
-  const strings = await (await ethers.getContractFactory('Strings')).deploy();
+export const deployStringsExpandedLibrary = async () => {
+  const strings = await (await ethers.getContractFactory('StringsExpanded')).deploy();
 
   return { strings };
 };
@@ -17,10 +17,10 @@ export const deployProofsVerificationLibrary = async () => {
 };
 
 export const deployProofsMetadata = async () => {
-  const { strings } = await deployStringsLibrary();
+  const { strings } = await deployStringsExpandedLibrary();
   const proofsMetadata = await (
     await ethers.getContractFactory('ProofsMetadata', {
-      libraries: { Strings: await strings.getAddress() },
+      libraries: { StringsExpanded: await strings.getAddress() },
     })
   ).deploy();
 
@@ -29,11 +29,15 @@ export const deployProofsMetadata = async () => {
 
 export const deployProofs = async () => {
   const { proofsMetadata, strings } = await deployProofsMetadata();
+  const { proofsVerification } = await deployProofsVerificationLibrary();
   const proofs = await (
     await ethers.getContractFactory('Proofs', {
-      libraries: { Strings: await strings.getAddress() },
+      libraries: {
+        StringsExpanded: await strings.getAddress(),
+        ProofsVerification: await proofsVerification.getAddress(),
+      },
     })
   ).deploy(await proofsMetadata.getAddress());
 
-  return { proofs, proofsMetadata, strings };
+  return { proofs, proofsMetadata, strings, proofsVerification };
 };

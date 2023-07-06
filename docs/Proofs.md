@@ -2,16 +2,15 @@
 
 Stores DAOsign proofs.
 
+Note
+Proof-of-Authority = PoAu
+Proof-of-Signature = PoSi
+Proof-of-Agreement = PoAg
+
 ### proofsMetadata
 
 ```solidity
 address proofsMetadata
-```
-
-### proofsVerificationLib
-
-```solidity
-address proofsVerificationLib
 ```
 
 ### signedProofs
@@ -23,19 +22,25 @@ mapping(string => mapping(string => string)) signedProofs
 ### proofsData
 
 ```solidity
-mapping(string => mapping(string => string)) proofsData
+mapping(string => mapping(enum ProofTypes.Proofs => mapping(address => string))) proofsData
+```
+
+### ProofOfAuthority
+
+```solidity
+event ProofOfAuthority(string agreementFileCID, string proofCID, string proof)
 ```
 
 ### constructor
 
 ```solidity
-constructor(address _proofsMetadata, address _proofsVerificationLib) public
+constructor(address _proofsMetadata) public
 ```
 
-### getProofOfAuthorityData
+### generatePoAuData
 
 ```solidity
-function getProofOfAuthorityData(address _creator, address[] _signers, string _agreementFileCID, string _version) public view returns (string)
+function generatePoAuData(address _creator, address[] _signers, string _agreementFileCID, string _version) public returns (string)
 ```
 
 Public:
@@ -46,28 +51,46 @@ Public:
     System:
     - autogenereate Proof-of-Agreement
 
-### getProofOfSignatureData
+### getPoSiData
 
 ```solidity
-function getProofOfSignatureData(address _signer, string _proofOfAuthorityCID, string _version) public view returns (string)
+function getPoSiData(address _signer, string _proofOfAuthorityCID, string _version) public view returns (string)
 ```
 
-### storeProofOfAuthority
+### storePoAu
 
 ```solidity
-function storeProofOfAuthority(string _signature, address _creator, address[] _signers, string _agreementFileCID, string _version) public
+function storePoAu(address _creator, bytes _signature, string _agreementFileCID, string _proofCID) public
 ```
 
-### _getProofOfAuthorityDataMessage
+### _getPoAu
 
 ```solidity
-function _getProofOfAuthorityDataMessage(address _creator, address[] _signers, string _agreementFileCID) internal view returns (string)
+function _getPoAu(address _creator, bytes _signature, string _data) internal pure returns (string proof)
 ```
 
-### _getProofOfSignatureDataMessage
+### _getPoAuData
 
 ```solidity
-function _getProofOfSignatureDataMessage(address _signer, string _proofOfAuthorityCID) internal view returns (string)
+function _getPoAuData(address _creator, address[] _signers, string _agreementFileCID, string _version, uint256 _timestamp) internal view returns (string)
+```
+
+### _getPoSiData
+
+```solidity
+function _getPoSiData(address _signer, string _proofOfAuthorityCID, string _version, uint256 _timestamp) internal view returns (string)
+```
+
+### _getPoAuDataMessage
+
+```solidity
+function _getPoAuDataMessage(address _creator, address[] _signers, string _agreementFileCID, uint256 _timestamp) internal pure returns (string message)
+```
+
+### _getPoSiDataMessage
+
+```solidity
+function _getPoSiDataMessage(address _signer, string _proofOfAuthorityCID, uint256 _timestamp) internal pure returns (string message)
 ```
 
 ### _generateSignersJSON
