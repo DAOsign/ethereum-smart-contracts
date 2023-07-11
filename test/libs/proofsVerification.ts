@@ -64,11 +64,19 @@ describe('Proofs Verification', () => {
     const signature2 = await signer2.signMessage(ethers.getBytes(dataHash));
 
     // correct signer of the proof
-    expect(await proofsVerification.verifyPoAu(signer1.address, rawData, signature1)).equal(true);
-    expect(await proofsVerification.verifyPoAu(signer2.address, rawData, signature2)).equal(true);
+    expect(
+      await proofsVerification.verifyProofOfAuthority(signer1.address, rawData, signature1)
+    ).equal(true);
+    expect(
+      await proofsVerification.verifyProofOfAuthority(signer2.address, rawData, signature2)
+    ).equal(true);
     // wrong signer of the proof
-    expect(await proofsVerification.verifyPoAu(signer2.address, rawData, signature1)).equal(false);
+    expect(
+      await proofsVerification.verifyProofOfAuthority(signer2.address, rawData, signature1)
+    ).equal(false);
     // wrong signature
-    expect(await proofsVerification.verifyPoAu(signer1.address, rawData, signature2)).equal(false);
+    expect(
+      await proofsVerification.verifyProofOfAuthority(signer1.address, rawData, signature2)
+    ).equal(false);
   });
 });

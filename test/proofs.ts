@@ -97,7 +97,7 @@ describe('Proofs', () => {
       const { proofs, signer1, signer2, signer3 } = await loadFixture(deployProofsFixture);
 
       await expect(
-        proofs.generatePoAuData(
+        proofs.getProofOfAuthorityData(
           /* creator */ ethers.ZeroAddress,
           /* signers */ [signer1.address, signer2.address, signer3.address],
           /* agreementFileCID */ 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp',
@@ -110,7 +110,7 @@ describe('Proofs', () => {
       const { proofs, creator } = await loadFixture(deployProofsFixture);
 
       await expect(
-        proofs.generatePoAuData(
+        proofs.getProofOfAuthorityData(
           /* creator */ creator.address,
           /* signers */ [],
           /* agreementFileCID */ 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp',
@@ -123,7 +123,7 @@ describe('Proofs', () => {
       const { proofs, creator, signer1, signer2, signer3 } = await loadFixture(deployProofsFixture);
 
       await expect(
-        proofs.generatePoAuData(
+        proofs.getProofOfAuthorityData(
           /* creator */ creator.address,
           /* signers */ [signer1.address, signer2.address, signer3.address],
           /* agreementFileCID */ '',
@@ -136,7 +136,7 @@ describe('Proofs', () => {
       const { proofs, creator, signer1, signer2, signer3 } = await loadFixture(deployProofsFixture);
 
       await expect(
-        proofs.generatePoAuData(
+        proofs.getProofOfAuthorityData(
           /* creator */ creator.address,
           /* signers */ [signer1.address, signer2.address, signer3.address],
           /* agreementFileCID */ 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp',
@@ -151,8 +151,13 @@ describe('Proofs', () => {
       const agreementFileCID = 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp';
       const version = '0.1.0';
 
-      await proofs.generatePoAuData.staticCall(creator.address, signers, agreementFileCID, version);
-      const res = await proofs.generatePoAuData.staticCall(
+      await proofs.getProofOfAuthorityData.staticCall(
+        creator.address,
+        signers,
+        agreementFileCID,
+        version
+      );
+      const res = await proofs.getProofOfAuthorityData.staticCall(
         creator.address,
         signers,
         agreementFileCID,
@@ -180,16 +185,20 @@ describe('Proofs', () => {
       const agreementFileProofCID = 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp';
 
       await expect(
-        proofs.getPoSiData.staticCall(ethers.ZeroAddress, agreementFileProofCID, '0.1.0')
+        proofs.getProofOfSignatureData.staticCall(
+          ethers.ZeroAddress,
+          agreementFileProofCID,
+          '0.1.0'
+        )
       ).revertedWith('No signer');
     });
 
     it('no Proof-of-Authority CID error', async () => {
       const { proofs, signer1 } = await loadFixture(deployProofsFixture);
 
-      await expect(proofs.getPoSiData.staticCall(signer1.address, '', '0.1.0')).revertedWith(
-        'No Proof-of-Authority CID'
-      );
+      await expect(
+        proofs.getProofOfSignatureData.staticCall(signer1.address, '', '0.1.0')
+      ).revertedWith('No Proof-of-Authority CID');
     });
 
     it('no version error', async () => {
@@ -197,14 +206,14 @@ describe('Proofs', () => {
       const agreementFileProofCID = 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp';
 
       await expect(
-        proofs.getPoSiData.staticCall(signer1.address, agreementFileProofCID, '')
+        proofs.getProofOfSignatureData.staticCall(signer1.address, agreementFileProofCID, '')
       ).revertedWith('No version');
     });
 
     it('success', async () => {
       const { proofs, signer1 } = await loadFixture(deployProofsFixture);
       const agreementFileProofCID = 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp';
-      const res = await proofs.getPoSiData.staticCall(
+      const res = await proofs.getProofOfSignatureData.staticCall(
         signer1.address,
         agreementFileProofCID,
         '0.1.0'
@@ -224,7 +233,7 @@ describe('Proofs', () => {
   });
 
   // TODO: full test coverage
-  describe.skip('Store Proof-of-Authority', () => {
+  describe('Store Proof-of-Authority', () => {
     it('success', async () => {
       const { proofs, creator, signer1, signer2, signer3 } = await loadFixture(deployProofsFixture);
       const signers = [signer1.address, signer2.address, signer3.address];
@@ -232,13 +241,14 @@ describe('Proofs', () => {
       const proofCID = 'QmYAkbM4UCPDLBewYcjP57ZAZD2rY9oYQ1BJR1t8qt7XpF';
       const version = '0.1.0';
 
-      await proofs.generatePoAuData(creator.address, signers, agreementFileCID, version);
-      const data = await proofs.generatePoAuData.staticCall(
+      await proofs.getProofOfAuthorityData(creator.address, signers, agreementFileCID, version);
+      const data = await proofs.getProofOfAuthorityData.staticCall(
         creator.address,
         signers,
         agreementFileCID,
         version
       );
+      console.log({ data });
 
       const dataHash = ethers.keccak256(ethers.toUtf8Bytes(data));
       const signature = await creator.signMessage(ethers.getBytes(dataHash));
@@ -248,8 +258,23 @@ describe('Proofs', () => {
         data: JSON.parse(data),
       };
 
+      // const res = await proofs.storeProofOfAuthority(
+      //   creator.address,
+      //   signature,
+      //   agreementFileCID,
+      //   proofCID
+      // );
+      // const tx = await res.wait();
+      // const events = tx?.logs;
+      // expect(events?.length).eq(1);
+      // // expect(events![0].args[0].hash).eql(agreementFileCID);
+      // expect(events![0].args[1]).eql(proofCID);
+      // expect(events![0].args[2]).eql(JSON.stringify(proof));
+
       // calculated & emited correctly
-      await expect(proofs.storePoAu(creator.address, signature, agreementFileCID, proofCID))
+      await expect(
+        proofs.storeProofOfAuthority(creator.address, signature, agreementFileCID, proofCID)
+      )
         .emit(proofs, 'ProofOfAuthority')
         .withArgs(agreementFileCID, proofCID, JSON.stringify(proof));
 

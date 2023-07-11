@@ -53,7 +53,7 @@ contract Proofs {
     - autogenereate Proof-of-Agreement
      */
 
-    function generatePoAuData(
+    function getProofOfAuthorityData(
         address _creator,
         address[] calldata _signers,
         string calldata _agreementFileCID,
@@ -64,7 +64,7 @@ contract Proofs {
         ) {
             return proofsData[_agreementFileCID][ProofTypes.Proofs.ProofOfAuthority][_creator];
         }
-        string memory proofData = _getPoAuData(
+        string memory proofData = _getProofOfAuthorityData(
             _creator,
             _signers,
             _agreementFileCID,
@@ -75,15 +75,15 @@ contract Proofs {
         return proofData;
     }
 
-    function getPoSiData(
+    function getProofOfSignatureData(
         address _signer,
         string calldata _proofOfAuthorityCID,
         string calldata _version
     ) public view returns (string memory) {
-        return _getPoSiData(_signer, _proofOfAuthorityCID, _version, block.timestamp);
+        return _getProofOfSignatureData(_signer, _proofOfAuthorityCID, _version, block.timestamp);
     }
 
-    function storePoAu(
+    function storeProofOfAuthority(
         address _creator,
         bytes calldata _signature,
         string calldata _agreementFileCID,
@@ -92,7 +92,7 @@ contract Proofs {
         require(_proofCID.length() > 0, 'Empty ProofCID');
         require(signedProofs[_agreementFileCID][_proofCID].length() == 0, 'Proof already stored');
         require(
-            ProofsVerification.verifyPoAu(
+            ProofsVerification.verifyProofOfAuthority(
                 _creator,
                 proofsData[_agreementFileCID][ProofTypes.Proofs.ProofOfAuthority][_creator],
                 _signature
@@ -100,7 +100,7 @@ contract Proofs {
             'Invalid signature'
         );
 
-        string memory proof = _getPoAu(
+        string memory proof = _getProofOfAuthority(
             _creator,
             _signature,
             proofsData[_agreementFileCID][ProofTypes.Proofs.ProofOfAuthority][_creator]
@@ -110,7 +110,7 @@ contract Proofs {
         emit ProofOfAuthority(_agreementFileCID, _proofCID, proof);
     }
 
-    function _getPoAu(
+    function _getProofOfAuthority(
         address _creator,
         bytes calldata _signature,
         string memory _data
@@ -128,7 +128,7 @@ contract Proofs {
         );
     }
 
-    function _getPoAuData(
+    function _getProofOfAuthorityData(
         address _creator,
         address[] calldata _signers,
         string calldata _agreementFileCID,
@@ -148,13 +148,18 @@ contract Proofs {
                         _version
                     ),
                     ',"message":',
-                    _getPoAuDataMessage(_creator, _signers, _agreementFileCID, _timestamp),
+                    _getProofOfAuthorityDataMessage(
+                        _creator,
+                        _signers,
+                        _agreementFileCID,
+                        _timestamp
+                    ),
                     '}'
                 )
             );
     }
 
-    function _getPoSiData(
+    function _getProofOfSignatureData(
         address _signer,
         string calldata _proofOfAuthorityCID,
         string calldata _version,
@@ -172,13 +177,13 @@ contract Proofs {
                         _version
                     ),
                     ',"message":',
-                    _getPoSiDataMessage(_signer, _proofOfAuthorityCID, _timestamp),
+                    _getProofOfSignatureDataMessage(_signer, _proofOfAuthorityCID, _timestamp),
                     '}'
                 )
             );
     }
 
-    function _getPoAuDataMessage(
+    function _getProofOfAuthorityDataMessage(
         address _creator,
         address[] calldata _signers,
         string calldata _agreementFileCID,
@@ -199,7 +204,7 @@ contract Proofs {
         );
     }
 
-    function _getPoSiDataMessage(
+    function _getProofOfSignatureDataMessage(
         address _signer,
         string calldata _proofOfAuthorityCID,
         uint256 _timestamp

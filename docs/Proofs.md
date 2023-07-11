@@ -37,10 +37,10 @@ event ProofOfAuthority(string agreementFileCID, string proofCID, string proof)
 constructor(address _proofsMetadata) public
 ```
 
-### generatePoAuData
+### getProofOfAuthorityData
 
 ```solidity
-function generatePoAuData(address _creator, address[] _signers, string _agreementFileCID, string _version) public returns (string)
+function getProofOfAuthorityData(address _creator, address[] _signers, string _agreementFileCID, string _version) public returns (string)
 ```
 
 Public:
@@ -51,46 +51,46 @@ Public:
     System:
     - autogenereate Proof-of-Agreement
 
-### getPoSiData
+### getProofOfSignatureData
 
 ```solidity
-function getPoSiData(address _signer, string _proofOfAuthorityCID, string _version) public view returns (string)
+function getProofOfSignatureData(address _signer, string _proofOfAuthorityCID, string _version) public view returns (string)
 ```
 
-### storePoAu
+### storeProofOfAuthority
 
 ```solidity
-function storePoAu(address _creator, bytes _signature, string _agreementFileCID, string _proofCID) public
+function storeProofOfAuthority(address _creator, bytes _signature, string _agreementFileCID, string _proofCID) public
 ```
 
-### _getPoAu
+### _getProofOfAuthority
 
 ```solidity
-function _getPoAu(address _creator, bytes _signature, string _data) internal pure returns (string proof)
+function _getProofOfAuthority(address _creator, bytes _signature, string _data) internal pure returns (string proof)
 ```
 
-### _getPoAuData
+### _getProofOfAuthorityData
 
 ```solidity
-function _getPoAuData(address _creator, address[] _signers, string _agreementFileCID, string _version, uint256 _timestamp) internal view returns (string)
+function _getProofOfAuthorityData(address _creator, address[] _signers, string _agreementFileCID, string _version, uint256 _timestamp) internal view returns (string)
 ```
 
-### _getPoSiData
+### _getProofOfSignatureData
 
 ```solidity
-function _getPoSiData(address _signer, string _proofOfAuthorityCID, string _version, uint256 _timestamp) internal view returns (string)
+function _getProofOfSignatureData(address _signer, string _proofOfAuthorityCID, string _version, uint256 _timestamp) internal view returns (string)
 ```
 
-### _getPoAuDataMessage
+### _getProofOfAuthorityDataMessage
 
 ```solidity
-function _getPoAuDataMessage(address _creator, address[] _signers, string _agreementFileCID, uint256 _timestamp) internal pure returns (string message)
+function _getProofOfAuthorityDataMessage(address _creator, address[] _signers, string _agreementFileCID, uint256 _timestamp) internal pure returns (string message)
 ```
 
-### _getPoSiDataMessage
+### _getProofOfSignatureDataMessage
 
 ```solidity
-function _getPoSiDataMessage(address _signer, string _proofOfAuthorityCID, uint256 _timestamp) internal pure returns (string message)
+function _getProofOfSignatureDataMessage(address _signer, string _proofOfAuthorityCID, uint256 _timestamp) internal pure returns (string message)
 ```
 
 ### _generateSignersJSON

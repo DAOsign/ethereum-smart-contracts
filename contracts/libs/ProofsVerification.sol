@@ -16,11 +16,11 @@ library ProofsVerification {
      * Verify Proof-of-Authority signature
      * @param _signer Signer of the data
      * @param _data Raw Proof-of-Authority stringified JSON object that the signer signs.
-     *              Note: it may be the output of Proofs.getPoSiData function
+     *              Note: it may be the output of Proofs.getProofOfSignatureData function
      * @param _signature Signature of the {_data}
      * @return isValid Is signature valid or not
      */
-    function verifyPoAu(
+    function verifyProofOfAuthority(
         address _signer,
         string memory _data,
         bytes calldata _signature
