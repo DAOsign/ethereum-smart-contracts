@@ -50,13 +50,16 @@ describe('Proofs Verification', () => {
     );
     const agreementFileProofCID = 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp';
 
-    const data: any = proofOfAuthorityData;
-    data.message = {
-      signer: signer1.address,
-      agreementFileProofCID,
-      app: 'daosign',
-      timestamp: await time.latest(),
-      metadata: {},
+    let data: any = proofOfAuthorityData;
+    data = {
+      ...data,
+      message: {
+        signer: signer1.address,
+        agreementFileProofCID,
+        app: 'daosign',
+        timestamp: await time.latest(),
+        metadata: {},
+      },
     };
     const rawData = JSON.stringify(data);
     const dataHash = ethers.keccak256(ethers.toUtf8Bytes(rawData));

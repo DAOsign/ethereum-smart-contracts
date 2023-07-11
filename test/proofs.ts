@@ -1,6 +1,7 @@
 import { loadFixture, time } from '@nomicfoundation/hardhat-toolbox/network-helpers';
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { deployProofs, deployProofsMetadata } from '../scripts/deployForTest';
 import { proofOfAuthorityData, proofOfSignatureData } from './data/proofs';
 import { Proofs } from './common';
@@ -232,14 +233,22 @@ describe('Proofs', () => {
     });
   });
 
-  // TODO: full test coverage
   describe('Store Proof-of-Authority', () => {
-    it('success', async () => {
-      const { proofs, creator, signer1, signer2, signer3 } = await loadFixture(deployProofsFixture);
+    const agreementFileCID = 'QmRf22bZar3WKmojipms22PkXH1MZGmvsqzQtuSvQE3uhm';
+    const proofCID = 'QmYAkbM4UCPDLBewYcjP57ZAZD2rY9oYQ1BJR1t8qt7XpF';
+    const version = '0.1.0';
+    let proof: unknown;
+    let proofs: any;
+    let creator: SignerWithAddress;
+    let signer1: SignerWithAddress;
+    let signer2: SignerWithAddress;
+    let signer3: SignerWithAddress;
+    let signature: string;
+    let signatureSigner1: string;
+
+    beforeEach(async () => {
+      ({ proofs, creator, signer1, signer2, signer3 } = await loadFixture(deployProofsFixture));
       const signers = [signer1.address, signer2.address, signer3.address];
-      const agreementFileCID = 'QmRf22bZar3WKmojipms22PkXH1MZGmvsqzQtuSvQE3uhm';
-      const proofCID = 'QmYAkbM4UCPDLBewYcjP57ZAZD2rY9oYQ1BJR1t8qt7XpF';
-      const version = '0.1.0';
 
       await proofs.getProofOfAuthorityData(creator.address, signers, agreementFileCID, version);
       const data = await proofs.getProofOfAuthorityData.staticCall(
@@ -248,29 +257,37 @@ describe('Proofs', () => {
         agreementFileCID,
         version
       );
-      console.log({ data });
 
       const dataHash = ethers.keccak256(ethers.toUtf8Bytes(data));
-      const signature = await creator.signMessage(ethers.getBytes(dataHash));
-      const proof = {
+      signature = await creator.signMessage(ethers.getBytes(dataHash));
+      signatureSigner1 = await signer1.signMessage(ethers.getBytes(dataHash));
+      proof = {
         address: creator.address.toLocaleLowerCase(),
         sig: signature,
         data: JSON.parse(data),
       };
+    });
 
-      // const res = await proofs.storeProofOfAuthority(
-      //   creator.address,
-      //   signature,
-      //   agreementFileCID,
-      //   proofCID
-      // );
-      // const tx = await res.wait();
-      // const events = tx?.logs;
-      // expect(events?.length).eq(1);
-      // // expect(events![0].args[0].hash).eql(agreementFileCID);
-      // expect(events![0].args[1]).eql(proofCID);
-      // expect(events![0].args[2]).eql(JSON.stringify(proof));
+    it('error: Empty ProofCID', async () => {
+      await expect(
+        proofs.storeProofOfAuthority(creator.address, signature, agreementFileCID, '')
+      ).revertedWith('Empty ProofCID');
+    });
 
+    it('error: Proof already stored', async () => {
+      await proofs.storeProofOfAuthority(creator.address, signature, agreementFileCID, proofCID);
+      await expect(
+        proofs.storeProofOfAuthority(creator.address, signature, agreementFileCID, proofCID)
+      ).revertedWith('Proof already stored');
+    });
+
+    it('error: Invalid signature', async () => {
+      await expect(
+        proofs.storeProofOfAuthority(creator.address, signatureSigner1, agreementFileCID, proofCID)
+      ).revertedWith('Invalid signature');
+    });
+
+    it('success', async () => {
       // calculated & emited correctly
       await expect(
         proofs.storeProofOfAuthority(creator.address, signature, agreementFileCID, proofCID)
