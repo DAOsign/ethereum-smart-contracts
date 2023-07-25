@@ -177,45 +177,67 @@ describe('Proofs', () => {
 
       expect(JSON.parse(res)).to.deep.equal(expectedRes);
       expect(proofs.proofsData(agreementFileCID, Proofs.ProofOfAuthority, creator.address));
+      // TODO: add the second execution of `getProofOfAuthorityData` and make sure that is uses less
+      //       gas than before because now it returns cached data
     });
   });
 
   describe('Get Proof-of-Signature data', () => {
+    const agreementFileCID = 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp';
+    const agreementFileProofCID = 'QmQY5XFRomrnAD3o3yMWkTz1HWcCfZYuE87Gbwe7SjV1kk';
+
     it('no signer error', async () => {
       const { proofs } = await loadFixture(deployProofsFixture);
-      const agreementFileProofCID = 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp';
 
       await expect(
         proofs.getProofOfSignatureData.staticCall(
           ethers.ZeroAddress,
+          agreementFileCID,
           agreementFileProofCID,
           '0.1.0'
         )
       ).revertedWith('No signer');
     });
 
+    it('no Agreement File CID error', async () => {
+      const { proofs, signer1 } = await loadFixture(deployProofsFixture);
+
+      await expect(
+        proofs.getProofOfSignatureData.staticCall(
+          signer1.address,
+          '',
+          agreementFileProofCID,
+          '0.1.0'
+        )
+      ).revertedWith('No Agreement File CID');
+    });
+
     it('no Proof-of-Authority CID error', async () => {
       const { proofs, signer1 } = await loadFixture(deployProofsFixture);
 
       await expect(
-        proofs.getProofOfSignatureData.staticCall(signer1.address, '', '0.1.0')
+        proofs.getProofOfSignatureData.staticCall(signer1.address, agreementFileCID, '', '0.1.0')
       ).revertedWith('No Proof-of-Authority CID');
     });
 
     it('no version error', async () => {
       const { proofs, signer1 } = await loadFixture(deployProofsFixture);
-      const agreementFileProofCID = 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp';
 
       await expect(
-        proofs.getProofOfSignatureData.staticCall(signer1.address, agreementFileProofCID, '')
+        proofs.getProofOfSignatureData.staticCall(
+          signer1.address,
+          agreementFileCID,
+          agreementFileProofCID,
+          ''
+        )
       ).revertedWith('No version');
     });
 
     it('success', async () => {
       const { proofs, signer1 } = await loadFixture(deployProofsFixture);
-      const agreementFileProofCID = 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp';
       const res = await proofs.getProofOfSignatureData.staticCall(
         signer1.address,
+        agreementFileCID,
         agreementFileProofCID,
         '0.1.0'
       );
@@ -230,6 +252,8 @@ describe('Proofs', () => {
       };
 
       expect(JSON.parse(res)).to.deep.equal(expectedRes);
+      // TODO: add the second execution of `getProofOfSignatureData` and make sure that is uses less
+      //       gas than before because now it returns cached data
     });
   });
 
@@ -293,10 +317,108 @@ describe('Proofs', () => {
         proofs.storeProofOfAuthority(creator.address, signature, agreementFileCID, proofCID)
       )
         .emit(proofs, 'ProofOfAuthority')
-        .withArgs(agreementFileCID, proofCID, JSON.stringify(proof));
+        .withArgs(creator.address, signature, agreementFileCID, proofCID, JSON.stringify(proof));
 
       // calculated & stored correctly
       expect(JSON.parse(await proofs.signedProofs(agreementFileCID, proofCID))).eql(proof);
+    });
+  });
+
+  describe('Store Proof-of-Signature', () => {
+    const agreementFileCID = 'QmRf22bZar3WKmojipms22PkXH1MZGmvsqzQtuSvQE3uhm';
+    const proofOfAuthorityCID = 'QmQY5XFRomrnAD3o3yMWkTz1HWcCfZYuE87Gbwe7SjV1kk';
+    const proofOfSignatureCID = 'QmYAkbM4UCPDLBewYcjP57ZAZD2rY9oYQ1BJR1t8qt7XpF';
+    const version = '0.1.0';
+    let proof: unknown;
+    let proofs: any;
+    let signer1: SignerWithAddress;
+    let signer2: SignerWithAddress;
+    let signature: string;
+    let signatureSigner2: string;
+
+    beforeEach(async () => {
+      ({ proofs, signer1, signer2 } = await loadFixture(deployProofsFixture));
+
+      await proofs.getProofOfSignatureData(
+        signer1.address,
+        agreementFileCID,
+        proofOfAuthorityCID,
+        version
+      );
+      const data = await proofs.getProofOfSignatureData.staticCall(
+        signer1.address,
+        agreementFileCID,
+        proofOfAuthorityCID,
+        version
+      );
+
+      const dataHash = ethers.keccak256(ethers.toUtf8Bytes(data));
+      signature = await signer1.signMessage(ethers.getBytes(dataHash));
+      signatureSigner2 = await signer2.signMessage(ethers.getBytes(dataHash));
+      proof = {
+        address: signer1.address.toLocaleLowerCase(),
+        sig: signature,
+        data: JSON.parse(data),
+      };
+    });
+
+    it('error: Empty ProofCID', async () => {
+      await expect(
+        proofs.storeProofOfSignature(signer1.address, signature, agreementFileCID, '')
+      ).revertedWith('Empty ProofCID');
+    });
+
+    it('error: Proof already stored', async () => {
+      await proofs.storeProofOfSignature(
+        signer1.address,
+        signature,
+        agreementFileCID,
+        proofOfSignatureCID
+      );
+      await expect(
+        proofs.storeProofOfSignature(
+          signer1.address,
+          signature,
+          agreementFileCID,
+          proofOfSignatureCID
+        )
+      ).revertedWith('Proof already stored');
+    });
+
+    it('error: Invalid signature', async () => {
+      await expect(
+        proofs.storeProofOfSignature(
+          signer1.address,
+          signatureSigner2,
+          agreementFileCID,
+          proofOfSignatureCID
+        )
+      ).revertedWith('Invalid signature');
+    });
+
+    it('success', async () => {
+      // calculated & emited correctly
+      await expect(
+        proofs.storeProofOfSignature(
+          signer1.address,
+          signature,
+          agreementFileCID,
+          proofOfSignatureCID
+        )
+      )
+        .emit(proofs, 'ProofOfSignature')
+        .withArgs(
+          signer1.address,
+          signature,
+          agreementFileCID,
+          proofOfSignatureCID,
+          JSON.stringify(proof)
+        );
+
+      // calculated & stored correctly
+      expect(JSON.parse(await proofs.signedProofs(agreementFileCID, proofOfSignatureCID))).eql(
+        proof
+      );
     });
   });
 });

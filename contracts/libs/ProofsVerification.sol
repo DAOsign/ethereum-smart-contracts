@@ -13,14 +13,14 @@ library ProofsVerification {
     using ECDSA for bytes32;
 
     /**
-     * Verify Proof-of-Authority signature
+     * Verify Proof-of-Authority or Proof-of-Signature signature
      * @param _signer Signer of the data
      * @param _data Raw Proof-of-Authority stringified JSON object that the signer signs.
      *              Note: it may be the output of Proofs.getProofOfSignatureData function
      * @param _signature Signature of the {_data}
      * @return isValid Is signature valid or not
      */
-    function verifyProofOfAuthority(
+    function verifyProofOfAuthorityOrSignature(
         address _signer,
         string memory _data,
         bytes calldata _signature

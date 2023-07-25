@@ -28,7 +28,13 @@ mapping(string => mapping(enum ProofTypes.Proofs => mapping(address => string)))
 ### ProofOfAuthority
 
 ```solidity
-event ProofOfAuthority(string agreementFileCID, string proofCID, string proof)
+event ProofOfAuthority(address creator, bytes signature, string agreementFileCID, string proofCID, string proof)
+```
+
+### ProofOfSignature
+
+```solidity
+event ProofOfSignature(address signer, bytes signature, string agreementFileCID, string proofCID, string proof)
 ```
 
 ### constructor
@@ -54,7 +60,7 @@ Public:
 ### getProofOfSignatureData
 
 ```solidity
-function getProofOfSignatureData(address _signer, string _proofOfAuthorityCID, string _version) public view returns (string)
+function getProofOfSignatureData(address _signer, string _agreementFileCID, string _proofOfAuthorityCID, string _version) public returns (string)
 ```
 
 ### storeProofOfAuthority
@@ -63,10 +69,16 @@ function getProofOfSignatureData(address _signer, string _proofOfAuthorityCID, s
 function storeProofOfAuthority(address _creator, bytes _signature, string _agreementFileCID, string _proofCID) public
 ```
 
-### _getProofOfAuthority
+### storeProofOfSignature
 
 ```solidity
-function _getProofOfAuthority(address _creator, bytes _signature, string _data) internal pure returns (string proof)
+function storeProofOfSignature(address _signer, bytes _signature, string _agreementFileCID, string _proofCID) public
+```
+
+### _getProofOfAuthorityOrSignature
+
+```solidity
+function _getProofOfAuthorityOrSignature(address _creator, bytes _signature, string _data) internal pure returns (string proof)
 ```
 
 ### _getProofOfAuthorityData

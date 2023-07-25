@@ -3,13 +3,13 @@
 Verifies Proof-of-Authority and Proof-of-Signature validity. May be used to verify any Ethereum
 signature.
 
-### verifyProofOfAuthority
+### verifyProofOfAuthorityOrSignature
 
 ```solidity
-function verifyProofOfAuthority(address _signer, string _data, bytes _signature) public pure returns (bool)
+function verifyProofOfAuthorityOrSignature(address _signer, string _data, bytes _signature) public pure returns (bool)
 ```
 
-Verify Proof-of-Authority signature
+Verify Proof-of-Authority or Proof-of-Signature signature
 
 #### Parameters
 

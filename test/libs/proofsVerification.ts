@@ -44,7 +44,7 @@ describe('Proofs Verification', () => {
     );
   });
 
-  it('verify Proof-of-Authority', async () => {
+  it('verify Proof-of-Authority or Proof-of-Signature', async () => {
     const { proofsVerification, signer1, signer2 } = await loadFixture(
       deployProofsVerificationFixture
     );
@@ -66,20 +66,38 @@ describe('Proofs Verification', () => {
     const signature1 = await signer1.signMessage(ethers.getBytes(dataHash));
     const signature2 = await signer2.signMessage(ethers.getBytes(dataHash));
 
+    // TODO: add checks for Proof-of-Signature
+
     // correct signer of the proof
     expect(
-      await proofsVerification.verifyProofOfAuthority(signer1.address, rawData, signature1)
+      await proofsVerification.verifyProofOfAuthorityOrSignature(
+        signer1.address,
+        rawData,
+        signature1
+      )
     ).equal(true);
     expect(
-      await proofsVerification.verifyProofOfAuthority(signer2.address, rawData, signature2)
+      await proofsVerification.verifyProofOfAuthorityOrSignature(
+        signer2.address,
+        rawData,
+        signature2
+      )
     ).equal(true);
     // wrong signer of the proof
     expect(
-      await proofsVerification.verifyProofOfAuthority(signer2.address, rawData, signature1)
+      await proofsVerification.verifyProofOfAuthorityOrSignature(
+        signer2.address,
+        rawData,
+        signature1
+      )
     ).equal(false);
     // wrong signature
     expect(
-      await proofsVerification.verifyProofOfAuthority(signer1.address, rawData, signature2)
+      await proofsVerification.verifyProofOfAuthorityOrSignature(
+        signer1.address,
+        rawData,
+        signature2
+      )
     ).equal(false);
   });
 });

@@ -32,7 +32,20 @@ contract Proofs {
     // Agreement File CID -> Proof type -> singer address -> Proof Data
     mapping(string => mapping(ProofTypes.Proofs => mapping(address => string))) public proofsData;
 
-    event ProofOfAuthority(string indexed agreementFileCID, string proofCID, string proof);
+    event ProofOfAuthority(
+        address indexed creator,
+        bytes signature,
+        string indexed agreementFileCID,
+        string proofCID,
+        string proof
+    );
+    event ProofOfSignature(
+        address indexed signer,
+        bytes signature,
+        string indexed agreementFileCID,
+        string proofCID,
+        string proof
+    );
 
     constructor(address _proofsMetadata) {
         require(
@@ -53,6 +66,7 @@ contract Proofs {
     - autogenereate Proof-of-Agreement
      */
 
+    // TODO: rename to `generate...`
     function getProofOfAuthorityData(
         address _creator,
         address[] calldata _signers,
@@ -75,12 +89,27 @@ contract Proofs {
         return proofData;
     }
 
+    // TODO: rename to `generate...`
     function getProofOfSignatureData(
         address _signer,
+        string calldata _agreementFileCID,
         string calldata _proofOfAuthorityCID,
         string calldata _version
-    ) public view returns (string memory) {
-        return _getProofOfSignatureData(_signer, _proofOfAuthorityCID, _version, block.timestamp);
+    ) public returns (string memory) {
+        require(_agreementFileCID.length() > 0, 'No Agreement File CID');
+        if (
+            proofsData[_agreementFileCID][ProofTypes.Proofs.ProofOfSignature][_signer].length() > 0
+        ) {
+            return proofsData[_agreementFileCID][ProofTypes.Proofs.ProofOfSignature][_signer];
+        }
+        string memory proofData = _getProofOfSignatureData(
+            _signer,
+            _proofOfAuthorityCID,
+            _version,
+            block.timestamp
+        );
+        proofsData[_agreementFileCID][ProofTypes.Proofs.ProofOfSignature][_signer] = proofData;
+        return proofData;
     }
 
     function storeProofOfAuthority(
@@ -92,7 +121,7 @@ contract Proofs {
         require(_proofCID.length() > 0, 'Empty ProofCID');
         require(signedProofs[_agreementFileCID][_proofCID].length() == 0, 'Proof already stored');
         require(
-            ProofsVerification.verifyProofOfAuthority(
+            ProofsVerification.verifyProofOfAuthorityOrSignature(
                 _creator,
                 proofsData[_agreementFileCID][ProofTypes.Proofs.ProofOfAuthority][_creator],
                 _signature
@@ -100,17 +129,44 @@ contract Proofs {
             'Invalid signature'
         );
 
-        string memory proof = _getProofOfAuthority(
+        string memory proof = _getProofOfAuthorityOrSignature(
             _creator,
             _signature,
             proofsData[_agreementFileCID][ProofTypes.Proofs.ProofOfAuthority][_creator]
         );
         signedProofs[_agreementFileCID][_proofCID] = proof;
 
-        emit ProofOfAuthority(_agreementFileCID, _proofCID, proof);
+        emit ProofOfAuthority(_creator, _signature, _agreementFileCID, _proofCID, proof);
     }
 
-    function _getProofOfAuthority(
+    function storeProofOfSignature(
+        address _signer,
+        bytes calldata _signature,
+        string calldata _agreementFileCID,
+        string calldata _proofCID
+    ) public {
+        require(_proofCID.length() > 0, 'Empty ProofCID');
+        require(signedProofs[_agreementFileCID][_proofCID].length() == 0, 'Proof already stored');
+        require(
+            ProofsVerification.verifyProofOfAuthorityOrSignature(
+                _signer,
+                proofsData[_agreementFileCID][ProofTypes.Proofs.ProofOfSignature][_signer],
+                _signature
+            ),
+            'Invalid signature'
+        );
+
+        string memory proof = _getProofOfAuthorityOrSignature(
+            _signer,
+            _signature,
+            proofsData[_agreementFileCID][ProofTypes.Proofs.ProofOfSignature][_signer]
+        );
+        signedProofs[_agreementFileCID][_proofCID] = proof;
+
+        emit ProofOfSignature(_signer, _signature, _agreementFileCID, _proofCID, proof);
+    }
+
+    function _getProofOfAuthorityOrSignature(
         address _creator,
         bytes calldata _signature,
         string memory _data
