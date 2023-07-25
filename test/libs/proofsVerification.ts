@@ -2,7 +2,7 @@ import { loadFixture, time } from '@nomicfoundation/hardhat-toolbox/network-help
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { deployProofsVerificationLibrary } from '../../scripts/deployForTest';
-import { proofOfAuthorityData } from '../data/proofs';
+import { proofOfAuthorityData, proofOfSignatureData } from '../data/proofs';
 
 describe('Proofs Verification', () => {
   async function deployProofsVerificationFixture() {
@@ -44,15 +44,58 @@ describe('Proofs Verification', () => {
     );
   });
 
-  it('verify Proof-of-Authority or Proof-of-Signature', async () => {
-    const { proofsVerification, signer1, signer2 } = await loadFixture(
+  it('verify signed proof', async () => {
+    const { proofsVerification, creator, signer1, signer2, signer3 } = await loadFixture(
       deployProofsVerificationFixture
     );
+    const agreementFileCID = 'QmQY5XFRomrnAD3o3yMWkTz1HWcCfZYuE87Gbwe7SjV1kk';
     const agreementFileProofCID = 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp';
+    const signers = [signer1.address, signer2.address, signer3.address];
 
-    let data: any = proofOfAuthorityData;
-    data = {
-      ...data,
+    /**
+     * Proof-of-Authority
+     */
+    // poa - Proof-of-Authority
+    // pos - Proof-of-Signature
+    let poaData: any = proofOfAuthorityData;
+    poaData = {
+      ...poaData,
+      message: {
+        from: creator.address,
+        agreementFileCID,
+        signers,
+        app: 'daosign',
+        timestamp: await time.latest(),
+        metadata: {},
+      },
+    };
+    const rawPoaData = JSON.stringify(poaData);
+    const poaDataHash = ethers.keccak256(ethers.toUtf8Bytes(rawPoaData));
+    const poaSignature1 = await signer1.signMessage(ethers.getBytes(poaDataHash));
+    const poaSignature2 = await signer2.signMessage(ethers.getBytes(poaDataHash));
+
+    // correct signer of the proof
+    expect(
+      await proofsVerification.verifySignedProof(signer1.address, rawPoaData, poaSignature1)
+    ).equal(true);
+    expect(
+      await proofsVerification.verifySignedProof(signer2.address, rawPoaData, poaSignature2)
+    ).equal(true);
+    // wrong signer of the proof
+    expect(
+      await proofsVerification.verifySignedProof(signer2.address, rawPoaData, poaSignature1)
+    ).equal(false);
+    // wrong signature
+    expect(
+      await proofsVerification.verifySignedProof(signer1.address, rawPoaData, poaSignature2)
+    ).equal(false);
+
+    /**
+     * Proof-of-Signature
+     */
+    let posData: any = proofOfSignatureData;
+    posData = {
+      ...posData,
       message: {
         signer: signer1.address,
         agreementFileProofCID,
@@ -61,43 +104,25 @@ describe('Proofs Verification', () => {
         metadata: {},
       },
     };
-    const rawData = JSON.stringify(data);
-    const dataHash = ethers.keccak256(ethers.toUtf8Bytes(rawData));
-    const signature1 = await signer1.signMessage(ethers.getBytes(dataHash));
-    const signature2 = await signer2.signMessage(ethers.getBytes(dataHash));
-
-    // TODO: add checks for Proof-of-Signature
+    const rawPosData = JSON.stringify(posData);
+    const posDataHash = ethers.keccak256(ethers.toUtf8Bytes(rawPosData));
+    const posSignature1 = await signer1.signMessage(ethers.getBytes(posDataHash));
+    const posSignature2 = await signer2.signMessage(ethers.getBytes(posDataHash));
 
     // correct signer of the proof
     expect(
-      await proofsVerification.verifyProofOfAuthorityOrSignature(
-        signer1.address,
-        rawData,
-        signature1
-      )
+      await proofsVerification.verifySignedProof(signer1.address, rawPosData, posSignature1)
     ).equal(true);
     expect(
-      await proofsVerification.verifyProofOfAuthorityOrSignature(
-        signer2.address,
-        rawData,
-        signature2
-      )
+      await proofsVerification.verifySignedProof(signer2.address, rawPosData, posSignature2)
     ).equal(true);
     // wrong signer of the proof
     expect(
-      await proofsVerification.verifyProofOfAuthorityOrSignature(
-        signer2.address,
-        rawData,
-        signature1
-      )
+      await proofsVerification.verifySignedProof(signer2.address, rawPosData, posSignature1)
     ).equal(false);
     // wrong signature
     expect(
-      await proofsVerification.verifyProofOfAuthorityOrSignature(
-        signer1.address,
-        rawData,
-        signature2
-      )
+      await proofsVerification.verifySignedProof(signer1.address, rawPosData, posSignature2)
     ).equal(false);
   });
 });

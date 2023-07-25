@@ -43,10 +43,10 @@ event ProofOfSignature(address signer, bytes signature, string agreementFileCID,
 constructor(address _proofsMetadata) public
 ```
 
-### getProofOfAuthorityData
+### fetchProofOfAuthorityData
 
 ```solidity
-function getProofOfAuthorityData(address _creator, address[] _signers, string _agreementFileCID, string _version) public returns (string)
+function fetchProofOfAuthorityData(address _creator, address[] _signers, string _agreementFileCID, string _version) public returns (string)
 ```
 
 Public:
@@ -57,10 +57,10 @@ Public:
     System:
     - autogenereate Proof-of-Agreement
 
-### getProofOfSignatureData
+### fetchProofOfSignatureData
 
 ```solidity
-function getProofOfSignatureData(address _signer, string _agreementFileCID, string _proofOfAuthorityCID, string _version) public returns (string)
+function fetchProofOfSignatureData(address _signer, string _agreementFileCID, string _proofOfAuthorityCID, string _version) public returns (string)
 ```
 
 ### storeProofOfAuthority

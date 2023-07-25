@@ -98,7 +98,7 @@ describe('Proofs', () => {
       const { proofs, signer1, signer2, signer3 } = await loadFixture(deployProofsFixture);
 
       await expect(
-        proofs.getProofOfAuthorityData(
+        proofs.fetchProofOfAuthorityData(
           /* creator */ ethers.ZeroAddress,
           /* signers */ [signer1.address, signer2.address, signer3.address],
           /* agreementFileCID */ 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp',
@@ -111,7 +111,7 @@ describe('Proofs', () => {
       const { proofs, creator } = await loadFixture(deployProofsFixture);
 
       await expect(
-        proofs.getProofOfAuthorityData(
+        proofs.fetchProofOfAuthorityData(
           /* creator */ creator.address,
           /* signers */ [],
           /* agreementFileCID */ 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp',
@@ -124,7 +124,7 @@ describe('Proofs', () => {
       const { proofs, creator, signer1, signer2, signer3 } = await loadFixture(deployProofsFixture);
 
       await expect(
-        proofs.getProofOfAuthorityData(
+        proofs.fetchProofOfAuthorityData(
           /* creator */ creator.address,
           /* signers */ [signer1.address, signer2.address, signer3.address],
           /* agreementFileCID */ '',
@@ -137,7 +137,7 @@ describe('Proofs', () => {
       const { proofs, creator, signer1, signer2, signer3 } = await loadFixture(deployProofsFixture);
 
       await expect(
-        proofs.getProofOfAuthorityData(
+        proofs.fetchProofOfAuthorityData(
           /* creator */ creator.address,
           /* signers */ [signer1.address, signer2.address, signer3.address],
           /* agreementFileCID */ 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp',
@@ -152,20 +152,14 @@ describe('Proofs', () => {
       const agreementFileCID = 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp';
       const version = '0.1.0';
 
-      await proofs.getProofOfAuthorityData.staticCall(
-        creator.address,
-        signers,
-        agreementFileCID,
-        version
-      );
-      const res = await proofs.getProofOfAuthorityData.staticCall(
+      let res = await proofs.fetchProofOfAuthorityData.staticCall(
         creator.address,
         signers,
         agreementFileCID,
         version
       );
 
-      const expectedRes: any = proofOfAuthorityData;
+      let expectedRes: any = proofOfAuthorityData;
       expectedRes.message = {
         from: creator.address,
         agreementFileCID,
@@ -177,8 +171,51 @@ describe('Proofs', () => {
 
       expect(JSON.parse(res)).to.deep.equal(expectedRes);
       expect(proofs.proofsData(agreementFileCID, Proofs.ProofOfAuthority, creator.address));
-      // TODO: add the second execution of `getProofOfAuthorityData` and make sure that is uses less
-      //       gas than before because now it returns cached data
+
+      /**
+       * the second execution of `fetchProofOfAuthorityData` uses less
+       * gas than before because now it returns a cached data
+       */
+      // first real function execution (more gas)
+      const tx1 = await proofs.fetchProofOfAuthorityData(
+        creator.address,
+        signers,
+        agreementFileCID,
+        version
+      );
+      const proofTime = await time.latest();
+      const gasUsedTx1 = (await tx1.wait())?.gasUsed || 0n;
+
+      // second real function execution (less gas)
+      const tx2 = await proofs.fetchProofOfAuthorityData(
+        creator.address,
+        signers,
+        agreementFileCID,
+        version
+      );
+      const gasUsedTx2 = (await tx2.wait())?.gasUsed || 0n;
+
+      res = await proofs.fetchProofOfAuthorityData.staticCall(
+        creator.address,
+        signers,
+        agreementFileCID,
+        version
+      );
+
+      expect(gasUsedTx1).greaterThan(gasUsedTx2 * 5n);
+
+      // check that the result of the third function execution is still the same
+      expectedRes = proofOfAuthorityData;
+      expectedRes.message = {
+        from: creator.address,
+        agreementFileCID,
+        signers: signers.map((signer) => ({ address: signer, metadata: {} })),
+        app: 'daosign',
+        timestamp: proofTime,
+        metadata: {},
+      };
+      expect(JSON.parse(res)).to.deep.equal(expectedRes);
+      expect(proofs.proofsData(agreementFileCID, Proofs.ProofOfAuthority, creator.address));
     });
   });
 
@@ -190,7 +227,7 @@ describe('Proofs', () => {
       const { proofs } = await loadFixture(deployProofsFixture);
 
       await expect(
-        proofs.getProofOfSignatureData.staticCall(
+        proofs.fetchProofOfSignatureData.staticCall(
           ethers.ZeroAddress,
           agreementFileCID,
           agreementFileProofCID,
@@ -203,7 +240,7 @@ describe('Proofs', () => {
       const { proofs, signer1 } = await loadFixture(deployProofsFixture);
 
       await expect(
-        proofs.getProofOfSignatureData.staticCall(
+        proofs.fetchProofOfSignatureData.staticCall(
           signer1.address,
           '',
           agreementFileProofCID,
@@ -216,7 +253,7 @@ describe('Proofs', () => {
       const { proofs, signer1 } = await loadFixture(deployProofsFixture);
 
       await expect(
-        proofs.getProofOfSignatureData.staticCall(signer1.address, agreementFileCID, '', '0.1.0')
+        proofs.fetchProofOfSignatureData.staticCall(signer1.address, agreementFileCID, '', '0.1.0')
       ).revertedWith('No Proof-of-Authority CID');
     });
 
@@ -224,7 +261,7 @@ describe('Proofs', () => {
       const { proofs, signer1 } = await loadFixture(deployProofsFixture);
 
       await expect(
-        proofs.getProofOfSignatureData.staticCall(
+        proofs.fetchProofOfSignatureData.staticCall(
           signer1.address,
           agreementFileCID,
           agreementFileProofCID,
@@ -235,14 +272,14 @@ describe('Proofs', () => {
 
     it('success', async () => {
       const { proofs, signer1 } = await loadFixture(deployProofsFixture);
-      const res = await proofs.getProofOfSignatureData.staticCall(
+      let res = await proofs.fetchProofOfSignatureData.staticCall(
         signer1.address,
         agreementFileCID,
         agreementFileProofCID,
         '0.1.0'
       );
 
-      const expectedRes: any = proofOfSignatureData;
+      let expectedRes: any = proofOfSignatureData;
       expectedRes.message = {
         signer: signer1.address,
         agreementFileProofCID,
@@ -252,8 +289,52 @@ describe('Proofs', () => {
       };
 
       expect(JSON.parse(res)).to.deep.equal(expectedRes);
-      // TODO: add the second execution of `getProofOfSignatureData` and make sure that is uses less
-      //       gas than before because now it returns cached data
+      expect(proofs.proofsData(agreementFileCID, Proofs.ProofOfAuthority, signer1.address));
+
+      /**
+       * the second execution of `fetchProofOfAuthorityData` uses less
+       * gas than before because now it returns a cached data
+       */
+      // first real function execution (more gas)
+      const tx1 = await proofs.fetchProofOfSignatureData(
+        signer1.address,
+        agreementFileCID,
+        agreementFileProofCID,
+        '0.1.0'
+      );
+      const proofTime = await time.latest();
+      const gasUsedTx1 = (await tx1.wait())?.gasUsed || 0n;
+
+      // second real function execution (less gas)
+      const tx2 = await proofs.fetchProofOfSignatureData(
+        signer1.address,
+        agreementFileCID,
+        agreementFileProofCID,
+        '0.1.0'
+      );
+      const gasUsedTx2 = (await tx2.wait())?.gasUsed || 0n;
+
+      res = await proofs.fetchProofOfSignatureData.staticCall(
+        signer1.address,
+        agreementFileCID,
+        agreementFileProofCID,
+        '0.1.0'
+      );
+
+      expect(gasUsedTx1).greaterThan(gasUsedTx2 * 5n);
+
+      // check that the result of the third function execution is still the same
+      expectedRes = proofOfSignatureData;
+      expectedRes.message = {
+        signer: signer1.address,
+        agreementFileProofCID,
+        app: 'daosign',
+        timestamp: proofTime,
+        metadata: {},
+      };
+
+      expect(JSON.parse(res)).to.deep.equal(expectedRes);
+      expect(proofs.proofsData(agreementFileCID, Proofs.ProofOfAuthority, signer1.address));
     });
   });
 
@@ -274,8 +355,8 @@ describe('Proofs', () => {
       ({ proofs, creator, signer1, signer2, signer3 } = await loadFixture(deployProofsFixture));
       const signers = [signer1.address, signer2.address, signer3.address];
 
-      await proofs.getProofOfAuthorityData(creator.address, signers, agreementFileCID, version);
-      const data = await proofs.getProofOfAuthorityData.staticCall(
+      await proofs.fetchProofOfAuthorityData(creator.address, signers, agreementFileCID, version);
+      const data = await proofs.fetchProofOfAuthorityData.staticCall(
         creator.address,
         signers,
         agreementFileCID,
@@ -339,13 +420,13 @@ describe('Proofs', () => {
     beforeEach(async () => {
       ({ proofs, signer1, signer2 } = await loadFixture(deployProofsFixture));
 
-      await proofs.getProofOfSignatureData(
+      await proofs.fetchProofOfSignatureData(
         signer1.address,
         agreementFileCID,
         proofOfAuthorityCID,
         version
       );
-      const data = await proofs.getProofOfSignatureData.staticCall(
+      const data = await proofs.fetchProofOfSignatureData.staticCall(
         signer1.address,
         agreementFileCID,
         proofOfAuthorityCID,

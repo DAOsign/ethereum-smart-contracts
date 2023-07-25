@@ -66,8 +66,7 @@ contract Proofs {
     - autogenereate Proof-of-Agreement
      */
 
-    // TODO: rename to `generate...`
-    function getProofOfAuthorityData(
+    function fetchProofOfAuthorityData(
         address _creator,
         address[] calldata _signers,
         string calldata _agreementFileCID,
@@ -89,8 +88,7 @@ contract Proofs {
         return proofData;
     }
 
-    // TODO: rename to `generate...`
-    function getProofOfSignatureData(
+    function fetchProofOfSignatureData(
         address _signer,
         string calldata _agreementFileCID,
         string calldata _proofOfAuthorityCID,
@@ -121,7 +119,7 @@ contract Proofs {
         require(_proofCID.length() > 0, 'Empty ProofCID');
         require(signedProofs[_agreementFileCID][_proofCID].length() == 0, 'Proof already stored');
         require(
-            ProofsVerification.verifyProofOfAuthorityOrSignature(
+            ProofsVerification.verifySignedProof(
                 _creator,
                 proofsData[_agreementFileCID][ProofTypes.Proofs.ProofOfAuthority][_creator],
                 _signature
@@ -148,7 +146,7 @@ contract Proofs {
         require(_proofCID.length() > 0, 'Empty ProofCID');
         require(signedProofs[_agreementFileCID][_proofCID].length() == 0, 'Proof already stored');
         require(
-            ProofsVerification.verifyProofOfAuthorityOrSignature(
+            ProofsVerification.verifySignedProof(
                 _signer,
                 proofsData[_agreementFileCID][ProofTypes.Proofs.ProofOfSignature][_signer],
                 _signature

@@ -20,7 +20,7 @@ library ProofsVerification {
      * @param _signature Signature of the {_data}
      * @return isValid Is signature valid or not
      */
-    function verifyProofOfAuthorityOrSignature(
+    function verifySignedProof(
         address _signer,
         string memory _data,
         bytes calldata _signature
