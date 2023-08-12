@@ -8,6 +8,7 @@ import { ERC165Checker } from '@openzeppelin/contracts/utils/introspection/ERC16
 import { IProofsMetadata } from './interfaces/IProofsMetadata.sol';
 import { StringsExpanded } from './libs/StringsExpanded.sol';
 import { ProofsVerification } from './libs/ProofsVerification.sol';
+import { ProofsHelper } from './libs/ProofsHelper.sol';
 import { ProofTypes } from './libs/common/ProofTypes.sol';
 
 /**
@@ -20,16 +21,13 @@ import { ProofTypes } from './libs/common/ProofTypes.sol';
  */
 contract Proofs {
     using StringsExpanded for string;
-    using StringsExpanded for bytes;
-    using StringsExpanded for uint256;
-    using StringsExpanded for address;
 
     address public proofsMetadata;
 
     // Agreement File CID -> Proof CID -> Proof Data
-    mapping(string => mapping(string => string)) public signedProofs;
+    mapping(string => mapping(string => string)) public finalProofs;
 
-    // Agreement File CID -> Proof type -> singer address -> Proof Data
+    // Agreement File CID -> Proof type -> singer address (or zero address for Proof-of-Agreement) -> Proof Data
     mapping(string => mapping(ProofTypes.Proofs => mapping(address => string))) public proofsData;
 
     event ProofOfAuthority(
@@ -37,14 +35,14 @@ contract Proofs {
         bytes signature,
         string indexed agreementFileCID,
         string proofCID,
-        string proof
+        string proofJSON
     );
     event ProofOfSignature(
         address indexed signer,
         bytes signature,
         string indexed agreementFileCID,
         string proofCID,
-        string proof
+        string proofJSON
     );
 
     constructor(address _proofsMetadata) {
@@ -77,7 +75,8 @@ contract Proofs {
         ) {
             return proofsData[_agreementFileCID][ProofTypes.Proofs.ProofOfAuthority][_creator];
         }
-        string memory proofData = _getProofOfAuthorityData(
+        string memory proofData = ProofsHelper.getProofOfAuthorityData(
+            proofsMetadata,
             _creator,
             _signers,
             _agreementFileCID,
@@ -88,6 +87,10 @@ contract Proofs {
         return proofData;
     }
 
+    /**
+     * Note: there is no check that the _proofOfAuthorityCID is actually for this proof. This check
+     *       should be done offchain.
+     */
     function fetchProofOfSignatureData(
         address _signer,
         string calldata _agreementFileCID,
@@ -100,13 +103,30 @@ contract Proofs {
         ) {
             return proofsData[_agreementFileCID][ProofTypes.Proofs.ProofOfSignature][_signer];
         }
-        string memory proofData = _getProofOfSignatureData(
+        string memory proofData = ProofsHelper.getProofOfSignatureData(
+            proofsMetadata,
             _signer,
             _proofOfAuthorityCID,
             _version,
             block.timestamp
         );
         proofsData[_agreementFileCID][ProofTypes.Proofs.ProofOfSignature][_signer] = proofData;
+        return proofData;
+    }
+
+    function fetchProofOfAgreementData(
+        string calldata _agreementFileCID,
+        string calldata _proofOfAuthorityCID,
+        string[] calldata _proofsOfSignatureCID
+    ) public returns (string memory) {
+        require(_agreementFileCID.length() > 0, 'No Agreement File CID');
+
+        string memory proofData = ProofsHelper.getProofOfAgreementData(
+            _proofOfAuthorityCID,
+            _proofsOfSignatureCID,
+            block.timestamp
+        );
+        proofsData[_agreementFileCID][ProofTypes.Proofs.ProofOfAgreement][address(0)] = proofData;
         return proofData;
     }
 
@@ -117,7 +137,7 @@ contract Proofs {
         string calldata _proofCID
     ) public {
         require(_proofCID.length() > 0, 'Empty ProofCID');
-        require(signedProofs[_agreementFileCID][_proofCID].length() == 0, 'Proof already stored');
+        require(finalProofs[_agreementFileCID][_proofCID].length() == 0, 'Proof already stored');
         require(
             ProofsVerification.verifySignedProof(
                 _creator,
@@ -127,12 +147,12 @@ contract Proofs {
             'Invalid signature'
         );
 
-        string memory proof = _getProofOfAuthorityOrSignature(
+        string memory proof = ProofsHelper.getProofOfAuthorityOrSignature(
             _creator,
             _signature,
             proofsData[_agreementFileCID][ProofTypes.Proofs.ProofOfAuthority][_creator]
         );
-        signedProofs[_agreementFileCID][_proofCID] = proof;
+        finalProofs[_agreementFileCID][_proofCID] = proof;
 
         emit ProofOfAuthority(_creator, _signature, _agreementFileCID, _proofCID, proof);
     }
@@ -144,7 +164,7 @@ contract Proofs {
         string calldata _proofCID
     ) public {
         require(_proofCID.length() > 0, 'Empty ProofCID');
-        require(signedProofs[_agreementFileCID][_proofCID].length() == 0, 'Proof already stored');
+        require(finalProofs[_agreementFileCID][_proofCID].length() == 0, 'Proof already stored');
         require(
             ProofsVerification.verifySignedProof(
                 _signer,
@@ -154,144 +174,13 @@ contract Proofs {
             'Invalid signature'
         );
 
-        string memory proof = _getProofOfAuthorityOrSignature(
+        string memory proof = ProofsHelper.getProofOfAuthorityOrSignature(
             _signer,
             _signature,
             proofsData[_agreementFileCID][ProofTypes.Proofs.ProofOfSignature][_signer]
         );
-        signedProofs[_agreementFileCID][_proofCID] = proof;
+        finalProofs[_agreementFileCID][_proofCID] = proof;
 
         emit ProofOfSignature(_signer, _signature, _agreementFileCID, _proofCID, proof);
-    }
-
-    function _getProofOfAuthorityOrSignature(
-        address _creator,
-        bytes calldata _signature,
-        string memory _data
-    ) internal pure returns (string memory proof) {
-        proof = string(
-            abi.encodePacked(
-                '{"address":"',
-                _creator.toString(),
-                '","sig":"',
-                _signature.toHexString(),
-                '","data":',
-                _data,
-                '}'
-            )
-        );
-    }
-
-    function _getProofOfAuthorityData(
-        address _creator,
-        address[] calldata _signers,
-        string calldata _agreementFileCID,
-        string calldata _version,
-        uint256 _timestamp
-    ) internal view returns (string memory) {
-        require(_creator != address(0), 'No creator');
-        require(_signers.length > 0, 'No signers');
-        require(_agreementFileCID.length() > 0, 'No Agreement File CID');
-        require(_version.length() > 0, 'No version');
-
-        return
-            string(
-                abi.encodePacked(
-                    IProofsMetadata(proofsMetadata).proofsMetadata(
-                        ProofTypes.Proofs.ProofOfAuthority,
-                        _version
-                    ),
-                    ',"message":',
-                    _getProofOfAuthorityDataMessage(
-                        _creator,
-                        _signers,
-                        _agreementFileCID,
-                        _timestamp
-                    ),
-                    '}'
-                )
-            );
-    }
-
-    function _getProofOfSignatureData(
-        address _signer,
-        string calldata _proofOfAuthorityCID,
-        string calldata _version,
-        uint256 _timestamp
-    ) internal view returns (string memory) {
-        require(_signer != address(0), 'No signer');
-        require(_proofOfAuthorityCID.length() > 0, 'No Proof-of-Authority CID');
-        require(_version.length() > 0, 'No version');
-
-        return
-            string(
-                abi.encodePacked(
-                    IProofsMetadata(proofsMetadata).proofsMetadata(
-                        ProofTypes.Proofs.ProofOfSignature,
-                        _version
-                    ),
-                    ',"message":',
-                    _getProofOfSignatureDataMessage(_signer, _proofOfAuthorityCID, _timestamp),
-                    '}'
-                )
-            );
-    }
-
-    function _getProofOfAuthorityDataMessage(
-        address _creator,
-        address[] calldata _signers,
-        string calldata _agreementFileCID,
-        uint256 _timestamp
-    ) internal pure returns (string memory message) {
-        message = string(
-            abi.encodePacked(
-                '{"from":"',
-                _creator.toString(),
-                '","agreementFileCID":"',
-                _agreementFileCID,
-                '","signers":',
-                _generateSignersJSON(_signers),
-                ',"app":"daosign","timestamp":',
-                _timestamp.toString(),
-                ',"metadata":{}}'
-            )
-        );
-    }
-
-    function _getProofOfSignatureDataMessage(
-        address _signer,
-        string calldata _proofOfAuthorityCID,
-        uint256 _timestamp
-    ) internal pure returns (string memory message) {
-        message = string(
-            abi.encodePacked(
-                '{"signer":"',
-                _signer.toString(),
-                '","agreementFileProofCID":"',
-                _proofOfAuthorityCID,
-                '","app":"daosign","timestamp":',
-                _timestamp.toString(),
-                ',"metadata":{}}'
-            )
-        );
-    }
-
-    function _generateSignersJSON(
-        address[] calldata _signers
-    ) internal pure returns (string memory) {
-        string memory res = '[';
-
-        for (uint256 i = 0; i < _signers.length; i++) {
-            res = res.concat(
-                string(abi.encodePacked('{"address":"', _signers[i].toString(), '","metadata":{}}'))
-            );
-            if (i != _signers.length - 1) {
-                res = res.concat(',');
-            }
-        }
-
-        res = res.concat(']');
-
-        return res;
     }
 }

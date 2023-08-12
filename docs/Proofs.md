@@ -13,10 +13,10 @@ Proof-of-Agreement = PoAg
 address proofsMetadata
 ```
 
-### signedProofs
+### finalProofs
 
 ```solidity
-mapping(string => mapping(string => string)) signedProofs
+mapping(string => mapping(string => string)) finalProofs
 ```
 
 ### proofsData
@@ -28,13 +28,13 @@ mapping(string => mapping(enum ProofTypes.Proofs => mapping(address => string)))
 ### ProofOfAuthority
 
 ```solidity
-event ProofOfAuthority(address creator, bytes signature, string agreementFileCID, string proofCID, string proof)
+event ProofOfAuthority(address creator, bytes signature, string agreementFileCID, string proofCID, string proofJSON)
 ```
 
 ### ProofOfSignature
 
 ```solidity
-event ProofOfSignature(address signer, bytes signature, string agreementFileCID, string proofCID, string proof)
+event ProofOfSignature(address signer, bytes signature, string agreementFileCID, string proofCID, string proofJSON)
 ```
 
 ### constructor
@@ -63,6 +63,15 @@ Public:
 function fetchProofOfSignatureData(address _signer, string _agreementFileCID, string _proofOfAuthorityCID, string _version) public returns (string)
 ```
 
+Note: there is no check that the _proofOfAuthorityCID is actually for this proof. This check
+      should be done offchain.
+
+### fetchProofOfAgreementData
+
+```solidity
+function fetchProofOfAgreementData(string _agreementFileCID, string _proofOfAuthorityCID, string[] _proofsOfSignatureCID) public returns (string)
+```
+
 ### storeProofOfAuthority
 
 ```solidity
@@ -73,41 +82,5 @@ function storeProofOfAuthority(address _creator, bytes _signature, string _agree
 
 ```solidity
 function storeProofOfSignature(address _signer, bytes _signature, string _agreementFileCID, string _proofCID) public
-```
-
-### _getProofOfAuthorityOrSignature
-
-```solidity
-function _getProofOfAuthorityOrSignature(address _creator, bytes _signature, string _data) internal pure returns (string proof)
-```
-
-### _getProofOfAuthorityData
-
-```solidity
-function _getProofOfAuthorityData(address _creator, address[] _signers, string _agreementFileCID, string _version, uint256 _timestamp) internal view returns (string)
-```
-
-### _getProofOfSignatureData
-
-```solidity
-function _getProofOfSignatureData(address _signer, string _proofOfAuthorityCID, string _version, uint256 _timestamp) internal view returns (string)
-```
-
-### _getProofOfAuthorityDataMessage
-
-```solidity
-function _getProofOfAuthorityDataMessage(address _creator, address[] _signers, string _agreementFileCID, uint256 _timestamp) internal pure returns (string message)
-```
-
-### _getProofOfSignatureDataMessage
-
-```solidity
-function _getProofOfSignatureDataMessage(address _signer, string _proofOfAuthorityCID, uint256 _timestamp) internal pure returns (string message)
-```
-
-### _generateSignersJSON
-
-```solidity
-function _generateSignersJSON(address[] _signers) internal pure returns (string)
 ```
 
