@@ -1,4 +1,5 @@
-pragma solidity ^0.8.0;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.18;
 
 import { ProofTypes } from './common/ProofTypes.sol';
 import { StringsExpanded } from './StringsExpanded.sol';
@@ -10,6 +11,9 @@ library ProofsHelper {
     using StringsExpanded for address;
     using StringsExpanded for uint256;
 
+    /**
+     * Get full Proof-of-Authority or Proof-of-Signature
+     */
     function getProofOfAuthorityOrSignature(
         address _creator,
         bytes calldata _signature,
@@ -93,7 +97,6 @@ library ProofsHelper {
         require(_proofOfAuthorityCID.length() > 0, 'No Proof-of-Authority CID');
         for (uint256 i = 0; i < _proofsOfSignatureCID.length; i++) {
             require(_proofsOfSignatureCID[i].length() > 0, 'No Proof-of-Signature CID');
-            // TODO: check that Agreement File CID is the same as in PoA CID
         }
 
         string memory arrOfPoSigs = '{"proofCID":"';

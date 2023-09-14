@@ -6,6 +6,8 @@
 function getProofOfAuthorityOrSignature(address _creator, bytes _signature, string _data) external pure returns (string proof)
 ```
 
+Get full Proof-of-Authority or Proof-of-Signature
+
 ### getProofOfAuthorityData
 
 ```solidity

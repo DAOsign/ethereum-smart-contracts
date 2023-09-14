@@ -44,6 +44,15 @@ contract Proofs {
         string proofCID,
         string proofJSON
     );
+    event ProofOfAgreement(
+        string indexed agreementFileCID,
+        string proofOfAuthorityCID,
+        string proofCID,
+        string proofJSON
+    );
+
+    // TODO: potentially add structs to store data from each proof to verify
+    //       Proof-of-Signature and Proof-of-Agreement as they are dependant on other proofs
 
     constructor(address _proofsMetadata) {
         require(
@@ -53,16 +62,6 @@ contract Proofs {
         );
         proofsMetadata = _proofsMetadata;
     }
-
-    /**
-    Public:
-    - Create Proof-of-Authority data (given a creator's address, agreementFileCID, and the list of signers)
-    - Create Proof-of-Signature (given a signer's address and Proof-of-Authority IPFS CID)
-    - Sign (off-chain), store & verify signature of the data (used for any proof), generate proof IPFS CID
-
-    System:
-    - autogenereate Proof-of-Agreement
-     */
 
     function fetchProofOfAuthorityData(
         address _creator,
@@ -120,7 +119,13 @@ contract Proofs {
         string[] calldata _proofsOfSignatureCID
     ) public returns (string memory) {
         require(_agreementFileCID.length() > 0, 'No Agreement File CID');
-
+        if (
+            // TODO: Fix: for the same agreement file there may not exist the same 2 Proofs-of-Agreement
+            proofsData[_agreementFileCID][ProofTypes.Proofs.ProofOfAgreement][address(0)].length() >
+            0
+        ) {
+            return proofsData[_agreementFileCID][ProofTypes.Proofs.ProofOfAgreement][address(0)];
+        }
         string memory proofData = ProofsHelper.getProofOfAgreementData(
             _proofOfAuthorityCID,
             _proofsOfSignatureCID,
@@ -136,7 +141,7 @@ contract Proofs {
         string calldata _agreementFileCID,
         string calldata _proofCID
     ) public {
-        require(_proofCID.length() > 0, 'Empty ProofCID');
+        require(_proofCID.length() > 0, 'No ProofCID');
         require(finalProofs[_agreementFileCID][_proofCID].length() == 0, 'Proof already stored');
         require(
             ProofsVerification.verifySignedProof(
@@ -163,7 +168,7 @@ contract Proofs {
         string calldata _agreementFileCID,
         string calldata _proofCID
     ) public {
-        require(_proofCID.length() > 0, 'Empty ProofCID');
+        require(_proofCID.length() > 0, 'No ProofCID');
         require(finalProofs[_agreementFileCID][_proofCID].length() == 0, 'Proof already stored');
         require(
             ProofsVerification.verifySignedProof(
@@ -182,5 +187,31 @@ contract Proofs {
         finalProofs[_agreementFileCID][_proofCID] = proof;
 
         emit ProofOfSignature(_signer, _signature, _agreementFileCID, _proofCID, proof);
+    }
+
+    function storeProofOfAgreement(
+        string calldata _agreementFileCID,
+        string calldata _proofOfAuthorityCID, // TODO: involve this proofs into PoA storage to enable having multiple
+        //       PoA for the same AgreementFileCID
+        string calldata _proofOfAgreementCID
+    ) public {
+        require(_proofOfAgreementCID.length() > 0, 'No ProofCID');
+        require(_agreementFileCID.length() > 0, 'No Agreement File CID');
+        require(
+            finalProofs[_agreementFileCID][_proofOfAgreementCID].length() == 0,
+            'Proof already stored'
+        );
+
+        // TODO: Fix: for the same agreement file there may not exist the same 2 Proofs-of-Agreement
+        finalProofs[_agreementFileCID][_proofOfAgreementCID] = proofsData[_agreementFileCID][
+            ProofTypes.Proofs.ProofOfAgreement
+        ][address(0)];
+
+        emit ProofOfAgreement(
+            _agreementFileCID,
+            _proofOfAuthorityCID,
+            _proofOfAgreementCID,
+            finalProofs[_agreementFileCID][_proofOfAgreementCID]
+        );
     }
 }

@@ -37,6 +37,12 @@ event ProofOfAuthority(address creator, bytes signature, string agreementFileCID
 event ProofOfSignature(address signer, bytes signature, string agreementFileCID, string proofCID, string proofJSON)
 ```
 
+### ProofOfAgreement
+
+```solidity
+event ProofOfAgreement(string agreementFileCID, string proofOfAuthorityCID, string proofCID, string proofJSON)
+```
+
 ### constructor
 
 ```solidity
@@ -48,14 +54,6 @@ constructor(address _proofsMetadata) public
 ```solidity
 function fetchProofOfAuthorityData(address _creator, address[] _signers, string _agreementFileCID, string _version) public returns (string)
 ```
-
-Public:
-    - Create Proof-of-Authority data (given a creator's address, agreementFileCID, and the list of signers)
-    - Create Proof-of-Signature (given a signer's address and Proof-of-Authority IPFS CID)
-    - Sign (off-chain), store & verify signature of the data (used for any proof), generate proof IPFS CID
-
-    System:
-    - autogenereate Proof-of-Agreement
 
 ### fetchProofOfSignatureData
 
@@ -82,5 +80,11 @@ function storeProofOfAuthority(address _creator, bytes _signature, string _agree
 
 ```solidity
 function storeProofOfSignature(address _signer, bytes _signature, string _agreementFileCID, string _proofCID) public
+```
+
+### storeProofOfAgreement
+
+```solidity
+function storeProofOfAgreement(string _agreementFileCID, string _proofOfAuthorityCID, string _proofOfAgreementCID) public
 ```
 

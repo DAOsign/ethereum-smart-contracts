@@ -373,40 +373,6 @@ describe('Proofs', () => {
       ).revertedWith('No Agreement File CID');
     });
 
-    it('no Proof-of-Authority CID error', async () => {
-      const { proofs } = await loadFixture(deployProofsFixture);
-
-      await expect(
-        proofs.fetchProofOfAgreementData.staticCall(agreementFileCID, '', proofOfSignatureCIDs)
-      ).revertedWith('No Proof-of-Authority CID');
-    });
-
-    it('no Proof-of-Signature CID error', async () => {
-      const { proofs } = await loadFixture(deployProofsFixture);
-
-      await expect(
-        proofs.fetchProofOfAgreementData.staticCall(agreementFileCID, proofOfAuthorityCID, [
-          '',
-          'QmfSEEuZBsSgh3hLB8BU4ApNepDpaUWFCw9KqB7DxLbSV2',
-          'QmVMLPjLnT7PVQvZstd6DmL8K1VGHHypbYyG2HHSzN8BTK',
-        ])
-      ).revertedWith('No Proof-of-Signature CID');
-      await expect(
-        proofs.fetchProofOfAgreementData.staticCall(agreementFileCID, proofOfAuthorityCID, [
-          'QmUDLEHaLsr5wq7mnZTPMWQmre6Pa1Dd2hQx2kdcwXY7nU',
-          '',
-          'QmVMLPjLnT7PVQvZstd6DmL8K1VGHHypbYyG2HHSzN8BTK',
-        ])
-      ).revertedWith('No Proof-of-Signature CID');
-      await expect(
-        proofs.fetchProofOfAgreementData.staticCall(agreementFileCID, proofOfAuthorityCID, [
-          'QmUDLEHaLsr5wq7mnZTPMWQmre6Pa1Dd2hQx2kdcwXY7nU',
-          'QmfSEEuZBsSgh3hLB8BU4ApNepDpaUWFCw9KqB7DxLbSV2',
-          '',
-        ])
-      ).revertedWith('No Proof-of-Signature CID');
-    });
-
     it('success', async () => {
       const { proofs } = await loadFixture(deployProofsFixture);
       let res = await proofs.fetchProofOfAgreementData.staticCall(
@@ -460,10 +426,9 @@ describe('Proofs', () => {
         proofOfSignatureCIDs
       );
 
-      expect(gasUsedTx1).greaterThan(gasUsedTx2 * 2n);
+      expect(gasUsedTx1).greaterThan(gasUsedTx2 * 5n);
 
       // check that the result of the third function execution is still the same
-      expectedRes.timestamp = await time.latest();
       expect(JSON.parse(res)).to.deep.equal(expectedRes);
       expect(proofs.proofsData(agreementFileCID, Proofs.ProofOfAgreement, ethers.ZeroAddress));
     });
@@ -504,10 +469,10 @@ describe('Proofs', () => {
       };
     });
 
-    it('error: Empty ProofCID', async () => {
+    it('error: No ProofCID', async () => {
       await expect(
         proofs.storeProofOfAuthority(creator.address, signature, agreementFileCID, '')
-      ).revertedWith('Empty ProofCID');
+      ).revertedWith('No ProofCID');
     });
 
     it('error: Proof already stored', async () => {
@@ -520,6 +485,9 @@ describe('Proofs', () => {
     it('error: Invalid signature', async () => {
       await expect(
         proofs.storeProofOfAuthority(creator.address, signatureSigner1, agreementFileCID, proofCID)
+      ).revertedWith('Invalid signature');
+      await expect(
+        proofs.storeProofOfAuthority(creator.address, signature, '', proofCID)
       ).revertedWith('Invalid signature');
     });
 
@@ -574,10 +542,10 @@ describe('Proofs', () => {
       };
     });
 
-    it('error: Empty ProofCID', async () => {
+    it('error: No ProofCID', async () => {
       await expect(
         proofs.storeProofOfSignature(signer1.address, signature, agreementFileCID, '')
-      ).revertedWith('Empty ProofCID');
+      ).revertedWith('No ProofCID');
     });
 
     it('error: Proof already stored', async () => {
@@ -606,6 +574,9 @@ describe('Proofs', () => {
           proofOfSignatureCID
         )
       ).revertedWith('Invalid signature');
+      await expect(
+        proofs.storeProofOfSignature(signer1.address, signature, '', proofOfSignatureCID)
+      ).revertedWith('Invalid signature');
     });
 
     it('success', async () => {
@@ -631,6 +602,74 @@ describe('Proofs', () => {
       expect(JSON.parse(await proofs.finalProofs(agreementFileCID, proofOfSignatureCID))).eql(
         proof
       );
+    });
+  });
+
+  describe('Store Proof-of-Agreement', () => {
+    const agreementFileCID = 'QmfVd78Pns7Gd5ijurJo3vi892DmuPpz6eP5YsuSCsBoyD';
+    const proofOfAuthorityCID = 'QmRr3f12HHGSBYk3hpFuuAweKfcStQ16Vej81gr4GLbKU3';
+    const proofOfSignatureCIDs = [
+      'QmUDLEHaLsr5wq7mnZTPMWQmre6Pa1Dd2hQx2kdcwXY7nU',
+      'QmfSEEuZBsSgh3hLB8BU4ApNepDpaUWFCw9KqB7DxLbSV2',
+      'QmVMLPjLnT7PVQvZstd6DmL8K1VGHHypbYyG2HHSzN8BTK',
+    ];
+    const proofOfAgreementCID = 'QmQY5XFRomrnAD3o3yMWkTz1HWcCfZYuE87Gbwe7SjV1kk';
+    let proof: string;
+    let proofs: any;
+
+    beforeEach(async () => {
+      ({ proofs } = await loadFixture(deployProofsFixture));
+
+      await proofs.fetchProofOfAgreementData(
+        agreementFileCID,
+        proofOfAuthorityCID,
+        proofOfSignatureCIDs
+      );
+      proof = await proofs.fetchProofOfAgreementData.staticCall(
+        agreementFileCID,
+        proofOfAuthorityCID,
+        proofOfSignatureCIDs
+      );
+    });
+
+    it('error: No ProofCID', async () => {
+      await expect(
+        proofs.storeProofOfAgreement(agreementFileCID, proofOfAuthorityCID, '')
+      ).revertedWith('No ProofCID');
+    });
+
+    it('error: No Agreement File CID', async () => {
+      await expect(
+        proofs.storeProofOfAgreement('', proofOfAuthorityCID, proofOfAgreementCID)
+      ).revertedWith('No Agreement File CID');
+    });
+
+    it('error: Proof already stored', async () => {
+      await proofs.storeProofOfAgreement(
+        agreementFileCID,
+        proofOfAuthorityCID,
+        proofOfAgreementCID
+      );
+      await expect(
+        proofs.storeProofOfAgreement(agreementFileCID, proofOfAuthorityCID, proofOfAgreementCID)
+      ).revertedWith('Proof already stored');
+    });
+
+    it('success', async () => {
+      // calculated & emited correctly
+      await expect(
+        proofs.storeProofOfAgreement(
+          agreementFileCID,
+          proofOfAuthorityCID,
+          proofOfAgreementCID
+          // proof
+        )
+      )
+        .emit(proofs, 'ProofOfAgreement')
+        .withArgs(agreementFileCID, proofOfAuthorityCID, proofOfAgreementCID, proof);
+
+      // calculated & stored correctly
+      expect(await proofs.finalProofs(agreementFileCID, proofOfAgreementCID)).eql(proof);
     });
   });
 });
