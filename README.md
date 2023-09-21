@@ -1,4 +1,5 @@
 # DAOsign Smart Contracts
+# ⚠️ Work In Progress! Use at Your Own Risk! ⚠️
 
 This repository houses a collection of Ethereum smart contracts, developed as part of the DAOsign project. DAOsign leverages blockchain technology to generate, store, and validate Agreement Proofs.
 
