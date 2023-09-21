@@ -16,6 +16,17 @@ export const deployProofsVerificationLibrary = async () => {
   return { proofsVerification };
 };
 
+export const deployProofsHelperLibrary = async () => {
+  const { strings } = await deployStringsExpandedLibrary();
+  const proofsHelper = await (
+    await ethers.getContractFactory('ProofsHelper', {
+      libraries: { StringsExpanded: await strings.getAddress() },
+    })
+  ).deploy();
+
+  return { proofsHelper };
+};
+
 export const deployProofsMetadata = async () => {
   const { strings } = await deployStringsExpandedLibrary();
   const proofsMetadata = await (
@@ -30,14 +41,16 @@ export const deployProofsMetadata = async () => {
 export const deployProofs = async () => {
   const { proofsMetadata, strings } = await deployProofsMetadata();
   const { proofsVerification } = await deployProofsVerificationLibrary();
+  const { proofsHelper } = await deployProofsHelperLibrary();
   const proofs = await (
     await ethers.getContractFactory('Proofs', {
       libraries: {
         StringsExpanded: await strings.getAddress(),
         ProofsVerification: await proofsVerification.getAddress(),
+        ProofsHelper: await proofsHelper.getAddress(),
       },
     })
   ).deploy(await proofsMetadata.getAddress());
 
-  return { proofs, proofsMetadata, strings, proofsVerification };
+  return { proofs, proofsMetadata, strings, proofsVerification, proofsHelper };
 };

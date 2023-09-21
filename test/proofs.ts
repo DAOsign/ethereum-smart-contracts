@@ -9,7 +9,8 @@ import { Proofs } from './common';
 describe('Proofs', () => {
   async function deployProofsFixture() {
     const [owner, creator, signer1, signer2, signer3, anyone] = await ethers.getSigners();
-    const { proofs, proofsMetadata, strings, proofsVerification } = await deployProofs();
+    const { proofs, proofsMetadata, strings, proofsVerification, proofsHelper } =
+      await deployProofs();
 
     await proofsMetadata.addMetadata(
       Proofs.ProofOfAuthority,
@@ -26,6 +27,7 @@ describe('Proofs', () => {
       proofs,
       strings,
       proofsVerification,
+      proofsHelper,
       owner,
       creator,
       signer1,
@@ -37,7 +39,7 @@ describe('Proofs', () => {
 
   describe('constructor', () => {
     it('error on non-IERC165 and non-IProofsMetadata input', async () => {
-      const { proofs, strings, proofsVerification, anyone } = await loadFixture(
+      const { proofs, strings, proofsVerification, proofsHelper, anyone } = await loadFixture(
         deployProofsFixture
       );
 
@@ -48,6 +50,7 @@ describe('Proofs', () => {
             libraries: {
               StringsExpanded: await strings.getAddress(),
               ProofsVerification: await proofsVerification.getAddress(),
+              ProofsHelper: await proofsHelper.getAddress(),
             },
           })
         ).deploy(ethers.ZeroAddress)
@@ -59,6 +62,7 @@ describe('Proofs', () => {
             libraries: {
               StringsExpanded: await strings.getAddress(),
               ProofsVerification: await proofsVerification.getAddress(),
+              ProofsHelper: await proofsHelper.getAddress(),
             },
           })
         ).deploy(anyone.address)
@@ -70,6 +74,7 @@ describe('Proofs', () => {
             libraries: {
               StringsExpanded: await strings.getAddress(),
               ProofsVerification: await proofsVerification.getAddress(),
+              ProofsHelper: await proofsHelper.getAddress(),
             },
           })
         ).deploy(await proofs.getAddress())
@@ -77,7 +82,7 @@ describe('Proofs', () => {
     });
 
     it('success', async () => {
-      const { strings, proofsVerification } = await loadFixture(deployProofsFixture);
+      const { strings, proofsVerification, proofsHelper } = await loadFixture(deployProofsFixture);
       const { proofsMetadata } = await deployProofsMetadata();
 
       const proofs = await (
@@ -85,6 +90,7 @@ describe('Proofs', () => {
           libraries: {
             StringsExpanded: await strings.getAddress(),
             ProofsVerification: await proofsVerification.getAddress(),
+            ProofsHelper: await proofsHelper.getAddress(),
           },
         })
       ).deploy(await proofsMetadata.getAddress());
@@ -93,7 +99,7 @@ describe('Proofs', () => {
     });
   });
 
-  describe('Get Proof-of-Authority data', () => {
+  describe('Fetch Proof-of-Authority data', () => {
     it('no creator error', async () => {
       const { proofs, signer1, signer2, signer3 } = await loadFixture(deployProofsFixture);
 
@@ -170,7 +176,6 @@ describe('Proofs', () => {
       };
 
       expect(JSON.parse(res)).to.deep.equal(expectedRes);
-      expect(proofs.proofsData(agreementFileCID, Proofs.ProofOfAuthority, creator.address));
 
       /**
        * the second execution of `fetchProofOfAuthorityData` uses less
@@ -184,7 +189,14 @@ describe('Proofs', () => {
         version
       );
       const proofTime = await time.latest();
-      const gasUsedTx1 = (await tx1.wait())?.gasUsed || 0n;
+      const gasUsedTx1 = (await tx1.wait())?.gasUsed ?? 0n;
+
+      expectedRes.message.timestamp = await time.latest();
+      expect(
+        JSON.parse(
+          await proofs.proofsData(agreementFileCID, Proofs.ProofOfAuthority, creator.address)
+        )
+      ).to.deep.equal(expectedRes);
 
       // second real function execution (less gas)
       const tx2 = await proofs.fetchProofOfAuthorityData(
@@ -193,7 +205,7 @@ describe('Proofs', () => {
         agreementFileCID,
         version
       );
-      const gasUsedTx2 = (await tx2.wait())?.gasUsed || 0n;
+      const gasUsedTx2 = (await tx2.wait())?.gasUsed ?? 0n;
 
       res = await proofs.fetchProofOfAuthorityData.staticCall(
         creator.address,
@@ -219,7 +231,7 @@ describe('Proofs', () => {
     });
   });
 
-  describe('Get Proof-of-Signature data', () => {
+  describe('Fetch Proof-of-Signature data', () => {
     const agreementFileCID = 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp';
     const agreementFileProofCID = 'QmQY5XFRomrnAD3o3yMWkTz1HWcCfZYuE87Gbwe7SjV1kk';
 
@@ -289,10 +301,9 @@ describe('Proofs', () => {
       };
 
       expect(JSON.parse(res)).to.deep.equal(expectedRes);
-      expect(proofs.proofsData(agreementFileCID, Proofs.ProofOfAuthority, signer1.address));
 
       /**
-       * the second execution of `fetchProofOfAuthorityData` uses less
+       * the second execution of `fetchProofOfSignatureData` uses less
        * gas than before because now it returns a cached data
        */
       // first real function execution (more gas)
@@ -303,7 +314,14 @@ describe('Proofs', () => {
         '0.1.0'
       );
       const proofTime = await time.latest();
-      const gasUsedTx1 = (await tx1.wait())?.gasUsed || 0n;
+      const gasUsedTx1 = (await tx1.wait())?.gasUsed ?? 0n;
+
+      expectedRes.message.timestamp = await time.latest();
+      expect(
+        JSON.parse(
+          await proofs.proofsData(agreementFileCID, Proofs.ProofOfSignature, signer1.address)
+        )
+      ).to.deep.equal(expectedRes);
 
       // second real function execution (less gas)
       const tx2 = await proofs.fetchProofOfSignatureData(
@@ -312,7 +330,7 @@ describe('Proofs', () => {
         agreementFileProofCID,
         '0.1.0'
       );
-      const gasUsedTx2 = (await tx2.wait())?.gasUsed || 0n;
+      const gasUsedTx2 = (await tx2.wait())?.gasUsed ?? 0n;
 
       res = await proofs.fetchProofOfSignatureData.staticCall(
         signer1.address,
@@ -335,6 +353,84 @@ describe('Proofs', () => {
 
       expect(JSON.parse(res)).to.deep.equal(expectedRes);
       expect(proofs.proofsData(agreementFileCID, Proofs.ProofOfAuthority, signer1.address));
+    });
+  });
+
+  describe('Fetch Proof-of-Agreement data', () => {
+    const agreementFileCID = 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp';
+    const proofOfAuthorityCID = 'QmQY5XFRomrnAD3o3yMWkTz1HWcCfZYuE87Gbwe7SjV1kk';
+    const proofOfSignatureCIDs = [
+      'QmUDLEHaLsr5wq7mnZTPMWQmre6Pa1Dd2hQx2kdcwXY7nU',
+      'QmfSEEuZBsSgh3hLB8BU4ApNepDpaUWFCw9KqB7DxLbSV2',
+      'QmVMLPjLnT7PVQvZstd6DmL8K1VGHHypbYyG2HHSzN8BTK',
+    ];
+
+    it('no Agreement File CID error', async () => {
+      const { proofs } = await loadFixture(deployProofsFixture);
+
+      await expect(
+        proofs.fetchProofOfAgreementData.staticCall('', proofOfAuthorityCID, proofOfSignatureCIDs)
+      ).revertedWith('No Agreement File CID');
+    });
+
+    it('success', async () => {
+      const { proofs } = await loadFixture(deployProofsFixture);
+      let res = await proofs.fetchProofOfAgreementData.staticCall(
+        agreementFileCID,
+        proofOfAuthorityCID,
+        proofOfSignatureCIDs
+      );
+
+      const timestamp = await time.latest();
+      const expectedRes = {
+        agreementFileProofCID: proofOfAuthorityCID,
+        agreementSignProofs: proofOfSignatureCIDs.map((cid) => ({
+          proofCID: cid,
+        })),
+
+        timestamp,
+      };
+
+      expect(JSON.parse(res)).to.deep.equal(expectedRes);
+
+      /**
+       * the second execution of `fetchProofOfAgreementData` uses less
+       * gas than before because now it returns a cached data
+       */
+      // first real function execution (more gas)
+      const tx1 = await proofs.fetchProofOfAgreementData(
+        agreementFileCID,
+        proofOfAuthorityCID,
+        proofOfSignatureCIDs
+      );
+      const gasUsedTx1 = (await tx1.wait())?.gasUsed ?? 0n;
+
+      expectedRes.timestamp = await time.latest();
+      expect(
+        JSON.parse(
+          await proofs.proofsData(agreementFileCID, Proofs.ProofOfAgreement, ethers.ZeroAddress)
+        )
+      ).to.deep.equal(expectedRes);
+
+      // second real function execution (less gas)
+      const tx2 = await proofs.fetchProofOfAgreementData(
+        agreementFileCID,
+        proofOfAuthorityCID,
+        proofOfSignatureCIDs
+      );
+      const gasUsedTx2 = (await tx2.wait())?.gasUsed ?? 0n;
+
+      res = await proofs.fetchProofOfAgreementData.staticCall(
+        agreementFileCID,
+        proofOfAuthorityCID,
+        proofOfSignatureCIDs
+      );
+
+      expect(gasUsedTx1).greaterThan(gasUsedTx2 * 5n);
+
+      // check that the result of the third function execution is still the same
+      expect(JSON.parse(res)).to.deep.equal(expectedRes);
+      expect(proofs.proofsData(agreementFileCID, Proofs.ProofOfAgreement, ethers.ZeroAddress));
     });
   });
 
@@ -373,10 +469,10 @@ describe('Proofs', () => {
       };
     });
 
-    it('error: Empty ProofCID', async () => {
+    it('error: No ProofCID', async () => {
       await expect(
         proofs.storeProofOfAuthority(creator.address, signature, agreementFileCID, '')
-      ).revertedWith('Empty ProofCID');
+      ).revertedWith('No ProofCID');
     });
 
     it('error: Proof already stored', async () => {
@@ -390,6 +486,9 @@ describe('Proofs', () => {
       await expect(
         proofs.storeProofOfAuthority(creator.address, signatureSigner1, agreementFileCID, proofCID)
       ).revertedWith('Invalid signature');
+      await expect(
+        proofs.storeProofOfAuthority(creator.address, signature, '', proofCID)
+      ).revertedWith('Invalid signature');
     });
 
     it('success', async () => {
@@ -401,7 +500,7 @@ describe('Proofs', () => {
         .withArgs(creator.address, signature, agreementFileCID, proofCID, JSON.stringify(proof));
 
       // calculated & stored correctly
-      expect(JSON.parse(await proofs.signedProofs(agreementFileCID, proofCID))).eql(proof);
+      expect(JSON.parse(await proofs.finalProofs(agreementFileCID, proofCID))).eql(proof);
     });
   });
 
@@ -443,10 +542,10 @@ describe('Proofs', () => {
       };
     });
 
-    it('error: Empty ProofCID', async () => {
+    it('error: No ProofCID', async () => {
       await expect(
         proofs.storeProofOfSignature(signer1.address, signature, agreementFileCID, '')
-      ).revertedWith('Empty ProofCID');
+      ).revertedWith('No ProofCID');
     });
 
     it('error: Proof already stored', async () => {
@@ -475,6 +574,9 @@ describe('Proofs', () => {
           proofOfSignatureCID
         )
       ).revertedWith('Invalid signature');
+      await expect(
+        proofs.storeProofOfSignature(signer1.address, signature, '', proofOfSignatureCID)
+      ).revertedWith('Invalid signature');
     });
 
     it('success', async () => {
@@ -497,9 +599,77 @@ describe('Proofs', () => {
         );
 
       // calculated & stored correctly
-      expect(JSON.parse(await proofs.signedProofs(agreementFileCID, proofOfSignatureCID))).eql(
+      expect(JSON.parse(await proofs.finalProofs(agreementFileCID, proofOfSignatureCID))).eql(
         proof
       );
+    });
+  });
+
+  describe('Store Proof-of-Agreement', () => {
+    const agreementFileCID = 'QmfVd78Pns7Gd5ijurJo3vi892DmuPpz6eP5YsuSCsBoyD';
+    const proofOfAuthorityCID = 'QmRr3f12HHGSBYk3hpFuuAweKfcStQ16Vej81gr4GLbKU3';
+    const proofOfSignatureCIDs = [
+      'QmUDLEHaLsr5wq7mnZTPMWQmre6Pa1Dd2hQx2kdcwXY7nU',
+      'QmfSEEuZBsSgh3hLB8BU4ApNepDpaUWFCw9KqB7DxLbSV2',
+      'QmVMLPjLnT7PVQvZstd6DmL8K1VGHHypbYyG2HHSzN8BTK',
+    ];
+    const proofOfAgreementCID = 'QmQY5XFRomrnAD3o3yMWkTz1HWcCfZYuE87Gbwe7SjV1kk';
+    let proof: string;
+    let proofs: any;
+
+    beforeEach(async () => {
+      ({ proofs } = await loadFixture(deployProofsFixture));
+
+      await proofs.fetchProofOfAgreementData(
+        agreementFileCID,
+        proofOfAuthorityCID,
+        proofOfSignatureCIDs
+      );
+      proof = await proofs.fetchProofOfAgreementData.staticCall(
+        agreementFileCID,
+        proofOfAuthorityCID,
+        proofOfSignatureCIDs
+      );
+    });
+
+    it('error: No ProofCID', async () => {
+      await expect(
+        proofs.storeProofOfAgreement(agreementFileCID, proofOfAuthorityCID, '')
+      ).revertedWith('No ProofCID');
+    });
+
+    it('error: No Agreement File CID', async () => {
+      await expect(
+        proofs.storeProofOfAgreement('', proofOfAuthorityCID, proofOfAgreementCID)
+      ).revertedWith('No Agreement File CID');
+    });
+
+    it('error: Proof already stored', async () => {
+      await proofs.storeProofOfAgreement(
+        agreementFileCID,
+        proofOfAuthorityCID,
+        proofOfAgreementCID
+      );
+      await expect(
+        proofs.storeProofOfAgreement(agreementFileCID, proofOfAuthorityCID, proofOfAgreementCID)
+      ).revertedWith('Proof already stored');
+    });
+
+    it('success', async () => {
+      // calculated & emited correctly
+      await expect(
+        proofs.storeProofOfAgreement(
+          agreementFileCID,
+          proofOfAuthorityCID,
+          proofOfAgreementCID
+          // proof
+        )
+      )
+        .emit(proofs, 'ProofOfAgreement')
+        .withArgs(agreementFileCID, proofOfAuthorityCID, proofOfAgreementCID, proof);
+
+      // calculated & stored correctly
+      expect(await proofs.finalProofs(agreementFileCID, proofOfAgreementCID)).eql(proof);
     });
   });
 });
