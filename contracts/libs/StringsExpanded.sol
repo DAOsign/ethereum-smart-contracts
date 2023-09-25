@@ -8,7 +8,7 @@ library StringsExpanded {
     /**
      * Gets length of the string
      * @param s Input string
-     * @return The lenght of the string
+     * @return res The lenght of the string
      */
     function length(string memory s) public pure returns (uint256) {
         return bytes(s).length;
@@ -20,18 +20,18 @@ library StringsExpanded {
      * @param s2 The second string
      * @return res The resultant string created by merging s1 and s2
      */
-    function concat(string memory s1, string memory s2) internal pure returns (string memory) {
+    function concat(string memory s1, string memory s2) public pure returns (string memory) {
         return string(abi.encodePacked(s1, s2));
     }
 
     /**
-     * @dev Converts a `uint256` to its ASCII `string` decimal representation
+     * Converts a `uint256` to its ASCII `string` decimal representation
      * @notice Inspired by OraclizeAPI's implementation - MIT licence
      * https://github.com/oraclize/ethereum-api/blob/b42146b063c7d6ee1358846c198246239e9360e8/oraclizeAPI_0.4.25.sol
      * @param x Input number
      * @return res Number represented as a string
      */
-    function toString(uint256 x) internal pure returns (string memory) {
+    function toString(uint256 x) public pure returns (string memory) {
         if (x == 0) {
             return '0';
         }
@@ -52,6 +52,7 @@ library StringsExpanded {
 
     /**
      * Converts an Ethereum address to a string
+     * Note: only lowercase letters are used
      * @param addr The Ethereum address to convert
      * @return res The string representation of the Ethereum address, including the '0x' prefix
      */
@@ -68,7 +69,12 @@ library StringsExpanded {
         return string(str);
     }
 
-    function toHexString(bytes memory _bytes) internal pure returns (string memory) {
+    /**
+     * Converts Solidity bytes to a string
+     * @param _bytes Input bytes
+     * @return res Input bytes in a string format with '0x' prefix
+     */
+    function toHexString(bytes memory _bytes) public pure returns (string memory) {
         bytes memory hexString = new bytes(_bytes.length * 2);
 
         uint256 index = 0;

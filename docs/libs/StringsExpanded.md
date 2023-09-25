@@ -20,12 +20,12 @@ Gets length of the string
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| [0] | uint256 | The lenght of the string |
+| [0] | uint256 | res The lenght of the string |
 
 ### concat
 
 ```solidity
-function concat(string s1, string s2) internal pure returns (string)
+function concat(string s1, string s2) public pure returns (string)
 ```
 
 Combines two input strings into one
@@ -46,13 +46,12 @@ Combines two input strings into one
 ### toString
 
 ```solidity
-function toString(uint256 x) internal pure returns (string)
+function toString(uint256 x) public pure returns (string)
 ```
 
+Converts a `uint256` to its ASCII `string` decimal representation
 Inspired by OraclizeAPI's implementation - MIT licence
 https://github.com/oraclize/ethereum-api/blob/b42146b063c7d6ee1358846c198246239e9360e8/oraclizeAPI_0.4.25.sol
-
-_Converts a `uint256` to its ASCII `string` decimal representation_
 
 #### Parameters
 
@@ -73,6 +72,7 @@ function toString(address addr) public pure returns (string)
 ```
 
 Converts an Ethereum address to a string
+Note: only lowercase letters are used
 
 #### Parameters
 
@@ -89,6 +89,20 @@ Converts an Ethereum address to a string
 ### toHexString
 
 ```solidity
-function toHexString(bytes _bytes) internal pure returns (string)
+function toHexString(bytes _bytes) public pure returns (string)
 ```
+
+Converts Solidity bytes to a string
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _bytes | bytes | Input bytes |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | string | res Input bytes in a string format with '0x' prefix |
 
