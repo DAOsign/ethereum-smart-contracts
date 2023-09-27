@@ -15,12 +15,12 @@ describe('Proofs', () => {
     await proofsMetadata.addMetadata(
       Proofs.ProofOfAuthority,
       '0.1.0',
-      JSON.stringify(proofOfAuthorityData).slice(0, -1)
+      JSON.stringify(proofOfAuthorityData).slice(0, -1),
     );
     await proofsMetadata.addMetadata(
       Proofs.ProofOfSignature,
       '0.1.0',
-      JSON.stringify(proofOfSignatureData).slice(0, -1)
+      JSON.stringify(proofOfSignatureData).slice(0, -1),
     );
 
     return {
@@ -39,9 +39,8 @@ describe('Proofs', () => {
 
   describe('constructor', () => {
     it('error on non-IERC165 and non-IProofsMetadata input', async () => {
-      const { proofs, strings, proofsVerification, proofsHelper, anyone } = await loadFixture(
-        deployProofsFixture
-      );
+      const { proofs, strings, proofsVerification, proofsHelper, anyone } =
+        await loadFixture(deployProofsFixture);
 
       // zero address
       await expect(
@@ -53,7 +52,7 @@ describe('Proofs', () => {
               ProofsHelper: await proofsHelper.getAddress(),
             },
           })
-        ).deploy(ethers.ZeroAddress)
+        ).deploy(ethers.ZeroAddress),
       ).revertedWith('Must support IProofsMetadata');
       // EOA (user address)
       await expect(
@@ -65,7 +64,7 @@ describe('Proofs', () => {
               ProofsHelper: await proofsHelper.getAddress(),
             },
           })
-        ).deploy(anyone.address)
+        ).deploy(anyone.address),
       ).revertedWith('Must support IProofsMetadata');
       // ranom contract address
       await expect(
@@ -77,7 +76,7 @@ describe('Proofs', () => {
               ProofsHelper: await proofsHelper.getAddress(),
             },
           })
-        ).deploy(await proofs.getAddress())
+        ).deploy(await proofs.getAddress()),
       ).revertedWith('Must support IProofsMetadata');
     });
 
@@ -108,8 +107,8 @@ describe('Proofs', () => {
           /* creator */ ethers.ZeroAddress,
           /* signers */ [signer1.address, signer2.address, signer3.address],
           /* agreementFileCID */ 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp',
-          /* version */ '0.1.0'
-        )
+          /* version */ '0.1.0',
+        ),
       ).revertedWith('No creator');
     });
 
@@ -121,8 +120,8 @@ describe('Proofs', () => {
           /* creator */ creator.address,
           /* signers */ [],
           /* agreementFileCID */ 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp',
-          /* version */ '0.1.0'
-        )
+          /* version */ '0.1.0',
+        ),
       ).revertedWith('No signers');
     });
 
@@ -134,8 +133,8 @@ describe('Proofs', () => {
           /* creator */ creator.address,
           /* signers */ [signer1.address, signer2.address, signer3.address],
           /* agreementFileCID */ '',
-          /* version */ '0.1.0'
-        )
+          /* version */ '0.1.0',
+        ),
       ).revertedWith('No Agreement File CID');
     });
 
@@ -147,8 +146,8 @@ describe('Proofs', () => {
           /* creator */ creator.address,
           /* signers */ [signer1.address, signer2.address, signer3.address],
           /* agreementFileCID */ 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp',
-          /* version */ ''
-        )
+          /* version */ '',
+        ),
       ).revertedWith('No version');
     });
 
@@ -162,7 +161,7 @@ describe('Proofs', () => {
         creator.address,
         signers,
         agreementFileCID,
-        version
+        version,
       );
 
       let expectedRes: any = proofOfAuthorityData;
@@ -186,7 +185,7 @@ describe('Proofs', () => {
         creator.address,
         signers,
         agreementFileCID,
-        version
+        version,
       );
       const proofTime = await time.latest();
       const gasUsedTx1 = (await tx1.wait())?.gasUsed ?? 0n;
@@ -194,8 +193,8 @@ describe('Proofs', () => {
       expectedRes.message.timestamp = await time.latest();
       expect(
         JSON.parse(
-          await proofs.proofsData(agreementFileCID, Proofs.ProofOfAuthority, creator.address)
-        )
+          await proofs.proofsData(agreementFileCID, Proofs.ProofOfAuthority, creator.address),
+        ),
       ).to.deep.equal(expectedRes);
 
       // second real function execution (less gas)
@@ -203,7 +202,7 @@ describe('Proofs', () => {
         creator.address,
         signers,
         agreementFileCID,
-        version
+        version,
       );
       const gasUsedTx2 = (await tx2.wait())?.gasUsed ?? 0n;
 
@@ -211,7 +210,7 @@ describe('Proofs', () => {
         creator.address,
         signers,
         agreementFileCID,
-        version
+        version,
       );
 
       expect(gasUsedTx1).greaterThan(gasUsedTx2 * 5n);
@@ -243,8 +242,8 @@ describe('Proofs', () => {
           ethers.ZeroAddress,
           agreementFileCID,
           agreementFileProofCID,
-          '0.1.0'
-        )
+          '0.1.0',
+        ),
       ).revertedWith('No signer');
     });
 
@@ -256,8 +255,8 @@ describe('Proofs', () => {
           signer1.address,
           '',
           agreementFileProofCID,
-          '0.1.0'
-        )
+          '0.1.0',
+        ),
       ).revertedWith('No Agreement File CID');
     });
 
@@ -265,7 +264,7 @@ describe('Proofs', () => {
       const { proofs, signer1 } = await loadFixture(deployProofsFixture);
 
       await expect(
-        proofs.fetchProofOfSignatureData.staticCall(signer1.address, agreementFileCID, '', '0.1.0')
+        proofs.fetchProofOfSignatureData.staticCall(signer1.address, agreementFileCID, '', '0.1.0'),
       ).revertedWith('No Proof-of-Authority CID');
     });
 
@@ -277,8 +276,8 @@ describe('Proofs', () => {
           signer1.address,
           agreementFileCID,
           agreementFileProofCID,
-          ''
-        )
+          '',
+        ),
       ).revertedWith('No version');
     });
 
@@ -288,7 +287,7 @@ describe('Proofs', () => {
         signer1.address,
         agreementFileCID,
         agreementFileProofCID,
-        '0.1.0'
+        '0.1.0',
       );
 
       let expectedRes: any = proofOfSignatureData;
@@ -311,7 +310,7 @@ describe('Proofs', () => {
         signer1.address,
         agreementFileCID,
         agreementFileProofCID,
-        '0.1.0'
+        '0.1.0',
       );
       const proofTime = await time.latest();
       const gasUsedTx1 = (await tx1.wait())?.gasUsed ?? 0n;
@@ -319,8 +318,8 @@ describe('Proofs', () => {
       expectedRes.message.timestamp = await time.latest();
       expect(
         JSON.parse(
-          await proofs.proofsData(agreementFileCID, Proofs.ProofOfSignature, signer1.address)
-        )
+          await proofs.proofsData(agreementFileCID, Proofs.ProofOfSignature, signer1.address),
+        ),
       ).to.deep.equal(expectedRes);
 
       // second real function execution (less gas)
@@ -328,7 +327,7 @@ describe('Proofs', () => {
         signer1.address,
         agreementFileCID,
         agreementFileProofCID,
-        '0.1.0'
+        '0.1.0',
       );
       const gasUsedTx2 = (await tx2.wait())?.gasUsed ?? 0n;
 
@@ -336,7 +335,7 @@ describe('Proofs', () => {
         signer1.address,
         agreementFileCID,
         agreementFileProofCID,
-        '0.1.0'
+        '0.1.0',
       );
 
       expect(gasUsedTx1).greaterThan(gasUsedTx2 * 5n);
@@ -369,7 +368,7 @@ describe('Proofs', () => {
       const { proofs } = await loadFixture(deployProofsFixture);
 
       await expect(
-        proofs.fetchProofOfAgreementData.staticCall('', proofOfAuthorityCID, proofOfSignatureCIDs)
+        proofs.fetchProofOfAgreementData.staticCall('', proofOfAuthorityCID, proofOfSignatureCIDs),
       ).revertedWith('No Agreement File CID');
     });
 
@@ -378,7 +377,7 @@ describe('Proofs', () => {
       let res = await proofs.fetchProofOfAgreementData.staticCall(
         agreementFileCID,
         proofOfAuthorityCID,
-        proofOfSignatureCIDs
+        proofOfSignatureCIDs,
       );
 
       const timestamp = await time.latest();
@@ -401,29 +400,29 @@ describe('Proofs', () => {
       const tx1 = await proofs.fetchProofOfAgreementData(
         agreementFileCID,
         proofOfAuthorityCID,
-        proofOfSignatureCIDs
+        proofOfSignatureCIDs,
       );
       const gasUsedTx1 = (await tx1.wait())?.gasUsed ?? 0n;
 
       expectedRes.timestamp = await time.latest();
       expect(
         JSON.parse(
-          await proofs.proofsData(agreementFileCID, Proofs.ProofOfAgreement, ethers.ZeroAddress)
-        )
+          await proofs.proofsData(agreementFileCID, Proofs.ProofOfAgreement, ethers.ZeroAddress),
+        ),
       ).to.deep.equal(expectedRes);
 
       // second real function execution (less gas)
       const tx2 = await proofs.fetchProofOfAgreementData(
         agreementFileCID,
         proofOfAuthorityCID,
-        proofOfSignatureCIDs
+        proofOfSignatureCIDs,
       );
       const gasUsedTx2 = (await tx2.wait())?.gasUsed ?? 0n;
 
       res = await proofs.fetchProofOfAgreementData.staticCall(
         agreementFileCID,
         proofOfAuthorityCID,
-        proofOfSignatureCIDs
+        proofOfSignatureCIDs,
       );
 
       expect(gasUsedTx1).greaterThan(gasUsedTx2 * 5n);
@@ -456,7 +455,7 @@ describe('Proofs', () => {
         creator.address,
         signers,
         agreementFileCID,
-        version
+        version,
       );
 
       const dataHash = ethers.keccak256(ethers.toUtf8Bytes(data));
@@ -471,30 +470,30 @@ describe('Proofs', () => {
 
     it('error: No ProofCID', async () => {
       await expect(
-        proofs.storeProofOfAuthority(creator.address, signature, agreementFileCID, '')
+        proofs.storeProofOfAuthority(creator.address, signature, agreementFileCID, ''),
       ).revertedWith('No ProofCID');
     });
 
     it('error: Proof already stored', async () => {
       await proofs.storeProofOfAuthority(creator.address, signature, agreementFileCID, proofCID);
       await expect(
-        proofs.storeProofOfAuthority(creator.address, signature, agreementFileCID, proofCID)
+        proofs.storeProofOfAuthority(creator.address, signature, agreementFileCID, proofCID),
       ).revertedWith('Proof already stored');
     });
 
     it('error: Invalid signature', async () => {
       await expect(
-        proofs.storeProofOfAuthority(creator.address, signatureSigner1, agreementFileCID, proofCID)
+        proofs.storeProofOfAuthority(creator.address, signatureSigner1, agreementFileCID, proofCID),
       ).revertedWith('Invalid signature');
       await expect(
-        proofs.storeProofOfAuthority(creator.address, signature, '', proofCID)
+        proofs.storeProofOfAuthority(creator.address, signature, '', proofCID),
       ).revertedWith('Invalid signature');
     });
 
     it('success', async () => {
       // calculated & emited correctly
       await expect(
-        proofs.storeProofOfAuthority(creator.address, signature, agreementFileCID, proofCID)
+        proofs.storeProofOfAuthority(creator.address, signature, agreementFileCID, proofCID),
       )
         .emit(proofs, 'ProofOfAuthority')
         .withArgs(creator.address, signature, agreementFileCID, proofCID, JSON.stringify(proof));
@@ -523,13 +522,13 @@ describe('Proofs', () => {
         signer1.address,
         agreementFileCID,
         proofOfAuthorityCID,
-        version
+        version,
       );
       const data = await proofs.fetchProofOfSignatureData.staticCall(
         signer1.address,
         agreementFileCID,
         proofOfAuthorityCID,
-        version
+        version,
       );
 
       const dataHash = ethers.keccak256(ethers.toUtf8Bytes(data));
@@ -544,7 +543,7 @@ describe('Proofs', () => {
 
     it('error: No ProofCID', async () => {
       await expect(
-        proofs.storeProofOfSignature(signer1.address, signature, agreementFileCID, '')
+        proofs.storeProofOfSignature(signer1.address, signature, agreementFileCID, ''),
       ).revertedWith('No ProofCID');
     });
 
@@ -553,15 +552,15 @@ describe('Proofs', () => {
         signer1.address,
         signature,
         agreementFileCID,
-        proofOfSignatureCID
+        proofOfSignatureCID,
       );
       await expect(
         proofs.storeProofOfSignature(
           signer1.address,
           signature,
           agreementFileCID,
-          proofOfSignatureCID
-        )
+          proofOfSignatureCID,
+        ),
       ).revertedWith('Proof already stored');
     });
 
@@ -571,11 +570,11 @@ describe('Proofs', () => {
           signer1.address,
           signatureSigner2,
           agreementFileCID,
-          proofOfSignatureCID
-        )
+          proofOfSignatureCID,
+        ),
       ).revertedWith('Invalid signature');
       await expect(
-        proofs.storeProofOfSignature(signer1.address, signature, '', proofOfSignatureCID)
+        proofs.storeProofOfSignature(signer1.address, signature, '', proofOfSignatureCID),
       ).revertedWith('Invalid signature');
     });
 
@@ -586,8 +585,8 @@ describe('Proofs', () => {
           signer1.address,
           signature,
           agreementFileCID,
-          proofOfSignatureCID
-        )
+          proofOfSignatureCID,
+        ),
       )
         .emit(proofs, 'ProofOfSignature')
         .withArgs(
@@ -595,12 +594,12 @@ describe('Proofs', () => {
           signature,
           agreementFileCID,
           proofOfSignatureCID,
-          JSON.stringify(proof)
+          JSON.stringify(proof),
         );
 
       // calculated & stored correctly
       expect(JSON.parse(await proofs.finalProofs(agreementFileCID, proofOfSignatureCID))).eql(
-        proof
+        proof,
       );
     });
   });
@@ -623,24 +622,24 @@ describe('Proofs', () => {
       await proofs.fetchProofOfAgreementData(
         agreementFileCID,
         proofOfAuthorityCID,
-        proofOfSignatureCIDs
+        proofOfSignatureCIDs,
       );
       proof = await proofs.fetchProofOfAgreementData.staticCall(
         agreementFileCID,
         proofOfAuthorityCID,
-        proofOfSignatureCIDs
+        proofOfSignatureCIDs,
       );
     });
 
     it('error: No ProofCID', async () => {
       await expect(
-        proofs.storeProofOfAgreement(agreementFileCID, proofOfAuthorityCID, '')
+        proofs.storeProofOfAgreement(agreementFileCID, proofOfAuthorityCID, ''),
       ).revertedWith('No ProofCID');
     });
 
     it('error: No Agreement File CID', async () => {
       await expect(
-        proofs.storeProofOfAgreement('', proofOfAuthorityCID, proofOfAgreementCID)
+        proofs.storeProofOfAgreement('', proofOfAuthorityCID, proofOfAgreementCID),
       ).revertedWith('No Agreement File CID');
     });
 
@@ -648,10 +647,10 @@ describe('Proofs', () => {
       await proofs.storeProofOfAgreement(
         agreementFileCID,
         proofOfAuthorityCID,
-        proofOfAgreementCID
+        proofOfAgreementCID,
       );
       await expect(
-        proofs.storeProofOfAgreement(agreementFileCID, proofOfAuthorityCID, proofOfAgreementCID)
+        proofs.storeProofOfAgreement(agreementFileCID, proofOfAuthorityCID, proofOfAgreementCID),
       ).revertedWith('Proof already stored');
     });
 
@@ -661,9 +660,9 @@ describe('Proofs', () => {
         proofs.storeProofOfAgreement(
           agreementFileCID,
           proofOfAuthorityCID,
-          proofOfAgreementCID
+          proofOfAgreementCID,
           // proof
-        )
+        ),
       )
         .emit(proofs, 'ProofOfAgreement')
         .withArgs(agreementFileCID, proofOfAuthorityCID, proofOfAgreementCID, proof);

@@ -24,7 +24,7 @@ describe('Proofs Helper', () => {
       const { proofsHelper } = await loadFixture(deployProofsHelperFixture);
 
       await expect(
-        proofsHelper.getProofOfAgreementData.staticCall('', proofOfSignatureCIDs, timestamp)
+        proofsHelper.getProofOfAgreementData.staticCall('', proofOfSignatureCIDs, timestamp),
       ).revertedWith('No Proof-of-Authority CID');
     });
 
@@ -39,8 +39,8 @@ describe('Proofs Helper', () => {
             'QmfSEEuZBsSgh3hLB8BU4ApNepDpaUWFCw9KqB7DxLbSV2',
             'QmVMLPjLnT7PVQvZstd6DmL8K1VGHHypbYyG2HHSzN8BTK',
           ],
-          timestamp
-        )
+          timestamp,
+        ),
       ).revertedWith('No Proof-of-Signature CID');
       await expect(
         proofsHelper.getProofOfAgreementData.staticCall(
@@ -50,8 +50,8 @@ describe('Proofs Helper', () => {
             '',
             'QmVMLPjLnT7PVQvZstd6DmL8K1VGHHypbYyG2HHSzN8BTK',
           ],
-          timestamp
-        )
+          timestamp,
+        ),
       ).revertedWith('No Proof-of-Signature CID');
       await expect(
         proofsHelper.getProofOfAgreementData.staticCall(
@@ -61,8 +61,8 @@ describe('Proofs Helper', () => {
             'QmfSEEuZBsSgh3hLB8BU4ApNepDpaUWFCw9KqB7DxLbSV2',
             '',
           ],
-          timestamp
-        )
+          timestamp,
+        ),
       ).revertedWith('No Proof-of-Signature CID');
     });
 

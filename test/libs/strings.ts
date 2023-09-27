@@ -34,8 +34,8 @@ describe('Strings library', () => {
     // 2^256 - 1
     expect(
       await strings['toString(uint256)'](
-        '115792089237316195423570985008687907853269984665640564039457584007913129639935'
-      )
+        '115792089237316195423570985008687907853269984665640564039457584007913129639935',
+      ),
     ).equal('115792089237316195423570985008687907853269984665640564039457584007913129639935');
   });
 
@@ -45,11 +45,11 @@ describe('Strings library', () => {
     expect(await strings['toString(address)'](ethers.ZeroAddress)).equal(ethers.ZeroAddress);
     // Mixed case -> lower case
     expect(await strings['toString(address)']('0x4D07e28E9EE6DC715b98f589169d7927239d7318')).equal(
-      '0x4d07e28e9ee6dc715b98f589169d7927239d7318'
+      '0x4d07e28e9ee6dc715b98f589169d7927239d7318',
     );
     // Lower case -> lower case
     expect(await strings['toString(address)']('0x4d07e28e9ee6dc715b98f589169d7927239d7318')).equal(
-      '0x4d07e28e9ee6dc715b98f589169d7927239d7318'
+      '0x4d07e28e9ee6dc715b98f589169d7927239d7318',
     );
   });
 

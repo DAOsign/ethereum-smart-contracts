@@ -61,9 +61,6 @@ function fetchProofOfAuthorityData(address _creator, address[] _signers, string 
 function fetchProofOfSignatureData(address _signer, string _agreementFileCID, string _proofOfAuthorityCID, string _version) public returns (string)
 ```
 
-Note: there is no check that the _proofOfAuthorityCID is actually for this proof. This check
-      should be done offchain.
-
 ### fetchProofOfAgreementData
 
 ```solidity

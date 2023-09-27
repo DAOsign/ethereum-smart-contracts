@@ -21,7 +21,7 @@ describe('Proofs Metadata', () => {
       const { proofsMetadata, anyone, owner } = await loadFixture(deployProofsMetadataFixture);
 
       await expect(
-        proofsMetadata.connect(anyone).addMetadata(Proofs.ProofOfAuthority, '0.1.0', '{}')
+        proofsMetadata.connect(anyone).addMetadata(Proofs.ProofOfAuthority, '0.1.0', '{}'),
       ).revertedWith('Ownable: caller is not the owner');
       await proofsMetadata.connect(owner).addMetadata(Proofs.ProofOfAuthority, '0.1.0', '{}');
     });
@@ -30,10 +30,10 @@ describe('Proofs Metadata', () => {
       const { proofsMetadata } = await loadFixture(deployProofsMetadataFixture);
 
       await expect(proofsMetadata.addMetadata(Proofs.ProofOfAuthority, '', '{}')).rejectedWith(
-        'Input params cannot be empty'
+        'Input params cannot be empty',
       );
       await expect(proofsMetadata.addMetadata(Proofs.ProofOfAuthority, '0.1.0', '')).rejectedWith(
-        'Input params cannot be empty'
+        'Input params cannot be empty',
       );
     });
 
@@ -43,7 +43,7 @@ describe('Proofs Metadata', () => {
       await proofsMetadata.addMetadata(Proofs.ProofOfAuthority, '0.1.0', '{}');
       await proofsMetadata.addMetadata(Proofs.ProofOfAuthority, '0.2.0', '{ domain: "daosign" }');
       await expect(
-        proofsMetadata.addMetadata(Proofs.ProofOfAuthority, '0.1.0', '{ domain: "daosign" }')
+        proofsMetadata.addMetadata(Proofs.ProofOfAuthority, '0.1.0', '{ domain: "daosign" }'),
       ).revertedWith('Metadata already exists');
     });
 
@@ -54,7 +54,7 @@ describe('Proofs Metadata', () => {
         .emit(proofsMetadata, 'MetadataAdded')
         .withArgs(Proofs.ProofOfAuthority, '0.1.0', '{}');
       await expect(
-        proofsMetadata.addMetadata(Proofs.ProofOfAuthority, '0.2.0', '{ domain: "daosign" }')
+        proofsMetadata.addMetadata(Proofs.ProofOfAuthority, '0.2.0', '{ domain: "daosign" }'),
       )
         .emit(proofsMetadata, 'MetadataAdded')
         .withArgs(Proofs.ProofOfAuthority, '0.2.0', '{ domain: "daosign" }');
@@ -69,7 +69,7 @@ describe('Proofs Metadata', () => {
       await expect(
         proofsMetadata
           .connect(anyone)
-          .forceUpdateMetadata(Proofs.ProofOfAuthority, '0.1.0', '{ domain: "daosign" }')
+          .forceUpdateMetadata(Proofs.ProofOfAuthority, '0.1.0', '{ domain: "daosign" }'),
       ).revertedWith('Ownable: caller is not the owner');
       await proofsMetadata
         .connect(owner)
@@ -81,10 +81,10 @@ describe('Proofs Metadata', () => {
       await proofsMetadata.addMetadata(Proofs.ProofOfAuthority, '0.1.0', '{}');
 
       await expect(
-        proofsMetadata.forceUpdateMetadata(Proofs.ProofOfAuthority, '', '{}')
+        proofsMetadata.forceUpdateMetadata(Proofs.ProofOfAuthority, '', '{}'),
       ).rejectedWith('Input params cannot be empty');
       await expect(
-        proofsMetadata.forceUpdateMetadata(Proofs.ProofOfAuthority, '0.1.0', '')
+        proofsMetadata.forceUpdateMetadata(Proofs.ProofOfAuthority, '0.1.0', ''),
       ).rejectedWith('Input params cannot be empty');
     });
 
@@ -95,14 +95,14 @@ describe('Proofs Metadata', () => {
         proofsMetadata.forceUpdateMetadata(
           Proofs.ProofOfAuthority,
           '0.1.0',
-          '{ domain: "daosign" }'
-        )
+          '{ domain: "daosign" }',
+        ),
       ).revertedWith('Metadata does not exist');
       await proofsMetadata.addMetadata(Proofs.ProofOfAuthority, '0.1.0', '{}');
       await proofsMetadata.forceUpdateMetadata(
         Proofs.ProofOfAuthority,
         '0.1.0',
-        '{ domain: "daosign" }'
+        '{ domain: "daosign" }',
       );
     });
 
@@ -114,13 +114,17 @@ describe('Proofs Metadata', () => {
         proofsMetadata.forceUpdateMetadata(
           Proofs.ProofOfAuthority,
           '0.1.0',
-          '{ domain: "daosign" }'
-        )
+          '{ domain: "daosign" }',
+        ),
       )
         .emit(proofsMetadata, 'MetadataUpdated')
         .withArgs(Proofs.ProofOfAuthority, '0.1.0', '{ domain: "daosign" }');
       await expect(
-        proofsMetadata.forceUpdateMetadata(Proofs.ProofOfAuthority, '0.1.0', '{ type: "contract" }')
+        proofsMetadata.forceUpdateMetadata(
+          Proofs.ProofOfAuthority,
+          '0.1.0',
+          '{ type: "contract" }',
+        ),
       )
         .emit(proofsMetadata, 'MetadataUpdated')
         .withArgs(Proofs.ProofOfAuthority, '0.1.0', '{ type: "contract" }');
@@ -140,13 +144,13 @@ describe('Proofs Metadata', () => {
     it('get proofsMetadata', async () => {
       expect(await proofsMetadata.proofsMetadata(Proofs.ProofOfAuthority, '0.3.0')).equal('');
       expect(await proofsMetadata.proofsMetadata(Proofs.ProofOfAuthority, '0.1.0')).equal(
-        '{ domain: "daosign" }'
+        '{ domain: "daosign" }',
       );
       expect(await proofsMetadata.proofsMetadata(Proofs.ProofOfSignature, '0.1.0')).equal(
-        '{ signer: 0x12345 }'
+        '{ signer: 0x12345 }',
       );
       expect(await proofsMetadata.proofsMetadata(Proofs.ProofOfAuthority, '0.2.0')).equal(
-        '{ domain: "DAOsign" }'
+        '{ domain: "DAOsign" }',
       );
 
       await proofsMetadata.forceUpdateMetadata(Proofs.ProofOfAuthority, '0.1.0', '{}');

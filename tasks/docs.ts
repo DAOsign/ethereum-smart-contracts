@@ -19,5 +19,5 @@ task('docs', 'Generate documentation based on the comments in the code').setActi
 
     // Regenerate the docs
     await hre.run('docgen');
-  }
+  },
 );

@@ -8,7 +8,7 @@
     "lint:ts": "npx eslint test/** --fix",
     "lint:sol": "npx solhint contracts/**/*.sol",
     "prettier": "yarn prettier:ts && yarn prettier:sol",
-    "prettier:sol": "npx prettier --write \"contracts/**/*.sol\"",
+    "prettier:sol": "npx prettier --plugin=prettier-plugin-solidity --write \"contracts/**/*.sol\"",
     "prettier:ts": "npx prettier --write \"**/*.ts\"",
     "typechain": "npx hardhat typechain",
     "build": "yarn hardhat compile",

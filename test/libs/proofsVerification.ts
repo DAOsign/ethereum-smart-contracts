@@ -14,7 +14,7 @@ describe('Proofs Verification', () => {
 
   it('verify any signature', async () => {
     const { proofsVerification, signer1, signer2, anyone } = await loadFixture(
-      deployProofsVerificationFixture
+      deployProofsVerificationFixture,
     );
 
     const message1 = ethers.solidityPackedKeccak256(['address', 'uint'], [anyone.address, 45]);
@@ -24,29 +24,29 @@ describe('Proofs Verification', () => {
 
     // correct signer of message1
     expect(await proofsVerification.verify.staticCall(signer1.address, message1, signature1)).equal(
-      true
+      true,
     );
     // wrong signer of message1
     expect(await proofsVerification.verify.staticCall(signer2.address, message1, signature1)).equal(
-      false
+      false,
     );
     // correct signer of message2
     expect(await proofsVerification.verify.staticCall(signer2.address, message2, signature2)).equal(
-      true
+      true,
     );
     // wrong signer of message2
     expect(await proofsVerification.verify.staticCall(signer1.address, message2, signature2)).equal(
-      false
+      false,
     );
     // wrong signature of message2
     expect(await proofsVerification.verify.staticCall(signer1.address, message2, signature1)).equal(
-      false
+      false,
     );
   });
 
   it('verify signed proof', async () => {
     const { proofsVerification, creator, signer1, signer2, signer3 } = await loadFixture(
-      deployProofsVerificationFixture
+      deployProofsVerificationFixture,
     );
     const agreementFileCID = 'QmQY5XFRomrnAD3o3yMWkTz1HWcCfZYuE87Gbwe7SjV1kk';
     const agreementFileProofCID = 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp';
@@ -76,18 +76,18 @@ describe('Proofs Verification', () => {
 
     // correct signer of the proof
     expect(
-      await proofsVerification.verifySignedProof(signer1.address, rawPoaData, poaSignature1)
+      await proofsVerification.verifySignedProof(signer1.address, rawPoaData, poaSignature1),
     ).equal(true);
     expect(
-      await proofsVerification.verifySignedProof(signer2.address, rawPoaData, poaSignature2)
+      await proofsVerification.verifySignedProof(signer2.address, rawPoaData, poaSignature2),
     ).equal(true);
     // wrong signer of the proof
     expect(
-      await proofsVerification.verifySignedProof(signer2.address, rawPoaData, poaSignature1)
+      await proofsVerification.verifySignedProof(signer2.address, rawPoaData, poaSignature1),
     ).equal(false);
     // wrong signature
     expect(
-      await proofsVerification.verifySignedProof(signer1.address, rawPoaData, poaSignature2)
+      await proofsVerification.verifySignedProof(signer1.address, rawPoaData, poaSignature2),
     ).equal(false);
 
     /**
@@ -111,18 +111,18 @@ describe('Proofs Verification', () => {
 
     // correct signer of the proof
     expect(
-      await proofsVerification.verifySignedProof(signer1.address, rawPosData, posSignature1)
+      await proofsVerification.verifySignedProof(signer1.address, rawPosData, posSignature1),
     ).equal(true);
     expect(
-      await proofsVerification.verifySignedProof(signer2.address, rawPosData, posSignature2)
+      await proofsVerification.verifySignedProof(signer2.address, rawPosData, posSignature2),
     ).equal(true);
     // wrong signer of the proof
     expect(
-      await proofsVerification.verifySignedProof(signer2.address, rawPosData, posSignature1)
+      await proofsVerification.verifySignedProof(signer2.address, rawPosData, posSignature1),
     ).equal(false);
     // wrong signature
     expect(
-      await proofsVerification.verifySignedProof(signer1.address, rawPosData, posSignature2)
+      await proofsVerification.verifySignedProof(signer1.address, rawPosData, posSignature2),
     ).equal(false);
   });
 });

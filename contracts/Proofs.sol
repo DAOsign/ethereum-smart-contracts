@@ -86,10 +86,6 @@ contract Proofs {
         return proofData;
     }
 
-    /**
-     * Note: there is no check that the _proofOfAuthorityCID is actually for this proof. This check
-     *       should be done offchain.
-     */
     function fetchProofOfSignatureData(
         address _signer,
         string calldata _agreementFileCID,
@@ -102,6 +98,7 @@ contract Proofs {
         ) {
             return proofsData[_agreementFileCID][ProofTypes.Proofs.ProofOfSignature][_signer];
         }
+        // TODO: require finalProofs[_agreementFileCID][_proofOfAuthorityCID] exists
         string memory proofData = ProofsHelper.getProofOfSignatureData(
             proofsMetadata,
             _signer,
@@ -126,6 +123,8 @@ contract Proofs {
         ) {
             return proofsData[_agreementFileCID][ProofTypes.Proofs.ProofOfAgreement][address(0)];
         }
+        // TODO: require finalProofs[_agreementFileCID][_proofOfAuthorityCID] exists
+        // TODO: require finalProofs[_agreementFileCID][_proofsOfSignatureCID] exists
         string memory proofData = ProofsHelper.getProofOfAgreementData(
             _proofOfAuthorityCID,
             _proofsOfSignatureCID,
@@ -143,6 +142,7 @@ contract Proofs {
     ) public {
         require(_proofCID.length() > 0, 'No ProofCID');
         require(finalProofs[_agreementFileCID][_proofCID].length() == 0, 'Proof already stored');
+        // TODO: get timestamp from the proof and update proofsData mapping: replace _creator with timestamp
         require(
             ProofsVerification.verifySignedProof(
                 _creator,
