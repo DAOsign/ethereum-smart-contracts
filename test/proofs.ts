@@ -37,6 +37,47 @@ describe('Proofs', () => {
     };
   }
 
+  const storeProofOfAuthority = async (agreementFileCID: string, poaCID: string) => {
+    const version = '0.1.0';
+
+    const { proofs, creator, signer1, signer2, signer3 } = await loadFixture(deployProofsFixture);
+    const signers = [signer1.address, signer2.address, signer3.address];
+
+    await proofs.fetchProofOfAuthorityData(creator.address, signers, agreementFileCID, version);
+    const data = await proofs.fetchProofOfAuthorityData.staticCall(
+      creator.address,
+      signers,
+      agreementFileCID,
+      version,
+    );
+
+    const dataHash = ethers.keccak256(ethers.toUtf8Bytes(data));
+    const signature = await creator.signMessage(ethers.getBytes(dataHash));
+    await proofs.storeProofOfAuthority(creator.address, signature, agreementFileCID, poaCID);
+  };
+
+  const storeProofOfSignature = async (
+    fileCID: string,
+    poaCID: string,
+    posCID: string,
+    proofs: any,
+    signer1: SignerWithAddress,
+  ) => {
+    const version = '0.1.0';
+
+    await proofs.fetchProofOfSignatureData(signer1.address, fileCID, poaCID, version);
+    const data = await proofs.fetchProofOfSignatureData.staticCall(
+      signer1.address,
+      fileCID,
+      poaCID,
+      version,
+    );
+
+    const dataHash = ethers.keccak256(ethers.toUtf8Bytes(data));
+    const signature = await signer1.signMessage(ethers.getBytes(dataHash));
+    await proofs.storeProofOfSignature(signer1.address, signature, fileCID, posCID);
+  };
+
   describe('constructor', () => {
     it('error on non-IERC165 and non-IProofsMetadata input', async () => {
       const { proofs, strings, proofsVerification, proofsHelper, anyone } =
@@ -233,44 +274,44 @@ describe('Proofs', () => {
   describe('Fetch Proof-of-Signature data', () => {
     const agreementFileCID = 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp';
     const agreementFileProofCID = 'QmQY5XFRomrnAD3o3yMWkTz1HWcCfZYuE87Gbwe7SjV1kk';
+    let proofs: any;
+    let signer1: SignerWithAddress;
+    const version = '0.1.0';
+
+    beforeEach(async () => {
+      ({ proofs, signer1 } = await loadFixture(deployProofsFixture));
+      await storeProofOfAuthority(agreementFileCID, agreementFileProofCID);
+    });
 
     it('no signer error', async () => {
-      const { proofs } = await loadFixture(deployProofsFixture);
-
       await expect(
         proofs.fetchProofOfSignatureData.staticCall(
           ethers.ZeroAddress,
           agreementFileCID,
           agreementFileProofCID,
-          '0.1.0',
+          version,
         ),
       ).revertedWith('No signer');
     });
 
     it('no Agreement File CID error', async () => {
-      const { proofs, signer1 } = await loadFixture(deployProofsFixture);
-
       await expect(
         proofs.fetchProofOfSignatureData.staticCall(
           signer1.address,
           '',
           agreementFileProofCID,
-          '0.1.0',
+          version,
         ),
       ).revertedWith('No Agreement File CID');
     });
 
     it('no Proof-of-Authority CID error', async () => {
-      const { proofs, signer1 } = await loadFixture(deployProofsFixture);
-
       await expect(
-        proofs.fetchProofOfSignatureData.staticCall(signer1.address, agreementFileCID, '', '0.1.0'),
-      ).revertedWith('No Proof-of-Authority CID');
+        proofs.fetchProofOfSignatureData.staticCall(signer1.address, agreementFileCID, '', version),
+      ).revertedWith('No Proof-of-Authority');
     });
 
     it('no version error', async () => {
-      const { proofs, signer1 } = await loadFixture(deployProofsFixture);
-
       await expect(
         proofs.fetchProofOfSignatureData.staticCall(
           signer1.address,
@@ -282,7 +323,6 @@ describe('Proofs', () => {
     });
 
     it('success', async () => {
-      const { proofs, signer1 } = await loadFixture(deployProofsFixture);
       let res = await proofs.fetchProofOfSignatureData.staticCall(
         signer1.address,
         agreementFileCID,
@@ -373,7 +413,16 @@ describe('Proofs', () => {
     });
 
     it('success', async () => {
-      const { proofs } = await loadFixture(deployProofsFixture);
+      const { proofs, signer1 } = await loadFixture(deployProofsFixture);
+
+      // Store Proof-of-Authority & Proofs-of-Agreement
+      await storeProofOfAuthority(agreementFileCID, proofOfAuthorityCID);
+      await Promise.all(
+        proofOfSignatureCIDs.map((posCID) =>
+          storeProofOfSignature(agreementFileCID, proofOfAuthorityCID, posCID, proofs, signer1),
+        ),
+      );
+
       let res = await proofs.fetchProofOfAgreementData.staticCall(
         agreementFileCID,
         proofOfAuthorityCID,
@@ -518,6 +567,8 @@ describe('Proofs', () => {
     beforeEach(async () => {
       ({ proofs, signer1, signer2 } = await loadFixture(deployProofsFixture));
 
+      await storeProofOfAuthority(agreementFileCID, proofOfAuthorityCID);
+
       await proofs.fetchProofOfSignatureData(
         signer1.address,
         agreementFileCID,
@@ -615,9 +666,17 @@ describe('Proofs', () => {
     const proofOfAgreementCID = 'QmQY5XFRomrnAD3o3yMWkTz1HWcCfZYuE87Gbwe7SjV1kk';
     let proof: string;
     let proofs: any;
+    let signer1: SignerWithAddress;
 
     beforeEach(async () => {
-      ({ proofs } = await loadFixture(deployProofsFixture));
+      ({ proofs, signer1 } = await loadFixture(deployProofsFixture));
+
+      await storeProofOfAuthority(agreementFileCID, proofOfAuthorityCID);
+      await Promise.all(
+        proofOfSignatureCIDs.map((posCID) =>
+          storeProofOfSignature(agreementFileCID, proofOfAuthorityCID, posCID, proofs, signer1),
+        ),
+      );
 
       await proofs.fetchProofOfAgreementData(
         agreementFileCID,

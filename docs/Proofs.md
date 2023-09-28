@@ -82,6 +82,6 @@ function storeProofOfSignature(address _signer, bytes _signature, string _agreem
 ### storeProofOfAgreement
 
 ```solidity
-function storeProofOfAgreement(string _agreementFileCID, string _proofOfAuthorityCID, string _proofOfAgreementCID) public
+function storeProofOfAgreement(string _agreementFileCID, string _proofOfAuthorityCID, string _proofCID) public
 ```
 

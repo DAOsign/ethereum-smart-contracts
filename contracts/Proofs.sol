@@ -51,9 +51,6 @@ contract Proofs {
         string proofJSON
     );
 
-    // TODO: potentially add structs to store data from each proof to verify
-    //       Proof-of-Signature and Proof-of-Agreement as they are dependant on other proofs
-
     constructor(address _proofsMetadata) {
         require(
             ERC165Checker.supportsERC165(_proofsMetadata) &&
@@ -69,6 +66,7 @@ contract Proofs {
         string calldata _agreementFileCID,
         string calldata _version
     ) public returns (string memory) {
+        // uint256 time = block.timestamp;
         if (
             proofsData[_agreementFileCID][ProofTypes.Proofs.ProofOfAuthority][_creator].length() > 0
         ) {
@@ -98,7 +96,11 @@ contract Proofs {
         ) {
             return proofsData[_agreementFileCID][ProofTypes.Proofs.ProofOfSignature][_signer];
         }
-        // TODO: require finalProofs[_agreementFileCID][_proofOfAuthorityCID] exists
+        require(
+            finalProofs[_agreementFileCID][_proofOfAuthorityCID].length() > 0,
+            'No Proof-of-Authority'
+        );
+
         string memory proofData = ProofsHelper.getProofOfSignatureData(
             proofsMetadata,
             _signer,
@@ -123,8 +125,16 @@ contract Proofs {
         ) {
             return proofsData[_agreementFileCID][ProofTypes.Proofs.ProofOfAgreement][address(0)];
         }
-        // TODO: require finalProofs[_agreementFileCID][_proofOfAuthorityCID] exists
-        // TODO: require finalProofs[_agreementFileCID][_proofsOfSignatureCID] exists
+        require(
+            finalProofs[_agreementFileCID][_proofOfAuthorityCID].length() > 0,
+            'No Proof-of-Authority'
+        );
+        for (uint256 i = 0; i < _proofsOfSignatureCID.length; i++) {
+            require(
+                finalProofs[_agreementFileCID][_proofsOfSignatureCID[i]].length() > 0,
+                'No Proof-of-Signature'
+            );
+        }
         string memory proofData = ProofsHelper.getProofOfAgreementData(
             _proofOfAuthorityCID,
             _proofsOfSignatureCID,
@@ -142,7 +152,6 @@ contract Proofs {
     ) public {
         require(_proofCID.length() > 0, 'No ProofCID');
         require(finalProofs[_agreementFileCID][_proofCID].length() == 0, 'Proof already stored');
-        // TODO: get timestamp from the proof and update proofsData mapping: replace _creator with timestamp
         require(
             ProofsVerification.verifySignedProof(
                 _creator,
@@ -191,27 +200,26 @@ contract Proofs {
 
     function storeProofOfAgreement(
         string calldata _agreementFileCID,
-        string calldata _proofOfAuthorityCID, // TODO: involve this proofs into PoA storage to enable having multiple
-        //       PoA for the same AgreementFileCID
-        string calldata _proofOfAgreementCID
+        string calldata _proofOfAuthorityCID,
+        string calldata _proofCID
     ) public {
-        require(_proofOfAgreementCID.length() > 0, 'No ProofCID');
+        require(_proofCID.length() > 0, 'No ProofCID');
         require(_agreementFileCID.length() > 0, 'No Agreement File CID');
+        require(finalProofs[_agreementFileCID][_proofCID].length() == 0, 'Proof already stored');
         require(
-            finalProofs[_agreementFileCID][_proofOfAgreementCID].length() == 0,
-            'Proof already stored'
+            finalProofs[_agreementFileCID][_proofOfAuthorityCID].length() > 0,
+            'Invalid input data'
         );
 
-        // TODO: Fix: for the same agreement file there may not exist the same 2 Proofs-of-Agreement
-        finalProofs[_agreementFileCID][_proofOfAgreementCID] = proofsData[_agreementFileCID][
+        finalProofs[_agreementFileCID][_proofCID] = proofsData[_agreementFileCID][
             ProofTypes.Proofs.ProofOfAgreement
         ][address(0)];
 
         emit ProofOfAgreement(
             _agreementFileCID,
             _proofOfAuthorityCID,
-            _proofOfAgreementCID,
-            finalProofs[_agreementFileCID][_proofOfAgreementCID]
+            _proofCID,
+            finalProofs[_agreementFileCID][_proofCID]
         );
     }
 }
