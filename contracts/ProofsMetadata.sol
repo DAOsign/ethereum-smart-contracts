@@ -17,7 +17,7 @@ contract ProofsMetadata is IProofsMetadata, Ownable, ERC165 {
     using StringsExpanded for string;
 
     // proof type -> version -> metadata itself
-    mapping(ProofTypes.Proofs => mapping(string => string)) public proofsMetadata;
+    mapping(ProofTypes.Proofs => mapping(string => bytes)) public proofsMetadata;
     // proof type -> history of versions
     mapping(ProofTypes.Proofs => string[]) public metadataVersions;
 
@@ -48,10 +48,10 @@ contract ProofsMetadata is IProofsMetadata, Ownable, ERC165 {
     function addMetadata(
         ProofTypes.Proofs _type,
         string calldata _version,
-        string calldata _metadata
+        bytes calldata _metadata
     ) public onlyOwner {
-        require(_version.length() > 0 && _metadata.length() > 0, 'Input params cannot be empty');
-        require(proofsMetadata[_type][_version].length() == 0, 'Metadata already exists');
+        require(_version.length() > 0 && _metadata.length > 0, 'Input params cannot be empty');
+        require(proofsMetadata[_type][_version].length == 0, 'Metadata already exists');
 
         proofsMetadata[_type][_version] = _metadata;
         metadataVersions[_type].push(_version);
@@ -73,10 +73,10 @@ contract ProofsMetadata is IProofsMetadata, Ownable, ERC165 {
     function forceUpdateMetadata(
         ProofTypes.Proofs _type,
         string calldata _version,
-        string calldata _metadata
+        bytes calldata _metadata
     ) public onlyOwner {
-        require(_version.length() > 0 && _metadata.length() > 0, 'Input params cannot be empty');
-        require(proofsMetadata[_type][_version].length() > 0, 'Metadata does not exist');
+        require(_version.length() > 0 && _metadata.length > 0, 'Input params cannot be empty');
+        require(proofsMetadata[_type][_version].length > 0, 'Metadata does not exist');
 
         proofsMetadata[_type][_version] = _metadata;
 

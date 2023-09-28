@@ -3,19 +3,19 @@
 ### MetadataAdded
 
 ```solidity
-event MetadataAdded(enum ProofTypes.Proofs proof, string version, string metadata)
+event MetadataAdded(enum ProofTypes.Proofs proof, string version, bytes metadata)
 ```
 
 ### MetadataUpdated
 
 ```solidity
-event MetadataUpdated(enum ProofTypes.Proofs proof, string version, string metadata)
+event MetadataUpdated(enum ProofTypes.Proofs proof, string version, bytes metadata)
 ```
 
 ### proofsMetadata
 
 ```solidity
-function proofsMetadata(enum ProofTypes.Proofs _type, string _version) external view returns (string)
+function proofsMetadata(enum ProofTypes.Proofs _type, string _version) external view returns (bytes)
 ```
 
 ### metadataVersions
@@ -33,12 +33,12 @@ function getMetadataNumOfVersions(enum ProofTypes.Proofs _type) external view re
 ### addMetadata
 
 ```solidity
-function addMetadata(enum ProofTypes.Proofs _type, string _version, string _metadata) external
+function addMetadata(enum ProofTypes.Proofs _type, string _version, bytes _metadata) external
 ```
 
 ### forceUpdateMetadata
 
 ```solidity
-function forceUpdateMetadata(enum ProofTypes.Proofs _type, string _version, string _metadata) external
+function forceUpdateMetadata(enum ProofTypes.Proofs _type, string _version, bytes _metadata) external
 ```
 

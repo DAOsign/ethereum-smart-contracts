@@ -4,13 +4,13 @@ pragma solidity ^0.8.18;
 import { ProofTypes } from '../libs/common/ProofTypes.sol';
 
 interface IProofsMetadata {
-    event MetadataAdded(ProofTypes.Proofs proof, string indexed version, string metadata);
-    event MetadataUpdated(ProofTypes.Proofs proof, string indexed version, string metadata);
+    event MetadataAdded(ProofTypes.Proofs proof, string indexed version, bytes metadata);
+    event MetadataUpdated(ProofTypes.Proofs proof, string indexed version, bytes metadata);
 
     function proofsMetadata(
         ProofTypes.Proofs _type,
         string calldata _version
-    ) external view returns (string memory);
+    ) external view returns (bytes memory);
 
     function metadataVersions(
         ProofTypes.Proofs _type,
@@ -22,12 +22,12 @@ interface IProofsMetadata {
     function addMetadata(
         ProofTypes.Proofs _type,
         string calldata _version,
-        string calldata _metadata
+        bytes calldata _metadata
     ) external;
 
     function forceUpdateMetadata(
         ProofTypes.Proofs _type,
         string calldata _version,
-        string calldata _metadata
+        bytes calldata _metadata
     ) external;
 }

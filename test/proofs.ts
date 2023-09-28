@@ -5,6 +5,7 @@ import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { deployProofs, deployProofsMetadata } from '../scripts/deployForTest';
 import { proofOfAuthorityData, proofOfSignatureData } from './data/proofs';
 import { Proofs } from './common';
+import { proofJSONtoBytes } from './utils';
 
 describe('Proofs', () => {
   async function deployProofsFixture() {
@@ -15,12 +16,12 @@ describe('Proofs', () => {
     await proofsMetadata.addMetadata(
       Proofs.ProofOfAuthority,
       '0.1.0',
-      JSON.stringify(proofOfAuthorityData).slice(0, -1),
+      proofJSONtoBytes(proofOfAuthorityData),
     );
     await proofsMetadata.addMetadata(
       Proofs.ProofOfSignature,
       '0.1.0',
-      JSON.stringify(proofOfSignatureData).slice(0, -1),
+      proofJSONtoBytes(proofOfSignatureData),
     );
 
     return {

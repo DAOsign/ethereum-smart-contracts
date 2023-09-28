@@ -6,7 +6,7 @@ can update this metadata.
 ### proofsMetadata
 
 ```solidity
-mapping(enum ProofTypes.Proofs => mapping(string => string)) proofsMetadata
+mapping(enum ProofTypes.Proofs => mapping(string => bytes)) proofsMetadata
 ```
 
 ### metadataVersions
@@ -46,7 +46,7 @@ Get number of versions that exist for metadata by its name
 ### addMetadata
 
 ```solidity
-function addMetadata(enum ProofTypes.Proofs _type, string _version, string _metadata) public
+function addMetadata(enum ProofTypes.Proofs _type, string _version, bytes _metadata) public
 ```
 
 Add metadata by the contract administrator.
@@ -57,12 +57,12 @@ Add metadata by the contract administrator.
 | ---- | ---- | ----------- |
 | _type | enum ProofTypes.Proofs | Type of the proof metadata. Declared in {ProofTypes} library |
 | _version | string | Protocol version of the metadata. The version should be increased every time                there is a change in the metadata. |
-| _metadata | string | Metadata in JSON format. |
+| _metadata | bytes | Metadata in JSON format. |
 
 ### forceUpdateMetadata
 
 ```solidity
-function forceUpdateMetadata(enum ProofTypes.Proofs _type, string _version, string _metadata) public
+function forceUpdateMetadata(enum ProofTypes.Proofs _type, string _version, bytes _metadata) public
 ```
 
 Update metadata by the contract administrator.
@@ -76,5 +76,5 @@ Note: This has to be done ONLY in the event of incorrect data entry in `addMetad
 | ---- | ---- | ----------- |
 | _type | enum ProofTypes.Proofs | Type of the proof metadata. Declared in {ProofTypes} library |
 | _version | string | Protocol version of the metadata. The version should be increased every time                there is a change in the metadata. This function is only to adjusting the                inconsistency of metadata in smart contract and the one, used on the website. |
-| _metadata | string | Metadata in JSON format. |
+| _metadata | bytes | Metadata in JSON format. |
 

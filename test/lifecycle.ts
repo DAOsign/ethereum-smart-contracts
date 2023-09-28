@@ -1,10 +1,11 @@
-import { loadFixture, time } from '@nomicfoundation/hardhat-toolbox/network-helpers';
+import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers';
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { deployProofs, deployProofsMetadata } from '../scripts/deployForTest';
+import { deployProofs } from '../scripts/deployForTest';
 import { proofOfAuthorityData, proofOfSignatureData } from './data/proofs';
 import { Proofs } from './common';
+import { proofJSONtoBytes } from './utils';
 
 describe('Lifecycle Tests of the Platform', () => {
   async function deployProofsFixture() {
@@ -15,12 +16,12 @@ describe('Lifecycle Tests of the Platform', () => {
     await proofsMetadata.addMetadata(
       Proofs.ProofOfAuthority,
       '0.1.0',
-      JSON.stringify(proofOfAuthorityData).slice(0, -1),
+      proofJSONtoBytes(proofOfAuthorityData),
     );
     await proofsMetadata.addMetadata(
       Proofs.ProofOfSignature,
       '0.1.0',
-      JSON.stringify(proofOfSignatureData).slice(0, -1),
+      proofJSONtoBytes(proofOfSignatureData),
     );
 
     return {
@@ -78,7 +79,7 @@ describe('Lifecycle Tests of the Platform', () => {
     await proofs.storeProofOfSignature(signer1.address, signature, fileCID, posCID);
   };
 
-  it.only('#1', async () => {
+  it('#1', async () => {
     const agreementFileCID = 'QmfVd78Pns7Gd5ijurJo3vi892DmuPpz6eP5YsuSCsBoyD';
     const proofOfAuthorityCID = 'QmRr3f12HHGSBYk3hpFuuAweKfcStQ16Vej81gr4GLbKU3';
     const proofOfSignatureCIDs = [
