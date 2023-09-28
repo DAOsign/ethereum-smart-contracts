@@ -6,6 +6,7 @@ pragma solidity ^0.8.18;
 import { IERC165 } from '@openzeppelin/contracts/utils/introspection/IERC165.sol';
 import { ERC165Checker } from '@openzeppelin/contracts/utils/introspection/ERC165Checker.sol';
 import { IProofsMetadata } from './interfaces/IProofsMetadata.sol';
+import { IProofs } from './interfaces/IProofs.sol';
 import { StringsExpanded } from './libs/StringsExpanded.sol';
 import { ProofsVerification } from './libs/ProofsVerification.sol';
 import { ProofsHelper } from './libs/ProofsHelper.sol';
@@ -19,7 +20,7 @@ import { ProofTypes } from './libs/common/ProofTypes.sol';
  * Proof-of-Signature = PoSi
  * Proof-of-Agreement = PoAg
  */
-contract Proofs {
+contract Proofs is IProofs {
     using StringsExpanded for string;
 
     address public proofsMetadata;
@@ -29,27 +30,6 @@ contract Proofs {
 
     // Agreement File CID -> Proof type -> singer address (or zero address for Proof-of-Agreement) -> Proof Data
     mapping(string => mapping(ProofTypes.Proofs => mapping(address => string))) public proofsData;
-
-    event ProofOfAuthority(
-        address indexed creator,
-        bytes signature,
-        string indexed agreementFileCID,
-        string proofCID,
-        string proofJSON
-    );
-    event ProofOfSignature(
-        address indexed signer,
-        bytes signature,
-        string indexed agreementFileCID,
-        string proofCID,
-        string proofJSON
-    );
-    event ProofOfAgreement(
-        string indexed agreementFileCID,
-        string proofOfAuthorityCID,
-        string proofCID,
-        string proofJSON
-    );
 
     constructor(address _proofsMetadata) {
         require(

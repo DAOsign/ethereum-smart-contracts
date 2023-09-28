@@ -13,6 +13,8 @@ Proof-of-Agreement = PoAg
 address proofsMetadata
 ```
 
+Functions from variables
+
 ### finalProofs
 
 ```solidity
@@ -23,24 +25,6 @@ mapping(string => mapping(string => string)) finalProofs
 
 ```solidity
 mapping(string => mapping(enum ProofTypes.Proofs => mapping(address => string))) proofsData
-```
-
-### ProofOfAuthority
-
-```solidity
-event ProofOfAuthority(address creator, bytes signature, string agreementFileCID, string proofCID, string proofJSON)
-```
-
-### ProofOfSignature
-
-```solidity
-event ProofOfSignature(address signer, bytes signature, string agreementFileCID, string proofCID, string proofJSON)
-```
-
-### ProofOfAgreement
-
-```solidity
-event ProofOfAgreement(string agreementFileCID, string proofOfAuthorityCID, string proofCID, string proofJSON)
 ```
 
 ### constructor
@@ -54,6 +38,8 @@ constructor(address _proofsMetadata) public
 ```solidity
 function fetchProofOfAuthorityData(address _creator, address[] _signers, string _agreementFileCID, string _version) public returns (string)
 ```
+
+Actual functions
 
 ### fetchProofOfSignatureData
 
