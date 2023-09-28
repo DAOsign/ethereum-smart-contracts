@@ -70,4 +70,6 @@ describe('Proofs Helper', () => {
       // TODO
     });
   });
+
+  // TODO: test other functions
 });

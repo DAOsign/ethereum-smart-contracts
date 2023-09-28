@@ -119,7 +119,9 @@ contract Proofs {
     ) public returns (string memory) {
         require(_agreementFileCID.length() > 0, 'No Agreement File CID');
         if (
-            // TODO: Fix: for the same agreement file there may not exist the same 2 Proofs-of-Agreement
+            // Note: The same agreement file can be used for 2 or more agreements only if done sequentially.
+            //       While there is one agreement proof waiting to be added to IPFS, another agreement with the same
+            //       agreement file will override the `proofsData` mapping for this agreement
             proofsData[_agreementFileCID][ProofTypes.Proofs.ProofOfAgreement][address(0)].length() >
             0
         ) {
