@@ -19,6 +19,9 @@ library ProofsHelper {
         bytes calldata _signature,
         string memory _data
     ) external pure returns (string memory proof) {
+        require(_creator != address(0), 'No creator');
+        require(_signature.length > 0, 'No signature');
+        require(_data.length() > 0, 'No data');
         proof = string(
             abi.encodePacked(
                 '{"address":"',
