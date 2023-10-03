@@ -156,7 +156,7 @@ describe('Proofs Helper', () => {
     });
 
     it('success', async () => {
-      const expectedRes: any = proofOfAuthorityData;
+      const expectedRes: any = JSON.parse(JSON.stringify(proofOfAuthorityData));
       expectedRes.message = {
         from: creatorAddr.toLowerCase(),
         agreementFileCID,
@@ -228,7 +228,7 @@ describe('Proofs Helper', () => {
     });
 
     it('success', async () => {
-      const expectedRes: any = proofOfSignatureData;
+      const expectedRes: any = JSON.parse(JSON.stringify(proofOfSignatureData));
       expectedRes.message = {
         signer: signer1.address.toLowerCase(),
         agreementFileProofCID: poaCID,

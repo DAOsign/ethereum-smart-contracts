@@ -206,7 +206,7 @@ describe('Proofs', () => {
         version,
       );
 
-      let expectedRes: any = proofOfAuthorityData;
+      let expectedRes: any = JSON.parse(JSON.stringify(proofOfAuthorityData));
       expectedRes.message = {
         from: creator.address,
         agreementFileCID,
@@ -331,7 +331,7 @@ describe('Proofs', () => {
         '0.1.0',
       );
 
-      let expectedRes: any = proofOfSignatureData;
+      let expectedRes: any = JSON.parse(JSON.stringify(proofOfSignatureData));
       expectedRes.message = {
         signer: signer1.address,
         agreementFileProofCID,
@@ -382,7 +382,7 @@ describe('Proofs', () => {
       expect(gasUsedTx1).greaterThan(gasUsedTx2 * 5n);
 
       // check that the result of the third function execution is still the same
-      expectedRes = proofOfSignatureData;
+      expectedRes = JSON.parse(JSON.stringify(proofOfSignatureData));
       expectedRes.message = {
         signer: signer1.address,
         agreementFileProofCID,
