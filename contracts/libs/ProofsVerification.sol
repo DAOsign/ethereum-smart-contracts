@@ -3,8 +3,6 @@ pragma solidity ^0.8.18;
 
 import { ECDSA } from '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
 
-// import 'hardhat/console.sol';
-
 /**
  * Verifies Proof-of-Authority and Proof-of-Signature validity. May be used to verify any Ethereum
  * signature.

@@ -7,45 +7,45 @@ pragma solidity ^0.8.18;
 library StringsExpanded {
     /**
      * Gets length of the string
-     * @param s Input string
+     * @param _s Input string
      * @return res The lenght of the string
      */
-    function length(string memory s) public pure returns (uint256) {
-        return bytes(s).length;
+    function length(string memory _s) public pure returns (uint256) {
+        return bytes(_s).length;
     }
 
     /**
      * Combines two input strings into one
-     * @param s1 The first string
-     * @param s2 The second string
+     * @param _s1 The first string
+     * @param _s2 The second string
      * @return res The resultant string created by merging s1 and s2
      */
-    function concat(string memory s1, string memory s2) public pure returns (string memory) {
-        return string(abi.encodePacked(s1, s2));
+    function concat(string memory _s1, string memory _s2) public pure returns (string memory) {
+        return string(abi.encodePacked(_s1, _s2));
     }
 
     /**
      * Converts a `uint256` to its ASCII `string` decimal representation
      * @notice Inspired by OraclizeAPI's implementation - MIT licence
      * https://github.com/oraclize/ethereum-api/blob/b42146b063c7d6ee1358846c198246239e9360e8/oraclizeAPI_0.4.25.sol
-     * @param x Input number
+     * @param _x Input number
      * @return res Number represented as a string
      */
-    function toString(uint256 x) public pure returns (string memory) {
-        if (x == 0) {
+    function toString(uint256 _x) public pure returns (string memory) {
+        if (_x == 0) {
             return '0';
         }
-        uint256 _temp = x;
+        uint256 _temp = _x;
         uint256 _digits;
         while (_temp != 0) {
             _digits++;
             _temp /= 10;
         }
         bytes memory _buffer = new bytes(_digits);
-        while (x != 0) {
+        while (_x != 0) {
             _digits -= 1;
-            _buffer[_digits] = bytes1(uint8(48 + uint256(x % 10)));
-            x /= 10;
+            _buffer[_digits] = bytes1(uint8(48 + uint256(_x % 10)));
+            _x /= 10;
         }
         return string(_buffer);
     }
@@ -53,11 +53,11 @@ library StringsExpanded {
     /**
      * Converts an Ethereum address to a string
      * Note: only lowercase letters are used
-     * @param addr The Ethereum address to convert
+     * @param _addr The Ethereum address to convert
      * @return res The string representation of the Ethereum address, including the '0x' prefix
      */
-    function toString(address addr) public pure returns (string memory) {
-        bytes32 _bytes = bytes32(uint256(uint160(addr)));
+    function toString(address _addr) public pure returns (string memory) {
+        bytes32 _bytes = bytes32(uint256(uint160(_addr)));
         bytes memory HEX = '0123456789abcdef';
         bytes memory str = new bytes(42);
         str[0] = '0';

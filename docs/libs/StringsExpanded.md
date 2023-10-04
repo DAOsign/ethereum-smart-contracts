@@ -5,7 +5,7 @@ Enhances operation with strings that are not possible in the current Solidity ve
 ### length
 
 ```solidity
-function length(string s) public pure returns (uint256)
+function length(string _s) public pure returns (uint256)
 ```
 
 Gets length of the string
@@ -14,7 +14,7 @@ Gets length of the string
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| s | string | Input string |
+| _s | string | Input string |
 
 #### Return Values
 
@@ -25,7 +25,7 @@ Gets length of the string
 ### concat
 
 ```solidity
-function concat(string s1, string s2) public pure returns (string)
+function concat(string _s1, string _s2) public pure returns (string)
 ```
 
 Combines two input strings into one
@@ -34,8 +34,8 @@ Combines two input strings into one
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| s1 | string | The first string |
-| s2 | string | The second string |
+| _s1 | string | The first string |
+| _s2 | string | The second string |
 
 #### Return Values
 
@@ -46,7 +46,7 @@ Combines two input strings into one
 ### toString
 
 ```solidity
-function toString(uint256 x) public pure returns (string)
+function toString(uint256 _x) public pure returns (string)
 ```
 
 Converts a `uint256` to its ASCII `string` decimal representation
@@ -57,7 +57,7 @@ https://github.com/oraclize/ethereum-api/blob/b42146b063c7d6ee1358846c198246239e
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| x | uint256 | Input number |
+| _x | uint256 | Input number |
 
 #### Return Values
 
@@ -68,7 +68,7 @@ https://github.com/oraclize/ethereum-api/blob/b42146b063c7d6ee1358846c198246239e
 ### toString
 
 ```solidity
-function toString(address addr) public pure returns (string)
+function toString(address _addr) public pure returns (string)
 ```
 
 Converts an Ethereum address to a string
@@ -78,7 +78,7 @@ Note: only lowercase letters are used
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| addr | address | The Ethereum address to convert |
+| _addr | address | The Ethereum address to convert |
 
 #### Return Values
 

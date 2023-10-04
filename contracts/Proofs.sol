@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.18;
 
-// import 'hardhat/console.sol';
-
 import { IERC165 } from '@openzeppelin/contracts/utils/introspection/IERC165.sol';
 import { ERC165Checker } from '@openzeppelin/contracts/utils/introspection/ERC165Checker.sol';
 import { IProofsMetadata } from './interfaces/IProofsMetadata.sol';
@@ -16,8 +14,8 @@ import { ProofTypes } from './libs/common/ProofTypes.sol';
  * Stores DAOsign proofs.
  *
  * Note
- * Proof-of-Authority = PoAu
- * Proof-of-Signature = PoSi
+ * Proof-of-Authority = PoA
+ * Proof-of-Signature = PoS
  * Proof-of-Agreement = PoAg
  */
 contract Proofs is IProofs {
@@ -40,13 +38,21 @@ contract Proofs is IProofs {
         proofsMetadata = _proofsMetadata;
     }
 
+    /**
+     * Generates Proof-of-Authority data for creator to sign and caches it in the smart contract
+     * memory
+     * @param _creator Agreement creator address
+     * @param _signers Array of signers of the agreement
+     * @param _agreementFileCID IPFS CID of the agreement file
+     * @param _version EIP712 version of the data
+     * @return proofData Proof-of-Authority data to sign
+     */
     function fetchProofOfAuthorityData(
         address _creator,
         address[] calldata _signers,
         string calldata _agreementFileCID,
         string calldata _version
     ) public returns (string memory) {
-        // uint256 time = block.timestamp;
         if (
             proofsData[_agreementFileCID][ProofTypes.Proofs.ProofOfAuthority][_creator].length() > 0
         ) {
@@ -64,6 +70,15 @@ contract Proofs is IProofs {
         return proofData;
     }
 
+    /**
+     * Generates Proof-of-Signature data for creator to sign and caches it in the smart contract
+     * memory
+     * @param _signer Current signer of the agreement from the list of agreement signers
+     * @param _agreementFileCID IPFS CID of the agreement file
+     * @param _proofOfAuthorityCID IPFS CID of Proof-of-Authority
+     * @param _version EIP712 version of the data
+     * @return proofData Proof-of-Signature data to sign
+     */
     function fetchProofOfSignatureData(
         address _signer,
         string calldata _agreementFileCID,
@@ -92,6 +107,14 @@ contract Proofs is IProofs {
         return proofData;
     }
 
+    /**
+     * Generates Proof-of-Agreement data for creator to sign and caches it in the smart contract
+     * memory
+     * @param _agreementFileCID IPFS CID of the agreement file
+     * @param _proofOfAuthorityCID IPFS CID of Proof-of-Authority
+     * @param _proofsOfSignatureCID IPFS CID of Proof-of-Signature
+     * @return proofData Proof-of-Agreement data to sign
+     */
     function fetchProofOfAgreementData(
         string calldata _agreementFileCID,
         string calldata _proofOfAuthorityCID,
@@ -126,6 +149,13 @@ contract Proofs is IProofs {
         return proofData;
     }
 
+    /**
+     * Stores Proof-of-Authority after verifying the correctness of the signature
+     * @param _creator Agreement creator address
+     * @param _signature Signature of Proof-of-Authority data
+     * @param _agreementFileCID IPFS CID of the agreement file
+     * @param _proofCID IPFS CID of Proof-of-Authority
+     */
     function storeProofOfAuthority(
         address _creator,
         bytes calldata _signature,
@@ -153,6 +183,13 @@ contract Proofs is IProofs {
         emit ProofOfAuthority(_creator, _signature, _agreementFileCID, _proofCID, proof);
     }
 
+    /**
+     * Stores Proof-of-Signature after verifying the correctness of the signature
+     * @param _signer Current signer of the agreement from the list of agreement signers
+     * @param _signature Signature of Proof-of-Signature data
+     * @param _agreementFileCID IPFS CID of the agreement file
+     * @param _proofCID IPFS CID of Proof-of-Signature
+     */
     function storeProofOfSignature(
         address _signer,
         bytes calldata _signature,
@@ -180,6 +217,12 @@ contract Proofs is IProofs {
         emit ProofOfSignature(_signer, _signature, _agreementFileCID, _proofCID, proof);
     }
 
+    /**
+     * Stores Proof-of-Agreement
+     * @param _agreementFileCID IPFS CID of the agreement file
+     * @param _proofOfAuthorityCID IPFS CID of Proof-of-Authority
+     * @param _proofCID IPFS CID of Proof-of-Agreement
+     */
     function storeProofOfAgreement(
         string calldata _agreementFileCID,
         string calldata _proofOfAuthorityCID,
