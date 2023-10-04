@@ -1,7 +1,7 @@
 import { loadFixture, time } from '@nomicfoundation/hardhat-toolbox/network-helpers';
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
-import { deployProofsVerificationLibrary } from '../../scripts/deployForTest';
+import { deployProofsVerificationLibrary } from '../../scripts/deploy';
 import { proofOfAuthorityData, proofOfSignatureData } from '../data/proofs';
 
 describe('Proofs Verification', () => {

@@ -1,7 +1,7 @@
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers';
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
-import { deployProofsMetadata } from '../scripts/deployForTest';
+import { deployProofsMetadata } from '../scripts/deploy';
 import { Proofs } from './common';
 import { ProofsMetadata } from '../typechain-types';
 import { proofJSONtoBytes } from './utils';
