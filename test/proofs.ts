@@ -413,6 +413,31 @@ describe('Proofs', () => {
       ).revertedWith('No Agreement File CID');
     });
 
+    it('no Proof-of-Authority error', async () => {
+      const { proofs } = await loadFixture(deployProofsFixture);
+
+      await expect(
+        proofs.fetchProofOfAgreementData.staticCall(
+          agreementFileCID,
+          proofOfAuthorityCID,
+          proofOfSignatureCIDs,
+        ),
+      ).revertedWith('No Proof-of-Authority');
+    });
+
+    it('no Proof-of-Signature error', async () => {
+      const { proofs } = await loadFixture(deployProofsFixture);
+      await storeProofOfAuthority(agreementFileCID, proofOfAuthorityCID);
+
+      await expect(
+        proofs.fetchProofOfAgreementData.staticCall(
+          agreementFileCID,
+          proofOfAuthorityCID,
+          proofOfSignatureCIDs,
+        ),
+      ).revertedWith('No Proof-of-Signature');
+    });
+
     it('success', async () => {
       const { proofs, signer1 } = await loadFixture(deployProofsFixture);
 
@@ -712,6 +737,18 @@ describe('Proofs', () => {
       await expect(
         proofs.storeProofOfAgreement(agreementFileCID, proofOfAuthorityCID, proofOfAgreementCID),
       ).revertedWith('Proof already stored');
+    });
+
+    it('error: Invalid input data', async () => {
+      const { proofs: proofsLocal } = await loadFixture(deployProofsFixture);
+
+      await expect(
+        proofsLocal.storeProofOfAgreement(
+          agreementFileCID,
+          proofOfAuthorityCID,
+          proofOfAgreementCID,
+        ),
+      ).revertedWith('Invalid input data');
     });
 
     it('success', async () => {
