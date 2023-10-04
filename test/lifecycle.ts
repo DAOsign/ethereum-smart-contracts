@@ -38,23 +38,45 @@ describe('Lifecycle Tests of the Platform', () => {
     };
   }
 
-  const storeProofOfAuthority = async (agreementFileCID: string, poaCID: string) => {
-    const version = '0.1.0';
-
-    const { proofs, creator, signer1, signer2, signer3 } = await loadFixture(deployProofsFixture);
-    const signers = [signer1.address, signer2.address, signer3.address];
-
-    await proofs.fetchProofOfAuthorityData(creator.address, signers, agreementFileCID, version);
-    const data = await proofs.fetchProofOfAuthorityData.staticCall(
+  const storeProofOfAuthority = async (
+    fileCID: string,
+    poaCID: string,
+    creator: SignerWithAddress,
+    proofs: any,
+    signers: SignerWithAddress[],
+    version: string,
+  ) => {
+    // Fetch proof data
+    await proofs.fetchProofOfAuthorityData(
+      creator.address,
+      signers.map((x) => x.address),
+      fileCID,
+      version,
+    );
+    const proofData = await proofs.fetchProofOfAuthorityData.staticCall(
       creator.address,
       signers,
-      agreementFileCID,
+      fileCID,
       version,
     );
 
-    const dataHash = ethers.keccak256(ethers.toUtf8Bytes(data));
-    const signature = await creator.signMessage(ethers.getBytes(dataHash));
-    await proofs.storeProofOfAuthority(creator.address, signature, agreementFileCID, poaCID);
+    // Sign proof data & generate Proof-of-Authority
+    const proofDataHash = ethers.keccak256(ethers.toUtf8Bytes(proofData));
+    const signature = await creator.signMessage(ethers.getBytes(proofDataHash));
+
+    const proof = {
+      address: creator.address.toLowerCase(),
+      sig: signature,
+      data: JSON.parse(proofData),
+    };
+
+    // calculated & emited correctly
+    await expect(proofs.storeProofOfAuthority(creator.address, signature, fileCID, poaCID))
+      .emit(proofs, 'ProofOfAuthority')
+      .withArgs(creator.address, signature, fileCID, poaCID, JSON.stringify(proof, null));
+
+    // calculated & stored correctly
+    expect(await proofs.finalProofs(fileCID, poaCID)).eql(JSON.stringify(proof, null));
   };
 
   const storeProofOfSignature = async (
@@ -62,24 +84,57 @@ describe('Lifecycle Tests of the Platform', () => {
     poaCID: string,
     posCID: string,
     proofs: any,
-    signer1: SignerWithAddress,
+    version: string,
+    signer: SignerWithAddress,
   ) => {
-    const version = '0.1.0';
-
-    await proofs.fetchProofOfSignatureData(signer1.address, fileCID, poaCID, version);
-    const data = await proofs.fetchProofOfSignatureData.staticCall(
-      signer1.address,
+    // Fetch proof data
+    await proofs.fetchProofOfSignatureData(signer, fileCID, poaCID, version);
+    const proofData = await proofs.fetchProofOfSignatureData.staticCall(
+      signer,
       fileCID,
       poaCID,
       version,
     );
 
-    const dataHash = ethers.keccak256(ethers.toUtf8Bytes(data));
-    const signature = await signer1.signMessage(ethers.getBytes(dataHash));
-    await proofs.storeProofOfSignature(signer1.address, signature, fileCID, posCID);
+    // Sign proof data & generate Proof-of-Signature
+    const proofDataHash = ethers.keccak256(ethers.toUtf8Bytes(proofData));
+    const signature = await signer.signMessage(ethers.getBytes(proofDataHash));
+
+    const proof = {
+      address: signer.address.toLowerCase(),
+      sig: signature,
+      data: JSON.parse(proofData),
+    };
+
+    // calculated & emited correctly
+    await expect(proofs.storeProofOfSignature(signer.address, signature, fileCID, posCID))
+      .emit(proofs, 'ProofOfSignature')
+      .withArgs(signer.address, signature, fileCID, posCID, JSON.stringify(proof, null));
+
+    // calculated & stored correctly
+    expect(await proofs.finalProofs(fileCID, posCID)).eql(JSON.stringify(proof, null));
   };
 
-  it('#1', async () => {
+  const storeProofOfAgreement = async (
+    fileCID: string,
+    poaCID: string,
+    posCIDs: string[],
+    poagCID: string,
+    proofs: any,
+  ) => {
+    await proofs.fetchProofOfAgreementData(fileCID, poaCID, posCIDs);
+    const proof = await proofs.fetchProofOfAgreementData.staticCall(fileCID, poaCID, posCIDs);
+
+    // calculated & emited correctly
+    await expect(proofs.storeProofOfAgreement(fileCID, poaCID, poagCID))
+      .emit(proofs, 'ProofOfAgreement')
+      .withArgs(fileCID, poaCID, poagCID, proof);
+
+    // calculated & stored correctly
+    expect(await proofs.finalProofs(fileCID, poagCID)).eql(proof);
+  };
+
+  it('3 signers', async () => {
     const agreementFileCID = 'QmfVd78Pns7Gd5ijurJo3vi892DmuPpz6eP5YsuSCsBoyD';
     const proofOfAuthorityCID = 'QmRr3f12HHGSBYk3hpFuuAweKfcStQ16Vej81gr4GLbKU3';
     const proofOfSignatureCIDs = [
@@ -88,40 +143,74 @@ describe('Lifecycle Tests of the Platform', () => {
       'QmVMLPjLnT7PVQvZstd6DmL8K1VGHHypbYyG2HHSzN8BTK',
     ];
     const proofOfAgreementCID = 'QmQY5XFRomrnAD3o3yMWkTz1HWcCfZYuE87Gbwe7SjV1kk';
+    const version = '0.1.0';
+    const { proofs, creator, signer1, signer2, signer3 } = await loadFixture(deployProofsFixture);
+    const signers = [signer1, signer2, signer3];
 
-    const { proofs, signer1 } = await loadFixture(deployProofsFixture);
+    await storeProofOfAuthority(
+      agreementFileCID,
+      proofOfAuthorityCID,
+      creator,
+      proofs,
+      signers,
+      version,
+    );
+    await Promise.all(
+      proofOfSignatureCIDs.map((posCID, i) =>
+        storeProofOfSignature(
+          agreementFileCID,
+          proofOfAuthorityCID,
+          posCID,
+          proofs,
+          version,
+          signers[i],
+        ),
+      ),
+    );
+    await storeProofOfAgreement(
+      agreementFileCID,
+      proofOfAuthorityCID,
+      proofOfSignatureCIDs,
+      proofOfAgreementCID,
+      proofs,
+    );
+  });
 
-    await storeProofOfAuthority(agreementFileCID, proofOfAuthorityCID);
+  it('1 signer, same as creator', async () => {
+    const agreementFileCID = 'QmVXk8pWLEa2hXEdqkeHDkqrnZqq5XHMniFzeoJc2dQx73';
+    const proofOfAuthorityCID = 'QmW4GUkS3MKNJMvJH8AJQNcXPYDbBWe7NwUiCZzVwLQrYD';
+    const proofOfSignatureCIDs = ['QmYZnzmLLoK86x9DXnoNX8NLhVALdmtkuhNnFzTmwmecSz'];
+    const proofOfAgreementCID = 'QmRBvTnJcpGSwGULVS6D8Pq39tQHQpM5nFdCMnbVrVEDpJ';
+    const version = '0.1.0';
+    const { proofs, creator } = await loadFixture(deployProofsFixture);
+    const signers = [creator];
+
+    await storeProofOfAuthority(
+      agreementFileCID,
+      proofOfAuthorityCID,
+      creator,
+      proofs,
+      signers,
+      version,
+    );
     await Promise.all(
       proofOfSignatureCIDs.map((posCID) =>
-        storeProofOfSignature(agreementFileCID, proofOfAuthorityCID, posCID, proofs, signer1),
+        storeProofOfSignature(
+          agreementFileCID,
+          proofOfAuthorityCID,
+          posCID,
+          proofs,
+          version,
+          creator,
+        ),
       ),
     );
-
-    await proofs.fetchProofOfAgreementData(
+    await storeProofOfAgreement(
       agreementFileCID,
       proofOfAuthorityCID,
       proofOfSignatureCIDs,
+      proofOfAgreementCID,
+      proofs,
     );
-    const proof = await proofs.fetchProofOfAgreementData.staticCall(
-      agreementFileCID,
-      proofOfAuthorityCID,
-      proofOfSignatureCIDs,
-    );
-
-    // calculated & emited correctly
-    await expect(
-      proofs.storeProofOfAgreement(
-        agreementFileCID,
-        proofOfAuthorityCID,
-        proofOfAgreementCID,
-        // proof
-      ),
-    )
-      .emit(proofs, 'ProofOfAgreement')
-      .withArgs(agreementFileCID, proofOfAuthorityCID, proofOfAgreementCID, proof);
-
-    // calculated & stored correctly
-    expect(await proofs.finalProofs(agreementFileCID, proofOfAgreementCID)).eql(proof);
   });
 });
