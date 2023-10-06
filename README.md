@@ -58,11 +58,27 @@ To deploy smart contracts and libraries to Ethereum Mainnet or Goerli Testnet yo
 
 ### Deploy all contracts and libraries
 
-This is recommended when deploying for the first time on the target network.
+Before deploying the contracts make sure they are compiled.
+
+```
+npx hardhat compile
+```
+
+Then deploy smart contracts to the target network and verify them on Etherscan.
 
 ```
 npx hardhat deploy:all --network goerli
 ```
+
+## Latest Deployments
+
+### 6 Oct 2023
+
+StringsExpanded &nbsp;&nbsp;`0xC7eb777864D0A507524eC8134ff185bab4A1A701`<br>
+ProofsMetadata &nbsp;&nbsp;&nbsp;&nbsp;`0xBB1dDe7b8490Bf12D275aA0ceBB827A0371eC7C2`<br>
+ProofsVerification &nbsp;`0x8c6E589E9CF159C84356C8719E40D27535520BBA`<br>
+ProofsHelper &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`0xD9B11cd550Cf7CDbC9915D325d37F746354d9a38`<br>
+Proofs &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`0x3C0A2766F77Afdb70A834cd4960cC5d695076497`<br>
 
 ## Contributions
 
