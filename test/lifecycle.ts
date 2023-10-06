@@ -1,17 +1,19 @@
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers';
 import { expect } from 'chai';
-import { ethers } from 'hardhat';
+import * as hre from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { deployProofs } from '../scripts/deploy';
+import { deployAll } from '../scripts/deploy';
 import { proofOfAuthorityData, proofOfSignatureData } from './data/proofs';
 import { Proofs } from './common';
 import { proofJSONtoBytes } from './utils';
+
+const { ethers } = hre;
 
 describe('Lifecycle Tests of the Platform', () => {
   async function deployProofsFixture() {
     const [owner, creator, signer1, signer2, signer3, anyone] = await ethers.getSigners();
     const { proofs, proofsMetadata, strings, proofsVerification, proofsHelper } =
-      await deployProofs();
+      await deployAll(hre);
 
     await proofsMetadata.addMetadata(
       Proofs.ProofOfAuthority,

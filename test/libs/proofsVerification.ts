@@ -1,13 +1,15 @@
 import { loadFixture, time } from '@nomicfoundation/hardhat-toolbox/network-helpers';
 import { expect } from 'chai';
-import { ethers } from 'hardhat';
-import { deployProofsVerificationLibrary } from '../../scripts/deploy';
+import * as hre from 'hardhat';
+import { deployProofsVerification } from '../../scripts/deploy';
 import { proofOfAuthorityData, proofOfSignatureData } from '../data/proofs';
+
+const { ethers } = hre;
 
 describe('Proofs Verification', () => {
   async function deployProofsVerificationFixture() {
     const [owner, creator, signer1, signer2, signer3, anyone] = await ethers.getSigners();
-    const { proofsVerification } = await deployProofsVerificationLibrary();
+    const { proofsVerification } = await deployProofsVerification(hre);
 
     return { proofsVerification, owner, creator, signer1, signer2, signer3, anyone };
   }

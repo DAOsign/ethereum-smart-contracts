@@ -1,17 +1,26 @@
 import { loadFixture, time } from '@nomicfoundation/hardhat-toolbox/network-helpers';
 import { expect } from 'chai';
-import { ethers } from 'hardhat';
+import * as hre from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { deployProofs } from '../../scripts/deploy';
+import {
+  deployProofsHelper,
+  deployProofsMetadata,
+  deployStringsExpanded,
+} from '../../scripts/deploy';
 import { proofOfAuthorityData, proofOfSignatureData } from '../data/proofs';
 import { Proofs } from '../common';
 import { proofJSONtoBytes } from '../utils';
 import { ProofsHelper, ProofsMetadata } from '../../typechain-types';
 
+const { ethers } = hre;
+
 describe('Proofs Helper', () => {
   async function deployProofsFixture() {
     const [owner, creator, signer1, signer2, signer3, anyone] = await ethers.getSigners();
-    const { proofsMetadata, proofsHelper } = await deployProofs();
+    const { strings } = await deployStringsExpanded(hre);
+    const stringsAddr = await strings.getAddress();
+    const { proofsHelper } = await deployProofsHelper(hre, stringsAddr);
+    const { proofsMetadata } = await deployProofsMetadata(hre, stringsAddr);
 
     await proofsMetadata.addMetadata(
       Proofs.ProofOfAuthority,

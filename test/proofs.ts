@@ -1,17 +1,23 @@
 import { loadFixture, time } from '@nomicfoundation/hardhat-toolbox/network-helpers';
 import { expect } from 'chai';
-import { ethers } from 'hardhat';
+import * as hre from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { deployProofs, deployProofsMetadata } from '../scripts/deploy';
+import { deployAll, deployProofsMetadata } from '../scripts/deploy';
 import { proofOfAuthorityData, proofOfSignatureData } from './data/proofs';
 import { Proofs } from './common';
 import { proofJSONtoBytes } from './utils';
 
+const { ethers } = hre;
+
 describe('Proofs', () => {
   async function deployProofsFixture() {
     const [owner, creator, signer1, signer2, signer3, anyone] = await ethers.getSigners();
+    // Note: `hre` is passed here as the same deployment scripts are used in both tests and in
+    //       hardhat tasks for real deployment. However, in hardhat tasks you much pass `hre` as a
+    //       parameter, so it was decided to pass `hre` parameter in tests as well to use the same
+    //       deployment functions.
     const { proofs, proofsMetadata, strings, proofsVerification, proofsHelper } =
-      await deployProofs();
+      await deployAll(hre);
 
     await proofsMetadata.addMetadata(
       Proofs.ProofOfAuthority,
@@ -124,7 +130,7 @@ describe('Proofs', () => {
 
     it('success', async () => {
       const { strings, proofsVerification, proofsHelper } = await loadFixture(deployProofsFixture);
-      const { proofsMetadata } = await deployProofsMetadata();
+      const { proofsMetadata } = await deployProofsMetadata(hre, await strings.getAddress());
 
       const proofs = await (
         await ethers.getContractFactory('Proofs', {

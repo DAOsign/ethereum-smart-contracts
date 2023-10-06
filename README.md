@@ -1,4 +1,5 @@
 # DAOsign Smart Contracts
+
 # ⚠️ Work In Progress! Use at Your Own Risk! ⚠️
 
 This repository houses a collection of Ethereum smart contracts, developed as part of the DAOsign project. DAOsign leverages blockchain technology to generate, store, and validate Agreement Proofs.
@@ -50,6 +51,18 @@ yarn test
 ## Smart Contract Documentation
 
 For detailed information about individual contracts, refer to the [documentation](./docs).
+
+## Deployment
+
+To deploy smart contracts and libraries to Ethereum Mainnet or Goerli Testnet you can use the following commands.
+
+### Deploy all contracts and libraries
+
+This is recommended when deploying for the first time on the target network.
+
+```
+npx hardhat deploy:all --network goerli
+```
 
 ## Contributions
 

@@ -1,11 +1,13 @@
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers';
 import { expect } from 'chai';
-import { ethers } from 'hardhat';
-import { deployStringsExpandedLibrary } from '../../scripts/deploy';
+import * as hre from 'hardhat';
+import { deployStringsExpanded } from '../../scripts/deploy';
+
+const { ethers } = hre;
 
 describe('Strings library', () => {
   async function deployStringsFixture() {
-    const { strings } = await deployStringsExpandedLibrary();
+    const { strings } = await deployStringsExpanded(hre);
 
     return { strings };
   }

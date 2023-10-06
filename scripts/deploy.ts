@@ -1,49 +1,76 @@
-import { ethers } from 'hardhat';
+import { HardhatRuntimeEnvironment } from 'hardhat/types';
 
 /**
- * Deploy all project smart contracts for testing purposes
+ * Deploy all project smart contracts and libraries
  */
 
-export const deployStringsExpandedLibrary = async () => {
-  const strings = await (await ethers.getContractFactory('StringsExpanded')).deploy();
+export const deployStringsExpanded = async (hre: HardhatRuntimeEnvironment) => {
+  const strings = await (await hre.ethers.getContractFactory('StringsExpanded')).deploy();
+  await strings.waitForDeployment();
 
   return { strings };
 };
 
-export const deployProofsVerificationLibrary = async () => {
-  const proofsVerification = await (await ethers.getContractFactory('ProofsVerification')).deploy();
+export const deployProofsVerification = async (hre: HardhatRuntimeEnvironment) => {
+  const proofsVerification = await (
+    await hre.ethers.getContractFactory('ProofsVerification')
+  ).deploy();
+  await proofsVerification.waitForDeployment();
 
   return { proofsVerification };
 };
 
-export const deployProofsHelperLibrary = async () => {
-  const { strings } = await deployStringsExpandedLibrary();
+export const deployProofsHelper = async (hre: HardhatRuntimeEnvironment, stringsAddr: string) => {
   const proofsHelper = await (
-    await ethers.getContractFactory('ProofsHelper', {
-      libraries: { StringsExpanded: await strings.getAddress() },
+    await hre.ethers.getContractFactory('ProofsHelper', {
+      libraries: { StringsExpanded: stringsAddr },
     })
   ).deploy();
+  await proofsHelper.waitForDeployment();
 
   return { proofsHelper };
 };
 
-export const deployProofsMetadata = async () => {
-  const { strings } = await deployStringsExpandedLibrary();
+export const deployProofsMetadata = async (hre: HardhatRuntimeEnvironment, stringsAddr: string) => {
   const proofsMetadata = await (
-    await ethers.getContractFactory('ProofsMetadata', {
-      libraries: { StringsExpanded: await strings.getAddress() },
+    await hre.ethers.getContractFactory('ProofsMetadata', {
+      libraries: { StringsExpanded: stringsAddr },
     })
   ).deploy();
+  await proofsMetadata.waitForDeployment();
 
-  return { proofsMetadata, strings };
+  return { proofsMetadata };
 };
 
-export const deployProofs = async () => {
-  const { proofsMetadata, strings } = await deployProofsMetadata();
-  const { proofsVerification } = await deployProofsVerificationLibrary();
-  const { proofsHelper } = await deployProofsHelperLibrary();
+export const deployProofs = async (
+  hre: HardhatRuntimeEnvironment,
+  stringsAddr: string,
+  proofsVerificationAddr: string,
+  proofsHelperAddr: string,
+  proofsMetadataAddr: string,
+) => {
   const proofs = await (
-    await ethers.getContractFactory('Proofs', {
+    await hre.ethers.getContractFactory('Proofs', {
+      libraries: {
+        StringsExpanded: stringsAddr,
+        ProofsVerification: proofsVerificationAddr,
+        ProofsHelper: proofsHelperAddr,
+      },
+    })
+  ).deploy(proofsMetadataAddr);
+  await proofs.waitForDeployment();
+
+  return { proofs };
+};
+
+export const deployAll = async (hre: HardhatRuntimeEnvironment) => {
+  const { strings } = await deployStringsExpanded(hre);
+  const stringsAddr = await strings.getAddress();
+  const { proofsMetadata } = await deployProofsMetadata(hre, stringsAddr);
+  const { proofsVerification } = await deployProofsVerification(hre);
+  const { proofsHelper } = await deployProofsHelper(hre, stringsAddr);
+  const proofs = await (
+    await hre.ethers.getContractFactory('Proofs', {
       libraries: {
         StringsExpanded: await strings.getAddress(),
         ProofsVerification: await proofsVerification.getAddress(),
