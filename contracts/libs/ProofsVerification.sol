@@ -23,7 +23,7 @@ library ProofsVerification {
         string memory _data,
         bytes calldata _signature
     ) public pure returns (bool) {
-        bytes32 dataHash = keccak256(abi.encodePacked(abi.encodePacked(_data)));
+        bytes32 dataHash = keccak256(abi.encodePacked(_data));
         return verify(_signer, dataHash, _signature);
     }
 
