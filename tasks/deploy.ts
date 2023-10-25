@@ -8,7 +8,7 @@ import {
   deployStringsExpanded,
 } from '../scripts/deploy';
 
-const deployAll = async (hre: HardhatRuntimeEnvironment) => {
+const deployAll = async (hre: HardhatRuntimeEnvironment, ownerAddr: string) => {
   console.log(`Deploying from address ${(await hre.ethers.getSigners())[0].address}`);
   console.log('Wait for up to 10 minutes.....');
   console.log(
@@ -48,6 +48,7 @@ on etherscan.io or goerli.etherscan.io',
     proofsVerificationAddr,
     proofsHelperAddr,
     proofsMetadataAddr,
+    ownerAddr,
   );
   const proofsAddr = await proofs.getAddress();
   console.log(`\x1b[42m Proofs \x1b[0m\x1b[32m ${proofsAddr}\x1b[0m\n`);
@@ -96,25 +97,32 @@ const verifyAll = async (
 task(
   'deploy-and-verify:all',
   'Deploy all smart contracts and libraries and verify them on Etherscan',
-).setAction(async (_, hre) => {
-  const { stringsAddr, proofsMetadataAddr, proofsVerificationAddr, proofsHelperAddr, proofsAddr } =
-    await deployAll(hre);
-  await verifyAll(
-    hre,
-    stringsAddr,
-    proofsMetadataAddr,
-    proofsVerificationAddr,
-    proofsHelperAddr,
-    proofsAddr,
-  );
-});
+)
+  .addParam('owner', 'Owner of Proofs contract')
+  .setAction(async ({ owner: ownerAddr }, hre) => {
+    const {
+      stringsAddr,
+      proofsMetadataAddr,
+      proofsVerificationAddr,
+      proofsHelperAddr,
+      proofsAddr,
+    } = await deployAll(hre, ownerAddr);
+    await verifyAll(
+      hre,
+      stringsAddr,
+      proofsMetadataAddr,
+      proofsVerificationAddr,
+      proofsHelperAddr,
+      proofsAddr,
+    );
+  });
 
 // First deployment
-task('deploy:all', 'Deploy all smart contracts and libraries for the first time').setAction(
-  async (_, hre) => {
-    await deployAll(hre);
-  },
-);
+task('deploy:all', 'Deploy all smart contracts and libraries for the first time')
+  .addParam('owner', 'Owner of Proofs contract')
+  .setAction(async ({ owner: ownerAddr }, hre) => {
+    await deployAll(hre, ownerAddr);
+  });
 
 // Following deployments
 task(
@@ -124,7 +132,8 @@ task(
   .addParam('strings', 'StringsExpanded library address')
   .addParam('proofsVerification', 'ProofsVerification library address')
   .addParam('proofsHelper', 'ProofsHelper library address')
-  .setAction(async ({ strings, proofsVerification, proofsHelper }, hre) => {
+  .addParam('owner', 'Owner of Proofs contract')
+  .setAction(async ({ strings, proofsVerification, proofsHelper, owner: ownerAddr }, hre) => {
     console.log(`Deploying from address ${(await hre.ethers.getSigners())[0].address}`);
     console.log('Wait for up to 5 minutes.....');
     console.log(
@@ -145,6 +154,7 @@ on etherscan.io or goerli.etherscan.io',
       proofsVerification,
       proofsHelper,
       proofsMetadataAddr,
+      ownerAddr,
     );
     console.log(`\x1b[42m Proofs \x1b[0m\x1b[32m ${await proofs.getAddress()}\x1b[0m\n`);
   });

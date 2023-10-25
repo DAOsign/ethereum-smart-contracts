@@ -32,10 +32,22 @@ Functions from variables
 function finalProofs(string agreementFileCID, string proofCID) external view returns (string)
 ```
 
-### proofsData
+### poaData
 
 ```solidity
-function proofsData(string agreementFileCID, enum ProofTypes.Proofs proofType, address signer) external view returns (string)
+function poaData(bytes32 input) external view returns (string)
+```
+
+### posData
+
+```solidity
+function posData(bytes32 input) external view returns (string)
+```
+
+### poagData
+
+```solidity
+function poagData(bytes32 input) external view returns (string)
 ```
 
 ### fetchProofOfAuthorityData
@@ -61,18 +73,36 @@ function fetchProofOfAgreementData(string _agreementFileCID, string _proofOfAuth
 ### storeProofOfAuthority
 
 ```solidity
-function storeProofOfAuthority(address _creator, bytes _signature, string _agreementFileCID, string _proofCID) external
+function storeProofOfAuthority(address _creator, address[] _signers, string _version, bytes _signature, string _fileCID, string _proofCID) external
 ```
 
 ### storeProofOfSignature
 
 ```solidity
-function storeProofOfSignature(address _signer, bytes _signature, string _agreementFileCID, string _proofCID) external
+function storeProofOfSignature(address _signer, bytes _signature, string _fileCID, string _posCID, string _poaCID, string _version) external
 ```
 
 ### storeProofOfAgreement
 
 ```solidity
-function storeProofOfAgreement(string _agreementFileCID, string _proofOfAuthorityCID, string _proofCID) external
+function storeProofOfAgreement(string _fileCID, string _poaCID, string[] _posCIDs, string _poagCID) external
+```
+
+### getPoAData
+
+```solidity
+function getPoAData(address _creator, address[] _signers, string _fileCID, string _version) external view returns (string)
+```
+
+### getPoSData
+
+```solidity
+function getPoSData(address _signer, string _fileCID, string _poaCID, string _version) external view returns (string)
+```
+
+### getPoAgData
+
+```solidity
+function getPoAgData(string _fileCID, string _poaCID, string[] _posCIDs) external view returns (string)
 ```
 

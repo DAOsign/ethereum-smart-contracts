@@ -35,11 +35,11 @@ interface IProofs {
         string calldata proofCID
     ) external view returns (string memory);
 
-    function proofsData(
-        string calldata agreementFileCID,
-        ProofTypes.Proofs proofType,
-        address signer
-    ) external view returns (string memory);
+    function poaData(bytes32 input) external view returns (string memory);
+
+    function posData(bytes32 input) external view returns (string memory);
+
+    function poagData(bytes32 input) external view returns (string memory);
 
     /**
      * Actual functions
@@ -66,21 +66,46 @@ interface IProofs {
 
     function storeProofOfAuthority(
         address _creator,
+        address[] calldata _signers,
+        string calldata _version,
         bytes calldata _signature,
-        string calldata _agreementFileCID,
+        string calldata _fileCID,
         string calldata _proofCID
     ) external;
 
     function storeProofOfSignature(
         address _signer,
         bytes calldata _signature,
-        string calldata _agreementFileCID,
-        string calldata _proofCID
+        string calldata _fileCID,
+        string calldata _posCID,
+        string calldata _poaCID,
+        string calldata _version
     ) external;
 
     function storeProofOfAgreement(
-        string calldata _agreementFileCID,
-        string calldata _proofOfAuthorityCID,
-        string calldata _proofCID
+        string calldata _fileCID,
+        string calldata _poaCID,
+        string[] calldata _posCIDs,
+        string calldata _poagCID
     ) external;
+
+    function getPoAData(
+        address _creator,
+        address[] calldata _signers,
+        string calldata _fileCID,
+        string calldata _version
+    ) external view returns (string memory);
+
+    function getPoSData(
+        address _signer,
+        string calldata _fileCID,
+        string calldata _poaCID,
+        string calldata _version
+    ) external view returns (string memory);
+
+    function getPoAgData(
+        string calldata _fileCID,
+        string calldata _poaCID,
+        string[] calldata _posCIDs
+    ) external view returns (string memory);
 }

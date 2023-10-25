@@ -21,22 +21,34 @@ Functions from variables
 mapping(string => mapping(string => string)) finalProofs
 ```
 
-### proofsData
+### poaData
 
 ```solidity
-mapping(string => mapping(enum ProofTypes.Proofs => mapping(address => string))) proofsData
+mapping(bytes32 => string) poaData
+```
+
+### posData
+
+```solidity
+mapping(bytes32 => string) posData
+```
+
+### poagData
+
+```solidity
+mapping(bytes32 => string) poagData
 ```
 
 ### constructor
 
 ```solidity
-constructor(address _proofsMetadata) public
+constructor(address _proofsMetadata, address _admin) public
 ```
 
 ### fetchProofOfAuthorityData
 
 ```solidity
-function fetchProofOfAuthorityData(address _creator, address[] _signers, string _agreementFileCID, string _version) public returns (string)
+function fetchProofOfAuthorityData(address _creator, address[] _signers, string _fileCID, string _version) external returns (string)
 ```
 
 Generates Proof-of-Authority data for creator to sign and caches it in the smart contract
@@ -48,7 +60,7 @@ memory
 | ---- | ---- | ----------- |
 | _creator | address | Agreement creator address |
 | _signers | address[] | Array of signers of the agreement |
-| _agreementFileCID | string | IPFS CID of the agreement file |
+| _fileCID | string | IPFS CID of the agreement file |
 | _version | string | EIP712 version of the data |
 
 #### Return Values
@@ -60,7 +72,7 @@ memory
 ### fetchProofOfSignatureData
 
 ```solidity
-function fetchProofOfSignatureData(address _signer, string _agreementFileCID, string _proofOfAuthorityCID, string _version) public returns (string)
+function fetchProofOfSignatureData(address _signer, string _fileCID, string _poaCID, string _version) external returns (string)
 ```
 
 Generates Proof-of-Signature data for creator to sign and caches it in the smart contract
@@ -71,8 +83,8 @@ memory
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | _signer | address | Current signer of the agreement from the list of agreement signers |
-| _agreementFileCID | string | IPFS CID of the agreement file |
-| _proofOfAuthorityCID | string | IPFS CID of Proof-of-Authority |
+| _fileCID | string | IPFS CID of the agreement file |
+| _poaCID | string | IPFS CID of Proof-of-Authority |
 | _version | string | EIP712 version of the data |
 
 #### Return Values
@@ -84,7 +96,7 @@ memory
 ### fetchProofOfAgreementData
 
 ```solidity
-function fetchProofOfAgreementData(string _agreementFileCID, string _proofOfAuthorityCID, string[] _proofsOfSignatureCID) public returns (string)
+function fetchProofOfAgreementData(string _fileCID, string _poaCID, string[] _posCID) external returns (string)
 ```
 
 Generates Proof-of-Agreement data for creator to sign and caches it in the smart contract
@@ -94,9 +106,9 @@ memory
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| _agreementFileCID | string | IPFS CID of the agreement file |
-| _proofOfAuthorityCID | string | IPFS CID of Proof-of-Authority |
-| _proofsOfSignatureCID | string[] | IPFS CID of Proof-of-Signature |
+| _fileCID | string | IPFS CID of the agreement file |
+| _poaCID | string | IPFS CID of Proof-of-Authority |
+| _posCID | string[] | IPFS CID of Proof-of-Signature |
 
 #### Return Values
 
@@ -107,7 +119,7 @@ memory
 ### storeProofOfAuthority
 
 ```solidity
-function storeProofOfAuthority(address _creator, bytes _signature, string _agreementFileCID, string _proofCID) public
+function storeProofOfAuthority(address _creator, address[] _signers, string _version, bytes _signature, string _fileCID, string _proofCID) external
 ```
 
 Stores Proof-of-Authority after verifying the correctness of the signature
@@ -117,14 +129,16 @@ Stores Proof-of-Authority after verifying the correctness of the signature
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | _creator | address | Agreement creator address |
+| _signers | address[] | List of signer addresses |
+| _version | string |  |
 | _signature | bytes | Signature of Proof-of-Authority data |
-| _agreementFileCID | string | IPFS CID of the agreement file |
+| _fileCID | string | IPFS CID of the agreement file |
 | _proofCID | string | IPFS CID of Proof-of-Authority |
 
 ### storeProofOfSignature
 
 ```solidity
-function storeProofOfSignature(address _signer, bytes _signature, string _agreementFileCID, string _proofCID) public
+function storeProofOfSignature(address _signer, bytes _signature, string _fileCID, string _posCID, string _poaCID, string _version) external
 ```
 
 Stores Proof-of-Signature after verifying the correctness of the signature
@@ -135,13 +149,15 @@ Stores Proof-of-Signature after verifying the correctness of the signature
 | ---- | ---- | ----------- |
 | _signer | address | Current signer of the agreement from the list of agreement signers |
 | _signature | bytes | Signature of Proof-of-Signature data |
-| _agreementFileCID | string | IPFS CID of the agreement file |
-| _proofCID | string | IPFS CID of Proof-of-Signature |
+| _fileCID | string | IPFS CID of the agreement file |
+| _posCID | string | IPFS CID of Proof-of-Signature |
+| _poaCID | string |  |
+| _version | string |  |
 
 ### storeProofOfAgreement
 
 ```solidity
-function storeProofOfAgreement(string _agreementFileCID, string _proofOfAuthorityCID, string _proofCID) public
+function storeProofOfAgreement(string _fileCID, string _poaCID, string[] _posCIDs, string _poagCID) external
 ```
 
 Stores Proof-of-Agreement
@@ -150,7 +166,44 @@ Stores Proof-of-Agreement
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| _agreementFileCID | string | IPFS CID of the agreement file |
-| _proofOfAuthorityCID | string | IPFS CID of Proof-of-Authority |
-| _proofCID | string | IPFS CID of Proof-of-Agreement |
+| _fileCID | string | IPFS CID of the agreement file |
+| _poaCID | string | IPFS CID of Proof-of-Authority |
+| _posCIDs | string[] | IPFS CIDs of Proof-of-Signature |
+| _poagCID | string | IPFS CID of Proof-of-Agreement |
+
+### getPoAData
+
+```solidity
+function getPoAData(address _creator, address[] _signers, string _fileCID, string _version) public view returns (string)
+```
+
+### getPoSData
+
+```solidity
+function getPoSData(address _signer, string _fileCID, string _poaCID, string _version) public view returns (string)
+```
+
+### getPoAgData
+
+```solidity
+function getPoAgData(string _fileCID, string _poaCID, string[] _posCIDs) public view returns (string)
+```
+
+### _setPoAData
+
+```solidity
+function _setPoAData(address _creator, address[] _signers, string _fileCID, string _version, string _data) internal
+```
+
+### _setPoSData
+
+```solidity
+function _setPoSData(address _signer, string _fileCID, string _poaCID, string _version, string _data) internal
+```
+
+### _setPoAgData
+
+```solidity
+function _setPoAgData(string _fileCID, string _poaCID, string[] _posCID, string _data) internal
+```
 

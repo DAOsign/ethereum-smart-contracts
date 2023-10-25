@@ -12,8 +12,10 @@ const { ethers } = hre;
 describe('Lifecycle Tests of the Platform', () => {
   async function deployProofsFixture() {
     const [owner, creator, signer1, signer2, signer3, anyone] = await ethers.getSigners();
-    const { proofs, proofsMetadata, strings, proofsVerification, proofsHelper } =
-      await deployAll(hre);
+    const { proofs, proofsMetadata, strings, proofsVerification, proofsHelper } = await deployAll(
+      hre,
+      owner.address,
+    );
 
     await proofsMetadata.addMetadata(
       Proofs.ProofOfAuthority,
@@ -73,7 +75,9 @@ describe('Lifecycle Tests of the Platform', () => {
     };
 
     // calculated & emited correctly
-    await expect(proofs.storeProofOfAuthority(creator.address, signature, fileCID, poaCID))
+    await expect(
+      proofs.storeProofOfAuthority(creator.address, signers, version, signature, fileCID, poaCID),
+    )
       .emit(proofs, 'ProofOfAuthority')
       .withArgs(creator.address, signature, fileCID, poaCID, JSON.stringify(proof, null));
 
@@ -109,7 +113,9 @@ describe('Lifecycle Tests of the Platform', () => {
     };
 
     // calculated & emited correctly
-    await expect(proofs.storeProofOfSignature(signer.address, signature, fileCID, posCID))
+    await expect(
+      proofs.storeProofOfSignature(signer.address, signature, fileCID, posCID, poaCID, version),
+    )
       .emit(proofs, 'ProofOfSignature')
       .withArgs(signer.address, signature, fileCID, posCID, JSON.stringify(proof, null));
 
@@ -128,7 +134,7 @@ describe('Lifecycle Tests of the Platform', () => {
     const proof = await proofs.fetchProofOfAgreementData.staticCall(fileCID, poaCID, posCIDs);
 
     // calculated & emited correctly
-    await expect(proofs.storeProofOfAgreement(fileCID, poaCID, poagCID))
+    await expect(proofs.storeProofOfAgreement(fileCID, poaCID, posCIDs, poagCID))
       .emit(proofs, 'ProofOfAgreement')
       .withArgs(fileCID, poaCID, poagCID, proof);
 
@@ -137,82 +143,42 @@ describe('Lifecycle Tests of the Platform', () => {
   };
 
   it('3 signers', async () => {
-    const agreementFileCID = 'QmfVd78Pns7Gd5ijurJo3vi892DmuPpz6eP5YsuSCsBoyD';
-    const proofOfAuthorityCID = 'QmRr3f12HHGSBYk3hpFuuAweKfcStQ16Vej81gr4GLbKU3';
-    const proofOfSignatureCIDs = [
+    const fileCID = 'QmfVd78Pns7Gd5ijurJo3vi892DmuPpz6eP5YsuSCsBoyD';
+    const poaCID = 'QmRr3f12HHGSBYk3hpFuuAweKfcStQ16Vej81gr4GLbKU3';
+    const posCIDs = [
       'QmUDLEHaLsr5wq7mnZTPMWQmre6Pa1Dd2hQx2kdcwXY7nU',
       'QmfSEEuZBsSgh3hLB8BU4ApNepDpaUWFCw9KqB7DxLbSV2',
       'QmVMLPjLnT7PVQvZstd6DmL8K1VGHHypbYyG2HHSzN8BTK',
     ];
-    const proofOfAgreementCID = 'QmQY5XFRomrnAD3o3yMWkTz1HWcCfZYuE87Gbwe7SjV1kk';
+    const poagCID = 'QmQY5XFRomrnAD3o3yMWkTz1HWcCfZYuE87Gbwe7SjV1kk';
     const version = '0.1.0';
     const { proofs, creator, signer1, signer2, signer3 } = await loadFixture(deployProofsFixture);
     const signers = [signer1, signer2, signer3];
 
-    await storeProofOfAuthority(
-      agreementFileCID,
-      proofOfAuthorityCID,
-      creator,
-      proofs,
-      signers,
-      version,
-    );
+    await storeProofOfAuthority(fileCID, poaCID, creator, proofs, signers, version);
     await Promise.all(
-      proofOfSignatureCIDs.map((posCID, i) =>
-        storeProofOfSignature(
-          agreementFileCID,
-          proofOfAuthorityCID,
-          posCID,
-          proofs,
-          version,
-          signers[i],
-        ),
+      posCIDs.map((posCID, i) =>
+        storeProofOfSignature(fileCID, poaCID, posCID, proofs, version, signers[i]),
       ),
     );
-    await storeProofOfAgreement(
-      agreementFileCID,
-      proofOfAuthorityCID,
-      proofOfSignatureCIDs,
-      proofOfAgreementCID,
-      proofs,
-    );
+    await storeProofOfAgreement(fileCID, poaCID, posCIDs, poagCID, proofs);
   });
 
   it('1 signer, same as creator', async () => {
-    const agreementFileCID = 'QmVXk8pWLEa2hXEdqkeHDkqrnZqq5XHMniFzeoJc2dQx73';
-    const proofOfAuthorityCID = 'QmW4GUkS3MKNJMvJH8AJQNcXPYDbBWe7NwUiCZzVwLQrYD';
-    const proofOfSignatureCIDs = ['QmYZnzmLLoK86x9DXnoNX8NLhVALdmtkuhNnFzTmwmecSz'];
-    const proofOfAgreementCID = 'QmRBvTnJcpGSwGULVS6D8Pq39tQHQpM5nFdCMnbVrVEDpJ';
+    const fileCID = 'QmVXk8pWLEa2hXEdqkeHDkqrnZqq5XHMniFzeoJc2dQx73';
+    const poaCID = 'QmW4GUkS3MKNJMvJH8AJQNcXPYDbBWe7NwUiCZzVwLQrYD';
+    const posCIDs = ['QmYZnzmLLoK86x9DXnoNX8NLhVALdmtkuhNnFzTmwmecSz'];
+    const poagCID = 'QmRBvTnJcpGSwGULVS6D8Pq39tQHQpM5nFdCMnbVrVEDpJ';
     const version = '0.1.0';
     const { proofs, creator } = await loadFixture(deployProofsFixture);
     const signers = [creator];
 
-    await storeProofOfAuthority(
-      agreementFileCID,
-      proofOfAuthorityCID,
-      creator,
-      proofs,
-      signers,
-      version,
-    );
+    await storeProofOfAuthority(fileCID, poaCID, creator, proofs, signers, version);
     await Promise.all(
-      proofOfSignatureCIDs.map((posCID) =>
-        storeProofOfSignature(
-          agreementFileCID,
-          proofOfAuthorityCID,
-          posCID,
-          proofs,
-          version,
-          creator,
-        ),
+      posCIDs.map((posCID) =>
+        storeProofOfSignature(fileCID, poaCID, posCID, proofs, version, creator),
       ),
     );
-    await storeProofOfAgreement(
-      agreementFileCID,
-      proofOfAuthorityCID,
-      proofOfSignatureCIDs,
-      proofOfAgreementCID,
-      proofs,
-    );
+    await storeProofOfAgreement(fileCID, poaCID, posCIDs, poagCID, proofs);
   });
 });

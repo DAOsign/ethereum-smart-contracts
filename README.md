@@ -67,7 +67,7 @@ npx hardhat compile
 Then deploy smart contracts to the target network and verify them on Etherscan.
 
 ```
-npx hardhat deploy:all --network goerli
+npx hardhat deploy:all --owner <your address> --network goerli
 ```
 
 ## Latest Deployments

@@ -48,6 +48,7 @@ export const deployProofs = async (
   proofsVerificationAddr: string,
   proofsHelperAddr: string,
   proofsMetadataAddr: string,
+  ownerAddr: string,
 ) => {
   const proofs = await (
     await hre.ethers.getContractFactory('Proofs', {
@@ -57,13 +58,13 @@ export const deployProofs = async (
         ProofsHelper: proofsHelperAddr,
       },
     })
-  ).deploy(proofsMetadataAddr);
+  ).deploy(proofsMetadataAddr, ownerAddr);
   await proofs.waitForDeployment();
 
   return { proofs };
 };
 
-export const deployAll = async (hre: HardhatRuntimeEnvironment) => {
+export const deployAll = async (hre: HardhatRuntimeEnvironment, ownerAddr: string) => {
   const { strings } = await deployStringsExpanded(hre);
   const stringsAddr = await strings.getAddress();
   const { proofsMetadata } = await deployProofsMetadata(hre, stringsAddr);
@@ -77,7 +78,7 @@ export const deployAll = async (hre: HardhatRuntimeEnvironment) => {
         ProofsHelper: await proofsHelper.getAddress(),
       },
     })
-  ).deploy(await proofsMetadata.getAddress());
+  ).deploy(await proofsMetadata.getAddress(), ownerAddr);
 
   return { proofs, proofsMetadata, strings, proofsVerification, proofsHelper };
 };
