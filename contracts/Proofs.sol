@@ -50,19 +50,18 @@ contract Proofs is Ownable, IProofs {
      * @param _signers Array of signers of the agreement
      * @param _fileCID IPFS CID of the agreement file
      * @param _version EIP712 version of the data
+     * @param _dataSig _creator's signature of all input parameters to make sure they are correct
      * @return proofData Proof-of-Authority data to sign
      */
     function fetchProofOfAuthorityData(
         address _creator,
         address[] calldata _signers,
         string calldata _fileCID,
-        string calldata _version
-    )
-        external
-        // dataSign from _creator
-        onlyOwner
-        returns (string memory)
-    {
+        string calldata _version,
+        bytes calldata _dataSig
+    ) external onlyOwner returns (string memory) {
+        bytes32 _dataHash = keccak256(abi.encodePacked(_creator, _signers, _fileCID, _version));
+        require(ProofsVerification.verify(_creator, _dataHash, _dataSig), 'Invalid data signature');
         if (getPoAData(_creator, _signers, _fileCID, _version).length() > 0) {
             return getPoAData(_creator, _signers, _fileCID, _version);
         }
@@ -91,14 +90,12 @@ contract Proofs is Ownable, IProofs {
         address _signer,
         string calldata _fileCID,
         string calldata _poaCID,
-        string calldata _version
-    )
-        external
-        // dataSign
-        onlyOwner
-        returns (string memory)
-    {
+        string calldata _version,
+        bytes calldata _dataSig
+    ) external onlyOwner returns (string memory) {
         require(_fileCID.length() > 0, 'No Agreement File CID');
+        bytes32 _dataHash = keccak256(abi.encodePacked(_signer, _fileCID, _poaCID, _version));
+        require(ProofsVerification.verify(_signer, _dataHash, _dataSig), 'Invalid data signature');
         if (getPoSData(_signer, _fileCID, _poaCID, _version).length() > 0) {
             return getPoSData(_signer, _fileCID, _poaCID, _version);
         }

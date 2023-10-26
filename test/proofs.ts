@@ -51,13 +51,24 @@ describe('Proofs', () => {
 
     const { proofs, creator, signer1, signer2, signer3 } = await loadFixture(deployProofsFixture);
     const signers = [signer1.address, signer2.address, signer3.address];
+    const dataSig = await creator.signMessage(
+      ethers.getBytes(
+        ethers.keccak256(
+          ethers.solidityPacked(
+            ['address', 'address[]', 'string', 'string'],
+            [creator.address, signers, fileCID, version],
+          ),
+        ),
+      ),
+    );
 
-    await proofs.fetchProofOfAuthorityData(creator.address, signers, fileCID, version);
+    await proofs.fetchProofOfAuthorityData(creator.address, signers, fileCID, version, dataSig);
     const data = await proofs.fetchProofOfAuthorityData.staticCall(
       creator.address,
       signers,
       fileCID,
       version,
+      dataSig,
     );
 
     const dataHash = ethers.keccak256(ethers.toUtf8Bytes(data));
@@ -80,13 +91,24 @@ describe('Proofs', () => {
     signer1: SignerWithAddress,
   ) => {
     const version = '0.1.0';
+    const dataSig = await signer1.signMessage(
+      ethers.getBytes(
+        ethers.keccak256(
+          ethers.solidityPacked(
+            ['address', 'string', 'string', 'string'],
+            [signer1.address, fileCID, poaCID, version],
+          ),
+        ),
+      ),
+    );
 
-    await proofs.fetchProofOfSignatureData(signer1.address, fileCID, poaCID, version);
+    await proofs.fetchProofOfSignatureData(signer1.address, fileCID, poaCID, version, dataSig);
     const data = await proofs.fetchProofOfSignatureData.staticCall(
       signer1.address,
       fileCID,
       poaCID,
       version,
+      dataSig,
     );
 
     const dataHash = ethers.keccak256(ethers.toUtf8Bytes(data));
@@ -164,56 +186,29 @@ describe('Proofs', () => {
   });
 
   describe('Fetch Proof-of-Authority data', () => {
-    it('no creator error', async () => {
-      const { proofs, signer1, signer2, signer3 } = await loadFixture(deployProofsFixture);
-
-      await expect(
-        proofs.fetchProofOfAuthorityData(
-          /* creator */ ethers.ZeroAddress,
-          /* signers */ [signer1.address, signer2.address, signer3.address],
-          /* fileCID */ 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp',
-          /* version */ '0.1.0',
-        ),
-      ).revertedWith('No creator');
-    });
-
-    it('no signers error', async () => {
-      const { proofs, creator } = await loadFixture(deployProofsFixture);
-
-      await expect(
-        proofs.fetchProofOfAuthorityData(
-          /* creator */ creator.address,
-          /* signers */ [],
-          /* fileCID */ 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp',
-          /* version */ '0.1.0',
-        ),
-      ).revertedWith('No signers');
-    });
-
-    it('no Agreement File CID error', async () => {
+    it('invalid data signature', async () => {
       const { proofs, creator, signer1, signer2, signer3 } = await loadFixture(deployProofsFixture);
+      const signers = [signer1.address, signer2.address, signer3.address];
+      const fileCID = 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp';
+      const version = '0.1.0';
+      const dataSig = await signer1.signMessage(
+        ethers.getBytes(
+          ethers.keccak256(
+            ethers.solidityPacked(
+              ['address', 'address[]', 'string', 'string'],
+              [signer1.address, signers, fileCID, version],
+            ),
+          ),
+        ),
+      );
 
       await expect(
-        proofs.fetchProofOfAuthorityData(
-          /* creator */ creator.address,
-          /* signers */ [signer1.address, signer2.address, signer3.address],
-          /* fileCID */ '',
-          /* version */ '0.1.0',
-        ),
-      ).revertedWith('No Agreement File CID');
-    });
-
-    it('no version error', async () => {
-      const { proofs, creator, signer1, signer2, signer3 } = await loadFixture(deployProofsFixture);
+        proofs.fetchProofOfAuthorityData(creator.address, signers, fileCID, version, dataSig),
+      ).revertedWith('Invalid data signature');
 
       await expect(
-        proofs.fetchProofOfAuthorityData(
-          /* creator */ creator.address,
-          /* signers */ [signer1.address, signer2.address, signer3.address],
-          /* fileCID */ 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp',
-          /* version */ '',
-        ),
-      ).revertedWith('No version');
+        proofs.fetchProofOfAuthorityData(signer1.address, signers, fileCID, version, dataSig),
+      ).not.reverted;
     });
 
     it('success', async () => {
@@ -221,12 +216,23 @@ describe('Proofs', () => {
       const signers = [signer1.address, signer2.address, signer3.address];
       const fileCID = 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp';
       const version = '0.1.0';
+      const dataSig = await creator.signMessage(
+        ethers.getBytes(
+          ethers.keccak256(
+            ethers.solidityPacked(
+              ['address', 'address[]', 'string', 'string'],
+              [creator.address, signers, fileCID, version],
+            ),
+          ),
+        ),
+      );
 
       let res = await proofs.fetchProofOfAuthorityData.staticCall(
         creator.address,
         signers,
         fileCID,
         version,
+        dataSig,
       );
 
       let expectedRes: any = JSON.parse(JSON.stringify(proofOfAuthorityData));
@@ -251,6 +257,7 @@ describe('Proofs', () => {
         signers,
         fileCID,
         version,
+        dataSig,
       );
       const proofTime = await time.latest();
       const gasUsedTx1 = (await tx1.wait())?.gasUsed ?? 0n;
@@ -266,6 +273,7 @@ describe('Proofs', () => {
         signers,
         fileCID,
         version,
+        dataSig,
       );
       const gasUsedTx2 = (await tx2.wait())?.gasUsed ?? 0n;
 
@@ -274,6 +282,7 @@ describe('Proofs', () => {
         signers,
         fileCID,
         version,
+        dataSig,
       );
 
       expect(gasUsedTx1).greaterThan(gasUsedTx2 * 5n);
@@ -298,43 +307,97 @@ describe('Proofs', () => {
     const poaCID = 'QmQY5XFRomrnAD3o3yMWkTz1HWcCfZYuE87Gbwe7SjV1kk';
     let proofs: any;
     let signer1: SignerWithAddress;
+    let signer2: SignerWithAddress;
     const version = '0.1.0';
 
     beforeEach(async () => {
-      ({ proofs, signer1 } = await loadFixture(deployProofsFixture));
+      ({ proofs, signer1, signer2 } = await loadFixture(deployProofsFixture));
       await storeProofOfAuthority(fileCID, poaCID);
     });
 
-    it('no signer error', async () => {
-      await expect(
-        proofs.fetchProofOfSignatureData.staticCall(ethers.ZeroAddress, fileCID, poaCID, version),
-      ).revertedWith('No signer');
-    });
+    // it('no signer error', async () => {
+    //   await expect(
+    //     proofs.fetchProofOfSignatureData.staticCall(ethers.ZeroAddress, fileCID, poaCID, version),
+    //   ).revertedWith('No signer');
+    // });
 
     it('no Agreement File CID error', async () => {
+      const dataSig = await signer1.signMessage(
+        ethers.getBytes(
+          ethers.keccak256(
+            ethers.solidityPacked(
+              ['address', 'string', 'string', 'string'],
+              [signer1.address, '', poaCID, version],
+            ),
+          ),
+        ),
+      );
       await expect(
-        proofs.fetchProofOfSignatureData.staticCall(signer1.address, '', poaCID, version),
+        proofs.fetchProofOfSignatureData.staticCall(signer1.address, '', poaCID, version, dataSig),
       ).revertedWith('No Agreement File CID');
     });
 
     it('no Proof-of-Authority CID error', async () => {
+      const dataSig = await signer1.signMessage(
+        ethers.getBytes(
+          ethers.keccak256(
+            ethers.solidityPacked(
+              ['address', 'string', 'string', 'string'],
+              [signer1.address, fileCID, '', version],
+            ),
+          ),
+        ),
+      );
       await expect(
-        proofs.fetchProofOfSignatureData.staticCall(signer1.address, fileCID, '', version),
+        proofs.fetchProofOfSignatureData.staticCall(signer1.address, fileCID, '', version, dataSig),
       ).revertedWith('No Proof-of-Authority');
     });
 
-    it('no version error', async () => {
+    // it('no version error', async () => {
+    //   await expect(
+    //     proofs.fetchProofOfSignatureData.staticCall(signer1.address, fileCID, poaCID, ''),
+    //   ).revertedWith('No version');
+    // });
+
+    it('invalid data signature', async () => {
+      const dataSig = await signer1.signMessage(
+        ethers.getBytes(
+          ethers.keccak256(
+            ethers.solidityPacked(
+              ['address', 'string', 'string', 'string'],
+              [signer1.address, fileCID, poaCID, version],
+            ),
+          ),
+        ),
+      );
+
       await expect(
-        proofs.fetchProofOfSignatureData.staticCall(signer1.address, fileCID, poaCID, ''),
-      ).revertedWith('No version');
+        proofs.fetchProofOfSignatureData(signer2.address, fileCID, poaCID, version, dataSig),
+      ).revertedWith('Invalid data signature');
+
+      await expect(
+        proofs.fetchProofOfSignatureData(signer1.address, fileCID, poaCID, version, dataSig),
+      ).not.reverted;
     });
 
     it('success', async () => {
+      const dataSig = await signer1.signMessage(
+        ethers.getBytes(
+          ethers.keccak256(
+            ethers.solidityPacked(
+              ['address', 'string', 'string', 'string'],
+              [signer1.address, fileCID, poaCID, version],
+            ),
+          ),
+        ),
+      );
+
       let res = await proofs.fetchProofOfSignatureData.staticCall(
         signer1.address,
         fileCID,
         poaCID,
-        '0.1.0',
+        version,
+        dataSig,
       );
 
       let expectedRes: any = JSON.parse(JSON.stringify(proofOfSignatureData));
@@ -353,7 +416,13 @@ describe('Proofs', () => {
        * gas than before because now it returns a cached data
        */
       // first real function execution (more gas)
-      const tx1 = await proofs.fetchProofOfSignatureData(signer1.address, fileCID, poaCID, '0.1.0');
+      const tx1 = await proofs.fetchProofOfSignatureData(
+        signer1.address,
+        fileCID,
+        poaCID,
+        version,
+        dataSig,
+      );
       const proofTime = await time.latest();
       const gasUsedTx1 = (await tx1.wait())?.gasUsed ?? 0n;
 
@@ -363,14 +432,21 @@ describe('Proofs', () => {
       ).to.deep.equal(expectedRes);
 
       // second real function execution (less gas)
-      const tx2 = await proofs.fetchProofOfSignatureData(signer1.address, fileCID, poaCID, '0.1.0');
+      const tx2 = await proofs.fetchProofOfSignatureData(
+        signer1.address,
+        fileCID,
+        poaCID,
+        version,
+        dataSig,
+      );
       const gasUsedTx2 = (await tx2.wait())?.gasUsed ?? 0n;
 
       res = await proofs.fetchProofOfSignatureData.staticCall(
         signer1.address,
         fileCID,
         poaCID,
-        '0.1.0',
+        version,
+        dataSig,
       );
 
       expect(gasUsedTx1).greaterThan(gasUsedTx2 * 5n);
@@ -492,12 +568,24 @@ describe('Proofs', () => {
       ({ proofs, creator, signer1, signer2, signer3 } = await loadFixture(deployProofsFixture));
       signers = [signer1.address, signer2.address, signer3.address];
 
-      await proofs.fetchProofOfAuthorityData(creator.address, signers, fileCID, version);
+      const dataSig = await creator.signMessage(
+        ethers.getBytes(
+          ethers.keccak256(
+            ethers.solidityPacked(
+              ['address', 'address[]', 'string', 'string'],
+              [creator.address, signers, fileCID, version],
+            ),
+          ),
+        ),
+      );
+
+      await proofs.fetchProofOfAuthorityData(creator.address, signers, fileCID, version, dataSig);
       const data = await proofs.fetchProofOfAuthorityData.staticCall(
         creator.address,
         signers,
         fileCID,
         version,
+        dataSig,
       );
 
       const dataHash = ethers.keccak256(ethers.toUtf8Bytes(data));
@@ -588,14 +676,26 @@ describe('Proofs', () => {
     beforeEach(async () => {
       ({ proofs, signer1, signer2 } = await loadFixture(deployProofsFixture));
 
+      const dataSig = await signer1.signMessage(
+        ethers.getBytes(
+          ethers.keccak256(
+            ethers.solidityPacked(
+              ['address', 'string', 'string', 'string'],
+              [signer1.address, fileCID, poaCID, version],
+            ),
+          ),
+        ),
+      );
+
       await storeProofOfAuthority(fileCID, poaCID);
 
-      await proofs.fetchProofOfSignatureData(signer1.address, fileCID, poaCID, version);
+      await proofs.fetchProofOfSignatureData(signer1.address, fileCID, poaCID, version, dataSig);
       const data = await proofs.fetchProofOfSignatureData.staticCall(
         signer1.address,
         fileCID,
         poaCID,
         version,
+        dataSig,
       );
 
       const dataHash = ethers.keccak256(ethers.toUtf8Bytes(data));

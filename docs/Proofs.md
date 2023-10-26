@@ -48,7 +48,7 @@ constructor(address _proofsMetadata, address _admin) public
 ### fetchProofOfAuthorityData
 
 ```solidity
-function fetchProofOfAuthorityData(address _creator, address[] _signers, string _fileCID, string _version) external returns (string)
+function fetchProofOfAuthorityData(address _creator, address[] _signers, string _fileCID, string _version, bytes _dataSig) external returns (string)
 ```
 
 Generates Proof-of-Authority data for creator to sign and caches it in the smart contract
@@ -62,6 +62,7 @@ memory
 | _signers | address[] | Array of signers of the agreement |
 | _fileCID | string | IPFS CID of the agreement file |
 | _version | string | EIP712 version of the data |
+| _dataSig | bytes | _creator's signature of all input parameters to make sure they are correct |
 
 #### Return Values
 
@@ -72,7 +73,7 @@ memory
 ### fetchProofOfSignatureData
 
 ```solidity
-function fetchProofOfSignatureData(address _signer, string _fileCID, string _poaCID, string _version) external returns (string)
+function fetchProofOfSignatureData(address _signer, string _fileCID, string _poaCID, string _version, bytes _dataSig) external returns (string)
 ```
 
 Generates Proof-of-Signature data for creator to sign and caches it in the smart contract
@@ -86,6 +87,7 @@ memory
 | _fileCID | string | IPFS CID of the agreement file |
 | _poaCID | string | IPFS CID of Proof-of-Authority |
 | _version | string | EIP712 version of the data |
+| _dataSig | bytes |  |
 
 #### Return Values
 

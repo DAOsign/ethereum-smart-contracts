@@ -50,18 +50,31 @@ describe('Lifecycle Tests of the Platform', () => {
     signers: SignerWithAddress[],
     version: string,
   ) => {
+    const dataSig = await creator.signMessage(
+      ethers.getBytes(
+        ethers.keccak256(
+          ethers.solidityPacked(
+            ['address', 'address[]', 'string', 'string'],
+            [creator.address, signers.map((x) => x.address), fileCID, version],
+          ),
+        ),
+      ),
+    );
+
     // Fetch proof data
     await proofs.fetchProofOfAuthorityData(
       creator.address,
       signers.map((x) => x.address),
       fileCID,
       version,
+      dataSig,
     );
     const proofData = await proofs.fetchProofOfAuthorityData.staticCall(
       creator.address,
       signers,
       fileCID,
       version,
+      dataSig,
     );
 
     // Sign proof data & generate Proof-of-Authority
@@ -93,13 +106,25 @@ describe('Lifecycle Tests of the Platform', () => {
     version: string,
     signer: SignerWithAddress,
   ) => {
+    const dataSig = await signer.signMessage(
+      ethers.getBytes(
+        ethers.keccak256(
+          ethers.solidityPacked(
+            ['address', 'string', 'string', 'string'],
+            [signer.address, fileCID, poaCID, version],
+          ),
+        ),
+      ),
+    );
+
     // Fetch proof data
-    await proofs.fetchProofOfSignatureData(signer, fileCID, poaCID, version);
+    await proofs.fetchProofOfSignatureData(signer, fileCID, poaCID, version, dataSig);
     const proofData = await proofs.fetchProofOfSignatureData.staticCall(
       signer,
       fileCID,
       poaCID,
       version,
+      dataSig,
     );
 
     // Sign proof data & generate Proof-of-Signature

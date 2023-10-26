@@ -48,14 +48,16 @@ interface IProofs {
         address _creator,
         address[] calldata _signers,
         string calldata _agreementFileCID,
-        string calldata _version
+        string calldata _version,
+        bytes calldata _dataSig
     ) external returns (string memory);
 
     function fetchProofOfSignatureData(
         address _signer,
         string calldata _agreementFileCID,
         string calldata _proofOfAuthorityCID,
-        string calldata _version
+        string calldata _version,
+        bytes calldata _dataSig
     ) external returns (string memory);
 
     function fetchProofOfAgreementData(

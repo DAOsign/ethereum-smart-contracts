@@ -53,7 +53,7 @@ function poagData(bytes32 input) external view returns (string)
 ### fetchProofOfAuthorityData
 
 ```solidity
-function fetchProofOfAuthorityData(address _creator, address[] _signers, string _agreementFileCID, string _version) external returns (string)
+function fetchProofOfAuthorityData(address _creator, address[] _signers, string _agreementFileCID, string _version, bytes _dataSig) external returns (string)
 ```
 
 Actual functions
@@ -61,7 +61,7 @@ Actual functions
 ### fetchProofOfSignatureData
 
 ```solidity
-function fetchProofOfSignatureData(address _signer, string _agreementFileCID, string _proofOfAuthorityCID, string _version) external returns (string)
+function fetchProofOfSignatureData(address _signer, string _agreementFileCID, string _proofOfAuthorityCID, string _version, bytes _dataSig) external returns (string)
 ```
 
 ### fetchProofOfAgreementData
