@@ -61,24 +61,42 @@ To deploy smart contracts and libraries to Ethereum Mainnet or Goerli Testnet yo
 Before deploying the contracts make sure they are compiled.
 
 ```
-npx hardhat compile
+yarn hardhat compile
 ```
 
 Then deploy smart contracts to the target network and verify them on Etherscan.
 
 ```
-npx hardhat deploy:all --owner <your address> --network goerli
+yarn hardhat deploy:all --owner <your address> --network goerli
+```
+
+## Verification
+
+To verify smart contracts on Etherscan execute these commands
+
+```
+yarn hardhat verify --network goerli <StringsExpanded addr>
+yarn hardhat verify --network goerli <ProofsMetadata addr>
+yarn hardhat verify --network goerli <ProofsHelper addr>
+yarn hardhat verify --network goerli <ProofsVerification addr>
+yarn hardhat verify --network goerli <Proofs addr> <ProofsMetadata addr> <your address (a.k.a. owner address)>
+```
+
+Or a generalized command for any smart contract would be
+
+```
+yarn hardhat verify --network goerli <contract address> <constructor params space separated>
 ```
 
 ## Latest Deployments
 
-### 6 Oct 2023
+### 25 Oct 2023
 
-StringsExpanded &nbsp;&nbsp;`0xC7eb777864D0A507524eC8134ff185bab4A1A701`<br>
-ProofsMetadata &nbsp;&nbsp;&nbsp;&nbsp;`0xBB1dDe7b8490Bf12D275aA0ceBB827A0371eC7C2`<br>
-ProofsVerification &nbsp;`0x8c6E589E9CF159C84356C8719E40D27535520BBA`<br>
-ProofsHelper &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`0xD9B11cd550Cf7CDbC9915D325d37F746354d9a38`<br>
-Proofs &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`0x3C0A2766F77Afdb70A834cd4960cC5d695076497`<br>
+StringsExpanded &nbsp;&nbsp;`0xB9130909edB2Df74996B32064657e38ACcC03Cbd`<br>
+ProofsMetadata &nbsp;&nbsp;&nbsp;&nbsp;`0x37958Dd1866E5aE3F16b8e4c7ebBd1D3B1AA6b42`<br>
+ProofsVerification &nbsp;`0x2853255D6e9136A520375E0B4eeAeb1eB26278e1`<br>
+ProofsHelper &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`0x78A4897C429D9F49E814C95C71DEceB4E7391967`<br>
+Proofs &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`0x9A6d8b61Fb6F2cc463ABb8D1E7cb8D77e7F7CCe5`<br>
 
 ## Contributions
 

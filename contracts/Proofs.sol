@@ -42,7 +42,6 @@ contract Proofs is Ownable, IProofs {
         _transferOwnership(_admin);
     }
 
-    // TODO: sequence? create counter on smart contract and use it for dataSign in fetch functions
     /**
      * Generates Proof-of-Authority data for creator to sign and caches it in the smart contract
      * memory
