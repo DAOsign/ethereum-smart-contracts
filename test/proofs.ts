@@ -186,6 +186,29 @@ describe('Proofs', () => {
   });
 
   describe('Fetch Proof-of-Authority data', () => {
+    it('caller is not the owner', async () => {
+      const { proofs, creator, signer1, signer2, signer3 } = await loadFixture(deployProofsFixture);
+      const signers = [signer1.address, signer2.address, signer3.address];
+      const fileCID = 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp';
+      const version = '0.1.0';
+      const dataSig = await creator.signMessage(
+        ethers.getBytes(
+          ethers.keccak256(
+            ethers.solidityPacked(
+              ['address', 'address[]', 'string', 'string'],
+              [creator.address, signers, fileCID, version],
+            ),
+          ),
+        ),
+      );
+
+      await expect(
+        proofs
+          .connect(creator)
+          .fetchProofOfAuthorityData(creator.address, signers, fileCID, version, dataSig),
+      ).revertedWith('Ownable: caller is not the owner');
+    });
+
     it('invalid data signature', async () => {
       const { proofs, creator, signer1, signer2, signer3 } = await loadFixture(deployProofsFixture);
       const signers = [signer1.address, signer2.address, signer3.address];
@@ -315,11 +338,23 @@ describe('Proofs', () => {
       await storeProofOfAuthority(fileCID, poaCID);
     });
 
-    // it('no signer error', async () => {
-    //   await expect(
-    //     proofs.fetchProofOfSignatureData.staticCall(ethers.ZeroAddress, fileCID, poaCID, version),
-    //   ).revertedWith('No signer');
-    // });
+    it('caller is not the owner', async () => {
+      const dataSig = await signer1.signMessage(
+        ethers.getBytes(
+          ethers.keccak256(
+            ethers.solidityPacked(
+              ['address', 'string', 'string', 'string'],
+              [signer1.address, fileCID, poaCID, version],
+            ),
+          ),
+        ),
+      );
+      await expect(
+        proofs
+          .connect(signer1)
+          .fetchProofOfSignatureData.staticCall(signer1.address, '', poaCID, version, dataSig),
+      ).revertedWith('Ownable: caller is not the owner');
+    });
 
     it('no Agreement File CID error', async () => {
       const dataSig = await signer1.signMessage(
@@ -352,12 +387,6 @@ describe('Proofs', () => {
         proofs.fetchProofOfSignatureData.staticCall(signer1.address, fileCID, '', version, dataSig),
       ).revertedWith('No Proof-of-Authority');
     });
-
-    // it('no version error', async () => {
-    //   await expect(
-    //     proofs.fetchProofOfSignatureData.staticCall(signer1.address, fileCID, poaCID, ''),
-    //   ).revertedWith('No version');
-    // });
 
     it('invalid data signature', async () => {
       const dataSig = await signer1.signMessage(
@@ -474,6 +503,14 @@ describe('Proofs', () => {
       'QmfSEEuZBsSgh3hLB8BU4ApNepDpaUWFCw9KqB7DxLbSV2',
       'QmVMLPjLnT7PVQvZstd6DmL8K1VGHHypbYyG2HHSzN8BTK',
     ];
+
+    it('caller is not the owner', async () => {
+      const { proofs, creator } = await loadFixture(deployProofsFixture);
+
+      await expect(
+        proofs.connect(creator).fetchProofOfAgreementData.staticCall(fileCID, poaCID, posCIDs),
+      ).revertedWith('Ownable: caller is not the owner');
+    });
 
     it('no Agreement File CID error', async () => {
       const { proofs } = await loadFixture(deployProofsFixture);
@@ -598,6 +635,14 @@ describe('Proofs', () => {
       };
     });
 
+    it('caller is not the owner', async () => {
+      await expect(
+        proofs
+          .connect(creator)
+          .storeProofOfAuthority(creator.address, signers, version, signature, fileCID, proofCID),
+      ).revertedWith('Ownable: caller is not the owner');
+    });
+
     it('error: No ProofCID', async () => {
       await expect(
         proofs.storeProofOfAuthority(creator.address, signers, version, signature, fileCID, ''),
@@ -708,6 +753,14 @@ describe('Proofs', () => {
       };
     });
 
+    it('caller is not the owner', async () => {
+      await expect(
+        proofs
+          .connect(signer1)
+          .storeProofOfSignature(signer1.address, signature, fileCID, posCID, poaCID, version),
+      ).revertedWith('Ownable: caller is not the owner');
+    });
+
     it('error: No ProofCID', async () => {
       await expect(
         proofs.storeProofOfSignature(signer1.address, signature, fileCID, '', poaCID, version),
@@ -780,6 +833,12 @@ describe('Proofs', () => {
 
       await proofs.fetchProofOfAgreementData(fileCID, poaCID, posCIDs);
       proof = await proofs.fetchProofOfAgreementData.staticCall(fileCID, poaCID, posCIDs);
+    });
+
+    it('caller is not the owner', async () => {
+      await expect(
+        proofs.connect(signer1).storeProofOfAgreement(fileCID, poaCID, posCIDs, poagCID),
+      ).revertedWith('Ownable: caller is not the owner');
     });
 
     it('error: No ProofCID', async () => {
