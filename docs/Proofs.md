@@ -1,211 +1,298 @@
+## ProofKind
+
+```solidity
+enum ProofKind {
+  Authority,
+  Signature,
+  Agreement
+}
+```
+
+## EIP712Domain
+
+```solidity
+struct EIP712Domain {
+  string name;
+  string version;
+  uint256 chainId;
+  address verifyingContract;
+}
+```
+
+## EIP712DOMAIN_TYPEHASH
+
+```solidity
+bytes32 EIP712DOMAIN_TYPEHASH
+```
+
+## Signer
+
+```solidity
+struct Signer {
+  address addr;
+  string data;
+}
+```
+
+## SIGNER_TYPEHASH
+
+```solidity
+bytes32 SIGNER_TYPEHASH
+```
+
+## ProofOfAuthority
+
+```solidity
+struct ProofOfAuthority {
+  string name;
+  address from;
+  string filecid;
+  struct Signer[] signers;
+  string app;
+  uint256 timestamp;
+  string metadata;
+}
+```
+
+## PROOF_AUTHORITY_TYPEHASH
+
+```solidity
+bytes32 PROOF_AUTHORITY_TYPEHASH
+```
+
+## ProofOfSignature
+
+```solidity
+struct ProofOfSignature {
+  string name;
+  address signer;
+  string filecid;
+  string app;
+  uint256 timestamp;
+  string metadata;
+}
+```
+
+## PROOF_SIGNATURE_TYPEHASH
+
+```solidity
+bytes32 PROOF_SIGNATURE_TYPEHASH
+```
+
+## Filecid
+
+```solidity
+struct Filecid {
+  string addr;
+  string data;
+}
+```
+
+## FILECID_TYPEHASH
+
+```solidity
+bytes32 FILECID_TYPEHASH
+```
+
+## ProofOfAgreement
+
+```solidity
+struct ProofOfAgreement {
+  string filecid;
+  struct Filecid[] signcids;
+  string app;
+  uint256 timestamp;
+  string metadata;
+}
+```
+
+## PROOF_AGREEMENT_TYPEHASH
+
+```solidity
+bytes32 PROOF_AGREEMENT_TYPEHASH
+```
+
 ## Proofs
 
-Stores DAOsign proofs.
-
-Note
-Proof-of-Authority = PoA
-Proof-of-Signature = PoS
-Proof-of-Agreement = PoAg
-
-### proofsMetadata
+### DOMAIN_HASH
 
 ```solidity
-address proofsMetadata
-```
-
-Functions from variables
-
-### finalProofs
-
-```solidity
-mapping(string => mapping(string => string)) finalProofs
-```
-
-### poaData
-
-```solidity
-mapping(bytes32 => string) poaData
-```
-
-### posData
-
-```solidity
-mapping(bytes32 => string) posData
-```
-
-### poagData
-
-```solidity
-mapping(bytes32 => string) poagData
+bytes32 DOMAIN_HASH
 ```
 
 ### constructor
 
 ```solidity
-constructor(address _proofsMetadata, address _admin) public
+constructor() internal
 ```
 
-### fetchProofOfAuthorityData
+### hash
 
 ```solidity
-function fetchProofOfAuthorityData(address _creator, address[] _signers, string _fileCID, string _version, bytes _dataSig) external returns (string)
+function hash(struct EIP712Domain _input) internal pure returns (bytes32)
 ```
 
-Generates Proof-of-Authority data for creator to sign and caches it in the smart contract
-memory
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| _creator | address | Agreement creator address |
-| _signers | address[] | Array of signers of the agreement |
-| _fileCID | string | IPFS CID of the agreement file |
-| _version | string | EIP712 version of the data |
-| _dataSig | bytes | _creator's signature of all input parameters to make sure they are correct |
-
-#### Return Values
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| [0] | string | proofData Proof-of-Authority data to sign |
-
-### fetchProofOfSignatureData
+### hash
 
 ```solidity
-function fetchProofOfSignatureData(address _signer, string _fileCID, string _poaCID, string _version, bytes _dataSig) external returns (string)
+function hash(struct Signer _input) internal pure returns (bytes32)
 ```
 
-Generates Proof-of-Signature data for creator to sign and caches it in the smart contract
-memory
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| _signer | address | Current signer of the agreement from the list of agreement signers |
-| _fileCID | string | IPFS CID of the agreement file |
-| _poaCID | string | IPFS CID of Proof-of-Authority |
-| _version | string | EIP712 version of the data |
-| _dataSig | bytes |  |
-
-#### Return Values
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| [0] | string | proofData Proof-of-Signature data to sign |
-
-### fetchProofOfAgreementData
+### hash
 
 ```solidity
-function fetchProofOfAgreementData(string _fileCID, string _poaCID, string[] _posCID) external returns (string)
+function hash(struct Signer[] _input) public pure returns (bytes32)
 ```
 
-Generates Proof-of-Agreement data for creator to sign and caches it in the smart contract
-memory
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| _fileCID | string | IPFS CID of the agreement file |
-| _poaCID | string | IPFS CID of Proof-of-Authority |
-| _posCID | string[] | IPFS CID of Proof-of-Signature |
-
-#### Return Values
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| [0] | string | proofData Proof-of-Agreement data to sign |
-
-### storeProofOfAuthority
+### hash
 
 ```solidity
-function storeProofOfAuthority(address _creator, address[] _signers, string _version, bytes _signature, string _fileCID, string _proofCID) external
+function hash(struct ProofOfAuthority _input) public pure returns (bytes32)
 ```
 
-Stores Proof-of-Authority after verifying the correctness of the signature
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| _creator | address | Agreement creator address |
-| _signers | address[] | List of signer addresses |
-| _version | string |  |
-| _signature | bytes | Signature of Proof-of-Authority data |
-| _fileCID | string | IPFS CID of the agreement file |
-| _proofCID | string | IPFS CID of Proof-of-Authority |
-
-### storeProofOfSignature
+### hash
 
 ```solidity
-function storeProofOfSignature(address _signer, bytes _signature, string _fileCID, string _posCID, string _poaCID, string _version) external
+function hash(struct ProofOfSignature _input) public pure returns (bytes32)
 ```
 
-Stores Proof-of-Signature after verifying the correctness of the signature
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| _signer | address | Current signer of the agreement from the list of agreement signers |
-| _signature | bytes | Signature of Proof-of-Signature data |
-| _fileCID | string | IPFS CID of the agreement file |
-| _posCID | string | IPFS CID of Proof-of-Signature |
-| _poaCID | string |  |
-| _version | string |  |
-
-### storeProofOfAgreement
+### hash
 
 ```solidity
-function storeProofOfAgreement(string _fileCID, string _poaCID, string[] _posCIDs, string _poagCID) external
+function hash(struct Filecid _input) internal pure returns (bytes32)
 ```
 
-Stores Proof-of-Agreement
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| _fileCID | string | IPFS CID of the agreement file |
-| _poaCID | string | IPFS CID of Proof-of-Authority |
-| _posCIDs | string[] | IPFS CIDs of Proof-of-Signature |
-| _poagCID | string | IPFS CID of Proof-of-Agreement |
-
-### getPoAData
+### hash
 
 ```solidity
-function getPoAData(address _creator, address[] _signers, string _fileCID, string _version) public view returns (string)
+function hash(struct Filecid[] _input) public pure returns (bytes32)
 ```
 
-### getPoSData
+### hash
 
 ```solidity
-function getPoSData(address _signer, string _fileCID, string _poaCID, string _version) public view returns (string)
+function hash(struct ProofOfAgreement _input) public pure returns (bytes32)
 ```
 
-### getPoAgData
+### recover
 
 ```solidity
-function getPoAgData(string _fileCID, string _poaCID, string[] _posCIDs) public view returns (string)
+function recover(bytes32 message, bytes sig) internal pure returns (address)
 ```
 
-### _setPoAData
+### recover
 
 ```solidity
-function _setPoAData(address _creator, address[] _signers, string _fileCID, string _version, string _data) internal
+function recover(struct ProofOfAuthority message, bytes signature) public view returns (address)
 ```
 
-### _setPoSData
+### recover
 
 ```solidity
-function _setPoSData(address _signer, string _fileCID, string _poaCID, string _version, string _data) internal
+function recover(struct ProofOfSignature message, bytes signature) public view returns (address)
 ```
 
-### _setPoAgData
+### recover
 
 ```solidity
-function _setPoAgData(string _fileCID, string _poaCID, string[] _posCID, string _data) internal
+function recover(struct ProofOfAgreement message, bytes signature) public view returns (address)
+```
+
+### store
+
+```solidity
+function store(struct ProofOfAuthority message, bytes signature) public
+```
+
+### store
+
+```solidity
+function store(struct ProofOfSignature message, bytes signature) public
+```
+
+### store
+
+```solidity
+function store(struct ProofOfAgreement message, bytes signature) public
+```
+
+### validate
+
+```solidity
+function validate(struct ProofOfAuthority) internal view virtual returns (bool)
+```
+
+### validate
+
+```solidity
+function validate(struct ProofOfSignature) internal view virtual returns (bool)
+```
+
+### validate
+
+```solidity
+function validate(struct ProofOfAgreement) internal view virtual returns (bool)
+```
+
+### save
+
+```solidity
+function save(struct ProofOfAuthority) internal virtual
+```
+
+### save
+
+```solidity
+function save(struct ProofOfSignature) internal virtual
+```
+
+### save
+
+```solidity
+function save(struct ProofOfAgreement) internal virtual
+```
+
+## DummyProofs
+
+### data
+
+```solidity
+mapping(bytes32 => bytes) data
+```
+
+### validate
+
+```solidity
+function validate(struct ProofOfAuthority) internal pure returns (bool)
+```
+
+### validate
+
+```solidity
+function validate(struct ProofOfSignature) internal pure returns (bool)
+```
+
+### validate
+
+```solidity
+function validate(struct ProofOfAgreement) internal pure returns (bool)
+```
+
+### save
+
+```solidity
+function save(struct ProofOfAuthority message) internal
+```
+
+### save
+
+```solidity
+function save(struct ProofOfSignature message) internal
+```
+
+### save
+
+```solidity
+function save(struct ProofOfAgreement message) internal
 ```
 
