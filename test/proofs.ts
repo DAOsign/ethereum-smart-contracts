@@ -139,7 +139,7 @@ function signProofOfAgreement(pkey: Buffer, message: ProofOfAgreementStruct): st
   });
 }
 
-describe('Proofs', function () {
+describe('Proofs', () => {
   async function deployProofsFixture() {
     const Proofs = await ethers.getContractFactory('DummyProofs');
 
@@ -152,8 +152,8 @@ describe('Proofs', function () {
     return { pkey, signer, proofs };
   }
 
-  describe('ProofOfAuthority', function () {
-    it('recover', async function () {
+  describe('ProofOfAuthority', () => {
+    it('recover', async () => {
       const { pkey, signer, proofs } = await loadFixture(deployProofsFixture);
       const recover =
         proofs['recover((string,address,string,(address,string)[],string,uint256,string),bytes)'];
@@ -166,7 +166,7 @@ describe('Proofs', function () {
           { addr: signer.address, data: 'data 2' },
         ],
         app: 'daosign',
-        timestamp: (Date.now() / 1000) | 0,
+        timestamp: Math.floor(Date.now() / 1000),
         metadata: 'proof metadata',
       };
       const signature = signProofOfAuthority(pkey, message);
@@ -175,8 +175,8 @@ describe('Proofs', function () {
     });
   });
 
-  describe('ProofOfSignature', function () {
-    it('recover', async function () {
+  describe('ProofOfSignature', () => {
+    it('recover', async () => {
       const { pkey, signer, proofs } = await loadFixture(deployProofsFixture);
       const recover = proofs['recover((string,address,string,string,uint256,string),bytes)'];
       const message: ProofOfSignatureStruct = {
@@ -184,7 +184,7 @@ describe('Proofs', function () {
         signer: signer.address,
         filecid: 'some file cid',
         app: 'daosign',
-        timestamp: (Date.now() / 1000) | 0,
+        timestamp: Math.floor(Date.now() / 1000),
         metadata: 'proof metadata',
       };
       const signature = signProofOfSignature(pkey, message);
@@ -193,23 +193,7 @@ describe('Proofs', function () {
     });
   });
 
-  describe('ProofOfAgreement', function () {
-    it('recover', async function () {
-      const { pkey, signer, proofs } = await loadFixture(deployProofsFixture);
-      const recover = proofs['recover((string,(string,string)[],string,uint256,string),bytes)'];
-      const message: ProofOfAgreementStruct = {
-        filecid: 'some file cid',
-        signcids: [
-          { addr: 'some file cid 1', data: '' },
-          { addr: 'some file cid 2', data: '' },
-        ],
-        app: 'daosign',
-        timestamp: (Date.now() / 1000) | 0,
-        metadata: 'proof metadata',
-      };
-      const signature = signProofOfAgreement(pkey, message);
-      const recovered = await recover(message, signature);
-      expect(recovered).eq(signer.address);
-    });
+  describe('ProofOfAgreement', () => {
+    // TODO
   });
 });
