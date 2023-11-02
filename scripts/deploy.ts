@@ -74,8 +74,8 @@ export const deployAll = async (hre: HardhatRuntimeEnvironment, ownerAddr: strin
     await hre.ethers.getContractFactory('Proofs', {
       libraries: {
         StringsExpanded: await strings.getAddress(),
-        ProofsVerification: await proofsVerification.getAddress(),
-        ProofsHelper: await proofsHelper.getAddress(),
+        // ProofsVerification: await proofsVerification.getAddress(),
+        // ProofsHelper: await proofsHelper.getAddress(),
       },
     })
   ).deploy(await proofsMetadata.getAddress(), ownerAddr);

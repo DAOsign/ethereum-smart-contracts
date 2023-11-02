@@ -4,13 +4,7 @@ pragma solidity ^0.8.18;
 import { ProofTypes } from '../libs/common/ProofTypes.sol';
 
 interface IProofs {
-    event ProofOfAuthorityEvent(
-        address indexed creator,
-        bytes signature,
-        string indexed agreementFileCID,
-        string proofCID,
-        string proofJSON
-    );
+    event NewProofOfAuthority(ProofOfAuthorityMsg indexed message);
     event ProofOfSignatureEvent(
         address indexed signer,
         bytes signature,
@@ -25,89 +19,67 @@ interface IProofs {
         string proofJSON
     );
 
+    struct EIP712Domain {
+        string name;
+        string version;
+    }
+    struct Signer {
+        address addr;
+        string metadata;
+    }
+    struct ProofOfAuthorityMsg {
+        string name;
+        address from;
+        string agreementFileCID;
+        Signer[] signers;
+        string app;
+        uint64 timestamp;
+        string metadata;
+    }
+    struct ProofOfAuthorityShrinked {
+        bytes sig;
+        string version;
+        ProofOfAuthorityMsg message;
+    }
+
     /**
      * Functions from variables
      */
-    function proofsMetadata() external view returns (address);
+    // function proofsMetadata() external view returns (address);
 
-    function finalProofs(
-        string calldata agreementFileCID,
-        string calldata proofCID
-    ) external view returns (string memory);
+    // function finalProofs(
+    //     string calldata agreementFileCID,
+    //     string calldata proofCID
+    // ) external view returns (string memory);
 
-    function poaData(bytes32 input) external view returns (string memory);
+    // function poaData(bytes32 input) external view returns (string memory);
 
-    function posData(bytes32 input) external view returns (string memory);
+    // function posData(bytes32 input) external view returns (string memory);
 
-    function poagData(bytes32 input) external view returns (string memory);
+    // function poagData(bytes32 input) external view returns (string memory);
 
-    /**
-     * Actual functions
-     */
-    // function fetchProofOfAuthorityData(
+    // function storeProofOfAuthority(
     //     address _creator,
     //     address[] calldata _signers,
-    //     string calldata _agreementFileCID,
     //     string calldata _version,
-    //     bytes calldata _dataSig
-    // ) external returns (string memory);
+    //     bytes calldata _signature,
+    //     string calldata _fileCID,
+    //     string calldata _proofCID
+    // ) external;
 
-    // function fetchProofOfSignatureData(
+    // function storeProofOfSignature(
     //     address _signer,
-    //     string calldata _agreementFileCID,
-    //     string calldata _proofOfAuthorityCID,
-    //     string calldata _version,
-    //     bytes calldata _dataSig
-    // ) external returns (string memory);
+    //     bytes calldata _signature,
+    //     string calldata _fileCID,
+    //     string calldata _posCID,
+    //     string calldata _poaCID,
+    //     string calldata _version
+    // ) external;
 
-    // function fetchProofOfAgreementData(
-    //     string calldata _agreementFileCID,
-    //     string calldata _proofOfAuthorityCID,
-    //     string[] calldata _proofsOfSignatureCID
-    // ) external returns (string memory);
-
-    function storeProofOfAuthority(
-        address _creator,
-        address[] calldata _signers,
-        string calldata _version,
-        bytes calldata _signature,
-        string calldata _fileCID,
-        string calldata _proofCID
-    ) external;
-
-    function storeProofOfSignature(
-        address _signer,
-        bytes calldata _signature,
-        string calldata _fileCID,
-        string calldata _posCID,
-        string calldata _poaCID,
-        string calldata _version
-    ) external;
-
-    function storeProofOfAgreement(
-        string calldata _fileCID,
-        string calldata _poaCID,
-        string[] calldata _posCIDs,
-        string calldata _poagCID
-    ) external;
-
-    function getPoAData(
-        address _creator,
-        address[] calldata _signers,
-        string calldata _fileCID,
-        string calldata _version
-    ) external view returns (string memory);
-
-    function getPoSData(
-        address _signer,
-        string calldata _fileCID,
-        string calldata _poaCID,
-        string calldata _version
-    ) external view returns (string memory);
-
-    function getPoAgData(
-        string calldata _fileCID,
-        string calldata _poaCID,
-        string[] calldata _posCIDs
-    ) external view returns (string memory);
+    // function storeProofOfAgreement(
+    //     string calldata _fileCID,
+    //     string calldata _poaCID,
+    //     string[] calldata _posCIDs,
+    //     string calldata _poagCID
+    // ) external;
 }

@@ -1,9 +1,9 @@
 ## IProofs
 
-### ProofOfAuthorityEvent
+### NewProofOfAuthority
 
 ```solidity
-event ProofOfAuthorityEvent(address creator, bytes signature, string agreementFileCID, string proofCID, string proofJSON)
+event NewProofOfAuthority(struct IProofs.ProofOfAuthorityMsg message)
 ```
 
 ### ProofOfSignatureEvent
@@ -18,73 +18,45 @@ event ProofOfSignatureEvent(address signer, bytes signature, string agreementFil
 event ProofOfAgreementEvent(string agreementFileCID, string proofOfAuthorityCID, string proofCID, string proofJSON)
 ```
 
-### proofsMetadata
+### EIP712Domain
 
 ```solidity
-function proofsMetadata() external view returns (address)
+struct EIP712Domain {
+  string name;
+  string version;
+}
 ```
 
-Functions from variables
-
-### finalProofs
+### Signer
 
 ```solidity
-function finalProofs(string agreementFileCID, string proofCID) external view returns (string)
+struct Signer {
+  address addr;
+  string metadata;
+}
 ```
 
-### poaData
+### ProofOfAuthorityMsg
 
 ```solidity
-function poaData(bytes32 input) external view returns (string)
+struct ProofOfAuthorityMsg {
+  string name;
+  address from;
+  string agreementFileCID;
+  struct IProofs.Signer[] signers;
+  string app;
+  uint64 timestamp;
+  string metadata;
+}
 ```
 
-### posData
+### ProofOfAuthorityShrinked
 
 ```solidity
-function posData(bytes32 input) external view returns (string)
-```
-
-### poagData
-
-```solidity
-function poagData(bytes32 input) external view returns (string)
-```
-
-### storeProofOfAuthority
-
-```solidity
-function storeProofOfAuthority(address _creator, address[] _signers, string _version, bytes _signature, string _fileCID, string _proofCID) external
-```
-
-Actual functions
-
-### storeProofOfSignature
-
-```solidity
-function storeProofOfSignature(address _signer, bytes _signature, string _fileCID, string _posCID, string _poaCID, string _version) external
-```
-
-### storeProofOfAgreement
-
-```solidity
-function storeProofOfAgreement(string _fileCID, string _poaCID, string[] _posCIDs, string _poagCID) external
-```
-
-### getPoAData
-
-```solidity
-function getPoAData(address _creator, address[] _signers, string _fileCID, string _version) external view returns (string)
-```
-
-### getPoSData
-
-```solidity
-function getPoSData(address _signer, string _fileCID, string _poaCID, string _version) external view returns (string)
-```
-
-### getPoAgData
-
-```solidity
-function getPoAgData(string _fileCID, string _poaCID, string[] _posCIDs) external view returns (string)
+struct ProofOfAuthorityShrinked {
+  bytes sig;
+  string version;
+  struct IProofs.ProofOfAuthorityMsg message;
+}
 ```
 
