@@ -181,7 +181,7 @@ library ProofsHelper {
     ) public pure returns (string memory _message) {
         _message = string(
             abi.encodePacked(
-                '{"from":"',
+                '{"name":"Proof-of-Authority","from":"',
                 _creator.toString(),
                 '","agreementFileCID":"',
                 _agreementFileCID,
@@ -189,7 +189,7 @@ library ProofsHelper {
                 generateSignersJSON(_signers),
                 ',"app":"daosign","timestamp":',
                 _timestamp.toString(),
-                ',"metadata":{}}'
+                ',"metadata":"{}"}'
             )
         );
     }
@@ -230,7 +230,7 @@ library ProofsHelper {
 
         for (uint256 i = 0; i < _signers.length; i++) {
             res = res.concat(
-                string(abi.encodePacked('{"address":"', _signers[i].toString(), '","metadata":{}}'))
+                string(abi.encodePacked('{"addr":"', _signers[i].toString(), '","metadata":"{}"}'))
             );
             if (i != _signers.length - 1) {
                 res = res.concat(',');

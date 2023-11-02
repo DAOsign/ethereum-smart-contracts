@@ -137,6 +137,92 @@ Stores Proof-of-Authority after verifying the correctness of the signature
 | _fileCID | string | IPFS CID of the agreement file |
 | _proofCID | string | IPFS CID of Proof-of-Authority |
 
+### EIP712Domain
+
+```solidity
+struct EIP712Domain {
+  string name;
+  string version;
+}
+```
+
+### Signer
+
+```solidity
+struct Signer {
+  address addr;
+  string metadata;
+}
+```
+
+### ProofOfAuthorityMsg
+
+```solidity
+struct ProofOfAuthorityMsg {
+  string name;
+  address from;
+  string agreementFileCID;
+  struct Proofs.Signer[] signers;
+  string app;
+  uint64 timestamp;
+  string metadata;
+}
+```
+
+### EIP712DOMAIN_TYPEHASH
+
+```solidity
+bytes32 EIP712DOMAIN_TYPEHASH
+```
+
+### PROOF_AUTHORITY_TYPEHASH
+
+```solidity
+bytes32 PROOF_AUTHORITY_TYPEHASH
+```
+
+### SIGNER_TYPEHASH
+
+```solidity
+bytes32 SIGNER_TYPEHASH
+```
+
+### recover
+
+```solidity
+function recover(bytes32 message, bytes sig) internal pure returns (address)
+```
+
+### hash
+
+```solidity
+function hash(struct Proofs.EIP712Domain _input) internal pure returns (bytes32)
+```
+
+### hash
+
+```solidity
+function hash(struct Proofs.Signer _input) internal pure returns (bytes32)
+```
+
+### hash
+
+```solidity
+function hash(struct Proofs.Signer[] _input) public pure returns (bytes32)
+```
+
+### hash
+
+```solidity
+function hash(struct Proofs.ProofOfAuthorityMsg _input) public pure returns (bytes32)
+```
+
+### recoverPoA
+
+```solidity
+function recoverPoA(struct Proofs.ProofOfAuthorityMsg message, bytes signature) external pure returns (address)
+```
+
 ### storeProofOfSignature
 
 ```solidity

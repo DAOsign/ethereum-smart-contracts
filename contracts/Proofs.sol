@@ -175,6 +175,113 @@ contract Proofs is Ownable, IProofs {
         emit ProofOfAuthority(_creator, _signature, _fileCID, _proofCID, proof);
     }
 
+    struct EIP712Domain {
+        string name;
+        string version;
+    }
+    struct Signer {
+        address addr;
+        string metadata;
+    }
+    struct ProofOfAuthorityMsg {
+        string name;
+        address from;
+        string agreementFileCID;
+        Signer[] signers;
+        string app;
+        uint64 timestamp;
+        string metadata;
+    }
+
+    bytes32 constant EIP712DOMAIN_TYPEHASH = keccak256('EIP712Domain(string name,string version)');
+    bytes32 constant PROOF_AUTHORITY_TYPEHASH =
+        keccak256(
+            'ProofOfAuthorityMsg(string name,address from,string agreementFileCID,Signer[] signers,string app,uint64 timestamp,string metadata)Signer(address addr,string metadata)'
+        );
+    bytes32 constant SIGNER_TYPEHASH = keccak256('Signer(address addr,string metadata)');
+
+    function recover(bytes32 message, bytes memory sig) internal pure returns (address) {
+        bytes32 r;
+        bytes32 s;
+        uint8 v;
+
+        // Check the signature length
+        if (sig.length != 65) {
+            return (address(0));
+        }
+
+        // Divide the signature in r, s and v variables
+        assembly {
+            r := mload(add(sig, 32))
+            s := mload(add(sig, 64))
+            v := byte(0, mload(add(sig, 96)))
+        }
+        // Version of signature should be 27 or 28, but 0 and 1 are also possible versions
+        if (v < 27) {
+            v += 27;
+        }
+
+        // If the version is correct return the signer address
+        if (v != 27 && v != 28) {
+            return (address(0));
+        } else {
+            return ecrecover(message, v, r, s);
+        }
+    }
+
+    function hash(EIP712Domain memory _input) internal pure returns (bytes32) {
+        bytes memory encoded = abi.encode(
+            EIP712DOMAIN_TYPEHASH,
+            keccak256(bytes(_input.name)),
+            keccak256(bytes(_input.version))
+            // _input.chainId,
+            // _input.verifyingContract
+        );
+        return keccak256(encoded);
+    }
+
+    function hash(Signer memory _input) internal pure returns (bytes32) {
+        bytes memory encoded = abi.encode(
+            SIGNER_TYPEHASH,
+            _input.addr,
+            keccak256(bytes(_input.metadata))
+        );
+        return keccak256(encoded);
+    }
+
+    function hash(Signer[] memory _input) public pure returns (bytes32) {
+        bytes memory encoded;
+        for (uint i = 0; i < _input.length; i++) {
+            encoded = abi.encodePacked(encoded, hash(_input[i]));
+        }
+        return keccak256(encoded);
+    }
+
+    function hash(ProofOfAuthorityMsg memory _input) public pure returns (bytes32) {
+        bytes memory encoded = abi.encode(
+            PROOF_AUTHORITY_TYPEHASH,
+            keccak256(bytes(_input.name)),
+            _input.from,
+            keccak256(bytes(_input.agreementFileCID)),
+            hash(_input.signers),
+            keccak256(bytes(_input.app)),
+            _input.timestamp,
+            keccak256(bytes(_input.metadata))
+        );
+        return keccak256(encoded);
+    }
+
+    function recoverPoA(
+        ProofOfAuthorityMsg memory message,
+        bytes memory signature
+    ) external pure returns (address) {
+        bytes32 DOMAIN_HASH = hash(EIP712Domain({ name: 'daosign', version: '0.1.0' }));
+
+        bytes32 packetHash = hash(message);
+        bytes32 digest = keccak256(abi.encodePacked('\x19\x01', DOMAIN_HASH, packetHash));
+        return recover(digest, signature);
+    }
+
     /**
      * Stores Proof-of-Signature after verifying the correctness of the signature
      * @param _signer Current signer of the agreement from the list of agreement signers

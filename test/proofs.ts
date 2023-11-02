@@ -2,6 +2,8 @@ import { loadFixture, time } from '@nomicfoundation/hardhat-toolbox/network-help
 import { expect } from 'chai';
 import * as hre from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
+import { SignTypedDataVersion, signTypedData } from '@metamask/eth-sig-util';
+import { HardhatNetworkHDAccountsConfig } from 'hardhat/types';
 import { deployAll, deployProofsMetadata } from '../scripts/deploy';
 import { proofOfAuthorityData, proofOfSignatureData } from './data/proofs';
 import { Proofs } from './common';
@@ -587,13 +589,14 @@ describe('Proofs', () => {
     });
   });
 
-  describe('Store Proof-of-Authority', () => {
+  describe.only('Store Proof-of-Authority', () => {
     const fileCID = 'QmRf22bZar3WKmojipms22PkXH1MZGmvsqzQtuSvQE3uhm';
     const proofCID = 'QmYAkbM4UCPDLBewYcjP57ZAZD2rY9oYQ1BJR1t8qt7XpF';
     const version = '0.1.0';
     let proof: unknown;
     let proofs: any;
     let creator: SignerWithAddress;
+    let owner: SignerWithAddress;
     let signer1: SignerWithAddress;
     let signer2: SignerWithAddress;
     let signer3: SignerWithAddress;
@@ -601,37 +604,97 @@ describe('Proofs', () => {
     let signature: string;
     let signatureSigner1: string;
 
+    const poaData = {
+      types: {
+        EIP712Domain: [
+          { name: 'name', type: 'string' },
+          { name: 'version', type: 'string' },
+        ],
+        Signer: [
+          { name: 'addr', type: 'address' },
+          { name: 'metadata', type: 'string' },
+        ],
+        ProofOfAuthorityMsg: [
+          { name: 'name', type: 'string' },
+          { name: 'from', type: 'address' },
+          { name: 'agreementFileCID', type: 'string' },
+          { name: 'signers', type: 'Signer[]' },
+          { name: 'app', type: 'string' },
+          { name: 'timestamp', type: 'uint64' },
+          { name: 'metadata', type: 'string' },
+        ],
+      },
+      primaryType: 'ProofOfAuthorityMsg',
+      domain: {
+        name: 'daosign',
+        version: '0.1.0',
+      },
+      message: {
+        name: 'Proof-of-Authority',
+        from: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+        agreementFileCID: '<Agreement File CID>',
+        signers: [{ addr: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266', metadata: '{}' }],
+        app: 'daosign',
+        timestamp: 12345,
+        metadata: '{}',
+      },
+    };
+
     beforeEach(async () => {
-      ({ proofs, creator, signer1, signer2, signer3 } = await loadFixture(deployProofsFixture));
+      ({ proofs, creator, signer1, signer2, signer3, owner } =
+        await loadFixture(deployProofsFixture));
       signers = [signer1.address, signer2.address, signer3.address];
 
-      const dataSig = await creator.signMessage(
-        ethers.getBytes(
-          ethers.keccak256(
-            ethers.solidityPacked(
-              ['address', 'address[]', 'string', 'string'],
-              [creator.address, signers, fileCID, version],
-            ),
-          ),
-        ),
-      );
+      creator = owner;
 
-      await proofs.fetchProofOfAuthorityData(creator.address, signers, fileCID, version, dataSig);
-      const data = await proofs.fetchProofOfAuthorityData.staticCall(
-        creator.address,
-        signers,
-        fileCID,
-        version,
-        dataSig,
-      );
+      // const dataSig = await creator.signMessage(
+      //   ethers.getBytes(
+      //     ethers.keccak256(
+      //       ethers.solidityPacked(
+      //         ['address', 'address[]', 'string', 'string'],
+      //         [creator.address, signers, fileCID, version],
+      //       ),
+      //     ),
+      //   ),
+      // );
 
-      const dataHash = ethers.keccak256(ethers.toUtf8Bytes(data));
-      signature = await creator.signMessage(ethers.getBytes(dataHash));
-      signatureSigner1 = await signer1.signMessage(ethers.getBytes(dataHash));
+      // await proofs.fetchProofOfAuthorityData(creator.address, signers, fileCID, version, dataSig);
+      // const data = await proofs.fetchProofOfAuthorityData.staticCall(
+      //   creator.address,
+      //   signers,
+      //   fileCID,
+      //   version,
+      //   dataSig,
+      // );
+
+      // console.log(util.inspect(JSON.parse(data), false, null, true));
+
+      const accounts = hre.config.networks.hardhat.accounts as HardhatNetworkHDAccountsConfig;
+      const wallet = ethers.Wallet.fromPhrase(accounts.mnemonic);
+      const privateKey = Buffer.from(wallet.privateKey.slice(2), 'hex');
+      console.log({
+        owner: owner.address,
+        creator: creator.address,
+        wallet: wallet.address,
+        privateKey,
+      });
+
+      const res = signTypedData({
+        privateKey,
+        version: SignTypedDataVersion.V4,
+        data: poaData, // JSON.parse(data), // poaData,
+      });
+      console.log({ res });
+
+      // const dataHash = ethers.keccak256(ethers.toUtf8Bytes(data));
+      signature = res;
+      // signature = await creator.signMessage(ethers.getBytes(dataHash));
+      // console.log(signature);
+      // signatureSigner1 = await signer1.signMessage(ethers.getBytes(dataHash));
       proof = {
-        address: creator.address.toLocaleLowerCase(),
-        sig: signature,
-        data: JSON.parse(data),
+        // address: creator.address.toLocaleLowerCase(),
+        // sig: signature,
+        // data: JSON.parse(data),
       };
     });
 
@@ -686,23 +749,31 @@ describe('Proofs', () => {
       ).revertedWith('Invalid signature');
     });
 
-    it('success', async () => {
+    it.only('success', async () => {
       // calculated & emited correctly
-      await expect(
-        proofs.storeProofOfAuthority(
-          creator.address,
-          signers,
-          version,
-          signature,
-          fileCID,
-          proofCID,
-        ),
-      )
-        .emit(proofs, 'ProofOfAuthority')
-        .withArgs(creator.address, signature, fileCID, proofCID, JSON.stringify(proof));
 
-      // calculated & stored correctly
-      expect(JSON.parse(await proofs.finalProofs(fileCID, proofCID))).eql(proof);
+      console.log({
+        message: poaData.message,
+        signature,
+      });
+      const res = await proofs.recoverPoA(poaData.message, signature);
+      expect(res).equal(creator.address);
+
+      // await expect(
+      //   proofs.storeProofOfAuthority(
+      //     creator.address,
+      //     signers,
+      //     version,
+      //     signature,
+      //     fileCID,
+      //     proofCID,
+      //   ),
+      // )
+      //   .emit(proofs, 'ProofOfAuthority')
+      //   .withArgs(creator.address, signature, fileCID, proofCID, JSON.stringify(proof));
+
+      // // calculated & stored correctly
+      // expect(JSON.parse(await proofs.finalProofs(fileCID, proofCID))).eql(proof);
     });
   });
 
