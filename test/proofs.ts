@@ -682,7 +682,7 @@ describe('Proofs', () => {
       const res = signTypedData({
         privateKey,
         version: SignTypedDataVersion.V4,
-        data: poaData, // JSON.parse(data), // poaData,
+        data: poaData,
       });
       console.log({ res });
 
@@ -692,9 +692,10 @@ describe('Proofs', () => {
       // console.log(signature);
       // signatureSigner1 = await signer1.signMessage(ethers.getBytes(dataHash));
       proof = {
-        // address: creator.address.toLocaleLowerCase(),
-        // sig: signature,
-        // data: JSON.parse(data),
+        addr: creator.address.toLocaleLowerCase(),
+        sig: signature,
+        version: poaData.domain.version,
+        message: poaData.message,
       };
     });
 
@@ -756,8 +757,9 @@ describe('Proofs', () => {
         message: poaData.message,
         signature,
       });
-      const res = await proofs.recoverPoA(poaData.message, signature);
-      expect(res).equal(creator.address);
+      const res = await proofs.store(proof, signature);
+      // const res = await proofs.recover(poaData.message, signature);
+      // expect(res).equal(creator.address);
 
       // await expect(
       //   proofs.storeProofOfAuthority(

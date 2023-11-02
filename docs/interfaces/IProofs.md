@@ -1,21 +1,21 @@
 ## IProofs
 
-### ProofOfAuthority
+### ProofOfAuthorityEvent
 
 ```solidity
-event ProofOfAuthority(address creator, bytes signature, string agreementFileCID, string proofCID, string proofJSON)
+event ProofOfAuthorityEvent(address creator, bytes signature, string agreementFileCID, string proofCID, string proofJSON)
 ```
 
-### ProofOfSignature
+### ProofOfSignatureEvent
 
 ```solidity
-event ProofOfSignature(address signer, bytes signature, string agreementFileCID, string proofCID, string proofJSON)
+event ProofOfSignatureEvent(address signer, bytes signature, string agreementFileCID, string proofCID, string proofJSON)
 ```
 
-### ProofOfAgreement
+### ProofOfAgreementEvent
 
 ```solidity
-event ProofOfAgreement(string agreementFileCID, string proofOfAuthorityCID, string proofCID, string proofJSON)
+event ProofOfAgreementEvent(string agreementFileCID, string proofOfAuthorityCID, string proofCID, string proofJSON)
 ```
 
 ### proofsMetadata
@@ -50,31 +50,13 @@ function posData(bytes32 input) external view returns (string)
 function poagData(bytes32 input) external view returns (string)
 ```
 
-### fetchProofOfAuthorityData
-
-```solidity
-function fetchProofOfAuthorityData(address _creator, address[] _signers, string _agreementFileCID, string _version, bytes _dataSig) external returns (string)
-```
-
-Actual functions
-
-### fetchProofOfSignatureData
-
-```solidity
-function fetchProofOfSignatureData(address _signer, string _agreementFileCID, string _proofOfAuthorityCID, string _version, bytes _dataSig) external returns (string)
-```
-
-### fetchProofOfAgreementData
-
-```solidity
-function fetchProofOfAgreementData(string _agreementFileCID, string _proofOfAuthorityCID, string[] _proofsOfSignatureCID) external returns (string)
-```
-
 ### storeProofOfAuthority
 
 ```solidity
 function storeProofOfAuthority(address _creator, address[] _signers, string _version, bytes _signature, string _fileCID, string _proofCID) external
 ```
+
+Actual functions
 
 ### storeProofOfSignature
 

@@ -45,79 +45,6 @@ mapping(bytes32 => string) poagData
 constructor(address _proofsMetadata, address _admin) public
 ```
 
-### fetchProofOfAuthorityData
-
-```solidity
-function fetchProofOfAuthorityData(address _creator, address[] _signers, string _fileCID, string _version, bytes _dataSig) external returns (string)
-```
-
-Generates Proof-of-Authority data for creator to sign and caches it in the smart contract
-memory
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| _creator | address | Agreement creator address |
-| _signers | address[] | Array of signers of the agreement |
-| _fileCID | string | IPFS CID of the agreement file |
-| _version | string | EIP712 version of the data |
-| _dataSig | bytes | _creator's signature of all input parameters to make sure they are correct |
-
-#### Return Values
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| [0] | string | proofData Proof-of-Authority data to sign |
-
-### fetchProofOfSignatureData
-
-```solidity
-function fetchProofOfSignatureData(address _signer, string _fileCID, string _poaCID, string _version, bytes _dataSig) external returns (string)
-```
-
-Generates Proof-of-Signature data for creator to sign and caches it in the smart contract
-memory
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| _signer | address | Current signer of the agreement from the list of agreement signers |
-| _fileCID | string | IPFS CID of the agreement file |
-| _poaCID | string | IPFS CID of Proof-of-Authority |
-| _version | string | EIP712 version of the data |
-| _dataSig | bytes |  |
-
-#### Return Values
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| [0] | string | proofData Proof-of-Signature data to sign |
-
-### fetchProofOfAgreementData
-
-```solidity
-function fetchProofOfAgreementData(string _fileCID, string _poaCID, string[] _posCID) external returns (string)
-```
-
-Generates Proof-of-Agreement data for creator to sign and caches it in the smart contract
-memory
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| _fileCID | string | IPFS CID of the agreement file |
-| _poaCID | string | IPFS CID of Proof-of-Authority |
-| _posCID | string[] | IPFS CID of Proof-of-Signature |
-
-#### Return Values
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| [0] | string | proofData Proof-of-Agreement data to sign |
-
 ### storeProofOfAuthority
 
 ```solidity
@@ -169,6 +96,17 @@ struct ProofOfAuthorityMsg {
 }
 ```
 
+### ProofOfAuthority
+
+```solidity
+struct ProofOfAuthority {
+  address addr;
+  bytes sig;
+  string version;
+  struct Proofs.ProofOfAuthorityMsg message;
+}
+```
+
 ### EIP712DOMAIN_TYPEHASH
 
 ```solidity
@@ -185,12 +123,6 @@ bytes32 PROOF_AUTHORITY_TYPEHASH
 
 ```solidity
 bytes32 SIGNER_TYPEHASH
-```
-
-### recover
-
-```solidity
-function recover(bytes32 message, bytes sig) internal pure returns (address)
 ```
 
 ### hash
@@ -217,10 +149,16 @@ function hash(struct Proofs.Signer[] _input) public pure returns (bytes32)
 function hash(struct Proofs.ProofOfAuthorityMsg _input) public pure returns (bytes32)
 ```
 
-### recoverPoA
+### store
 
 ```solidity
-function recoverPoA(struct Proofs.ProofOfAuthorityMsg message, bytes signature) external pure returns (address)
+function store(struct Proofs.ProofOfAuthority poa, bytes signature) public
+```
+
+### recover
+
+```solidity
+function recover(struct Proofs.ProofOfAuthorityMsg message, bytes signature) public pure returns (address)
 ```
 
 ### storeProofOfSignature

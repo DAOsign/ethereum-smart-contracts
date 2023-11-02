@@ -10,6 +10,7 @@ import { StringsExpanded } from './libs/StringsExpanded.sol';
 import { ProofsVerification } from './libs/ProofsVerification.sol';
 import { ProofsHelper } from './libs/ProofsHelper.sol';
 import { ProofTypes } from './libs/common/ProofTypes.sol';
+import { ECDSA } from '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
 
 /**
  * Stores DAOsign proofs.
@@ -21,6 +22,7 @@ import { ProofTypes } from './libs/common/ProofTypes.sol';
  */
 contract Proofs is Ownable, IProofs {
     using StringsExpanded for string;
+    using ECDSA for bytes32;
 
     address public proofsMetadata;
 
@@ -40,105 +42,6 @@ contract Proofs is Ownable, IProofs {
         );
         proofsMetadata = _proofsMetadata;
         _transferOwnership(_admin);
-    }
-
-    /**
-     * Generates Proof-of-Authority data for creator to sign and caches it in the smart contract
-     * memory
-     * @param _creator Agreement creator address
-     * @param _signers Array of signers of the agreement
-     * @param _fileCID IPFS CID of the agreement file
-     * @param _version EIP712 version of the data
-     * @param _dataSig _creator's signature of all input parameters to make sure they are correct
-     * @return proofData Proof-of-Authority data to sign
-     */
-    function fetchProofOfAuthorityData(
-        address _creator,
-        address[] calldata _signers,
-        string calldata _fileCID,
-        string calldata _version,
-        bytes calldata _dataSig
-    ) external onlyOwner returns (string memory) {
-        bytes32 _dataHash = keccak256(abi.encodePacked(_creator, _signers, _fileCID, _version));
-        require(ProofsVerification.verify(_creator, _dataHash, _dataSig), 'Invalid data signature');
-        if (getPoAData(_creator, _signers, _fileCID, _version).length() > 0) {
-            return getPoAData(_creator, _signers, _fileCID, _version);
-        }
-        string memory proofData = ProofsHelper.getProofOfAuthorityData(
-            proofsMetadata,
-            _creator,
-            _signers,
-            _fileCID,
-            _version,
-            block.timestamp
-        );
-        _setPoAData(_creator, _signers, _fileCID, _version, proofData);
-        return proofData;
-    }
-
-    /**
-     * Generates Proof-of-Signature data for creator to sign and caches it in the smart contract
-     * memory
-     * @param _signer Current signer of the agreement from the list of agreement signers
-     * @param _fileCID IPFS CID of the agreement file
-     * @param _poaCID IPFS CID of Proof-of-Authority
-     * @param _version EIP712 version of the data
-     * @return proofData Proof-of-Signature data to sign
-     */
-    function fetchProofOfSignatureData(
-        address _signer,
-        string calldata _fileCID,
-        string calldata _poaCID,
-        string calldata _version,
-        bytes calldata _dataSig
-    ) external onlyOwner returns (string memory) {
-        require(_fileCID.length() > 0, 'No Agreement File CID');
-        bytes32 _dataHash = keccak256(abi.encodePacked(_signer, _fileCID, _poaCID, _version));
-        require(ProofsVerification.verify(_signer, _dataHash, _dataSig), 'Invalid data signature');
-        if (getPoSData(_signer, _fileCID, _poaCID, _version).length() > 0) {
-            return getPoSData(_signer, _fileCID, _poaCID, _version);
-        }
-        require(finalProofs[_fileCID][_poaCID].length() > 0, 'No Proof-of-Authority');
-
-        string memory proofData = ProofsHelper.getProofOfSignatureData(
-            proofsMetadata,
-            _signer,
-            _poaCID,
-            _version,
-            block.timestamp
-        );
-        _setPoSData(_signer, _fileCID, _poaCID, _version, proofData);
-        return proofData;
-    }
-
-    /**
-     * Generates Proof-of-Agreement data for creator to sign and caches it in the smart contract
-     * memory
-     * @param _fileCID IPFS CID of the agreement file
-     * @param _poaCID IPFS CID of Proof-of-Authority
-     * @param _posCID IPFS CID of Proof-of-Signature
-     * @return proofData Proof-of-Agreement data to sign
-     */
-    function fetchProofOfAgreementData(
-        string calldata _fileCID,
-        string calldata _poaCID,
-        string[] calldata _posCID
-    ) external onlyOwner returns (string memory) {
-        require(_fileCID.length() > 0, 'No Agreement File CID');
-        if (getPoAgData(_fileCID, _poaCID, _posCID).length() > 0) {
-            return getPoAgData(_fileCID, _poaCID, _posCID);
-        }
-        require(finalProofs[_fileCID][_poaCID].length() > 0, 'No Proof-of-Authority');
-        for (uint256 i = 0; i < _posCID.length; i++) {
-            require(finalProofs[_fileCID][_posCID[i]].length() > 0, 'No Proof-of-Signature');
-        }
-        string memory proofData = ProofsHelper.getProofOfAgreementData(
-            _poaCID,
-            _posCID,
-            block.timestamp
-        );
-        _setPoAgData(_fileCID, _poaCID, _posCID, proofData);
-        return proofData;
     }
 
     /**
@@ -172,7 +75,7 @@ contract Proofs is Ownable, IProofs {
         );
         finalProofs[_fileCID][_proofCID] = proof;
 
-        emit ProofOfAuthority(_creator, _signature, _fileCID, _proofCID, proof);
+        emit ProofOfAuthorityEvent(_creator, _signature, _fileCID, _proofCID, proof);
     }
 
     struct EIP712Domain {
@@ -192,6 +95,12 @@ contract Proofs is Ownable, IProofs {
         uint64 timestamp;
         string metadata;
     }
+    struct ProofOfAuthority {
+        address addr;
+        bytes sig;
+        string version;
+        ProofOfAuthorityMsg message;
+    }
 
     bytes32 constant EIP712DOMAIN_TYPEHASH = keccak256('EIP712Domain(string name,string version)');
     bytes32 constant PROOF_AUTHORITY_TYPEHASH =
@@ -200,42 +109,11 @@ contract Proofs is Ownable, IProofs {
         );
     bytes32 constant SIGNER_TYPEHASH = keccak256('Signer(address addr,string metadata)');
 
-    function recover(bytes32 message, bytes memory sig) internal pure returns (address) {
-        bytes32 r;
-        bytes32 s;
-        uint8 v;
-
-        // Check the signature length
-        if (sig.length != 65) {
-            return (address(0));
-        }
-
-        // Divide the signature in r, s and v variables
-        assembly {
-            r := mload(add(sig, 32))
-            s := mload(add(sig, 64))
-            v := byte(0, mload(add(sig, 96)))
-        }
-        // Version of signature should be 27 or 28, but 0 and 1 are also possible versions
-        if (v < 27) {
-            v += 27;
-        }
-
-        // If the version is correct return the signer address
-        if (v != 27 && v != 28) {
-            return (address(0));
-        } else {
-            return ecrecover(message, v, r, s);
-        }
-    }
-
     function hash(EIP712Domain memory _input) internal pure returns (bytes32) {
         bytes memory encoded = abi.encode(
             EIP712DOMAIN_TYPEHASH,
             keccak256(bytes(_input.name)),
             keccak256(bytes(_input.version))
-            // _input.chainId,
-            // _input.verifyingContract
         );
         return keccak256(encoded);
     }
@@ -271,15 +149,21 @@ contract Proofs is Ownable, IProofs {
         return keccak256(encoded);
     }
 
-    function recoverPoA(
+    function store(ProofOfAuthority memory poa, bytes memory signature) public {
+        require(recover(poa.message, signature) == poa.message.from, 'Invalid signature');
+        // require(validate(message));
+        // save(message);
+    }
+
+    function recover(
         ProofOfAuthorityMsg memory message,
         bytes memory signature
-    ) external pure returns (address) {
+    ) public pure returns (address) {
         bytes32 DOMAIN_HASH = hash(EIP712Domain({ name: 'daosign', version: '0.1.0' }));
 
         bytes32 packetHash = hash(message);
         bytes32 digest = keccak256(abi.encodePacked('\x19\x01', DOMAIN_HASH, packetHash));
-        return recover(digest, signature);
+        return digest.recover(signature);
     }
 
     /**
@@ -312,7 +196,7 @@ contract Proofs is Ownable, IProofs {
         );
         finalProofs[_fileCID][_posCID] = proof;
 
-        emit ProofOfSignature(_signer, _signature, _fileCID, _posCID, proof);
+        emit ProofOfSignatureEvent(_signer, _signature, _fileCID, _posCID, proof);
     }
 
     /**
@@ -335,7 +219,7 @@ contract Proofs is Ownable, IProofs {
 
         finalProofs[_fileCID][_poagCID] = getPoAgData(_fileCID, _poaCID, _posCIDs);
 
-        emit ProofOfAgreement(_fileCID, _poaCID, _poagCID, finalProofs[_fileCID][_poagCID]);
+        emit ProofOfAgreementEvent(_fileCID, _poaCID, _poagCID, finalProofs[_fileCID][_poagCID]);
     }
 
     function getPoAData(

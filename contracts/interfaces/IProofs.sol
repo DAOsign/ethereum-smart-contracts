@@ -4,21 +4,21 @@ pragma solidity ^0.8.18;
 import { ProofTypes } from '../libs/common/ProofTypes.sol';
 
 interface IProofs {
-    event ProofOfAuthority(
+    event ProofOfAuthorityEvent(
         address indexed creator,
         bytes signature,
         string indexed agreementFileCID,
         string proofCID,
         string proofJSON
     );
-    event ProofOfSignature(
+    event ProofOfSignatureEvent(
         address indexed signer,
         bytes signature,
         string indexed agreementFileCID,
         string proofCID,
         string proofJSON
     );
-    event ProofOfAgreement(
+    event ProofOfAgreementEvent(
         string indexed agreementFileCID,
         string proofOfAuthorityCID,
         string proofCID,
@@ -44,27 +44,27 @@ interface IProofs {
     /**
      * Actual functions
      */
-    function fetchProofOfAuthorityData(
-        address _creator,
-        address[] calldata _signers,
-        string calldata _agreementFileCID,
-        string calldata _version,
-        bytes calldata _dataSig
-    ) external returns (string memory);
+    // function fetchProofOfAuthorityData(
+    //     address _creator,
+    //     address[] calldata _signers,
+    //     string calldata _agreementFileCID,
+    //     string calldata _version,
+    //     bytes calldata _dataSig
+    // ) external returns (string memory);
 
-    function fetchProofOfSignatureData(
-        address _signer,
-        string calldata _agreementFileCID,
-        string calldata _proofOfAuthorityCID,
-        string calldata _version,
-        bytes calldata _dataSig
-    ) external returns (string memory);
+    // function fetchProofOfSignatureData(
+    //     address _signer,
+    //     string calldata _agreementFileCID,
+    //     string calldata _proofOfAuthorityCID,
+    //     string calldata _version,
+    //     bytes calldata _dataSig
+    // ) external returns (string memory);
 
-    function fetchProofOfAgreementData(
-        string calldata _agreementFileCID,
-        string calldata _proofOfAuthorityCID,
-        string[] calldata _proofsOfSignatureCID
-    ) external returns (string memory);
+    // function fetchProofOfAgreementData(
+    //     string calldata _agreementFileCID,
+    //     string calldata _proofOfAuthorityCID,
+    //     string[] calldata _proofsOfSignatureCID
+    // ) external returns (string memory);
 
     function storeProofOfAuthority(
         address _creator,
