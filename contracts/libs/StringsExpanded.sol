@@ -6,6 +6,16 @@ pragma solidity ^0.8.18;
  */
 library StringsExpanded {
     /**
+     * @dev Compares two strings
+     * @param _s1 One string
+     * @param _s2 Another string
+     * @return Are string equal
+     */
+    function equal(string memory _s1, string memory _s2) internal pure returns (bool) {
+        return keccak256(abi.encodePacked(_s1)) == keccak256(abi.encodePacked(_s2));
+    }
+
+    /**
      * Gets length of the string
      * @param _s Input string
      * @return res The lenght of the string

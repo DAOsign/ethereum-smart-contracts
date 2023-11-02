@@ -95,12 +95,40 @@ contract Proofs is Ownable, IProofs {
         uint64 timestamp;
         string metadata;
     }
-    struct ProofOfAuthority {
-        address addr;
+    struct ProofOfAuthorityShrinked {
         bytes sig;
         string version;
         ProofOfAuthorityMsg message;
     }
+    //      types: {
+    //     EIP712Domain: [
+    //       { name: 'name', type: 'string' },
+    //       { name: 'version', type: 'string' },
+    //     ],
+    //     Signer: [
+    //       { name: 'addr', type: 'address' },
+    //       { name: 'metadata', type: 'string' },
+    //     ],
+    //     ProofOfAuthorityMsg: [
+    //       { name: 'name', type: 'string' },
+    //       { name: 'from', type: 'address' },
+    //       { name: 'agreementFileCID', type: 'string' },
+    //       { name: 'signers', type: 'Signer[]' },
+    //       { name: 'app', type: 'string' },
+    //       { name: 'timestamp', type: 'uint64' },
+    //       { name: 'metadata', type: 'string' },
+    //     ],
+    //   },
+    //   primaryType: 'ProofOfAuthorityMsg',
+    //   domain: {
+    //     name: 'daosign',
+    //     version: '0.1.0',
+    //   },
+
+    /**
+     * constructor
+     */
+    EIP712Domain public domain = EIP712Domain({ name: 'daosign', version: '0.1.0' });
 
     bytes32 constant EIP712DOMAIN_TYPEHASH = keccak256('EIP712Domain(string name,string version)');
     bytes32 constant PROOF_AUTHORITY_TYPEHASH =
@@ -108,6 +136,8 @@ contract Proofs is Ownable, IProofs {
             'ProofOfAuthorityMsg(string name,address from,string agreementFileCID,Signer[] signers,string app,uint64 timestamp,string metadata)Signer(address addr,string metadata)'
         );
     bytes32 constant SIGNER_TYPEHASH = keccak256('Signer(address addr,string metadata)');
+
+    mapping(bytes32 => bytes) proofs;
 
     function hash(EIP712Domain memory _input) internal pure returns (bytes32) {
         bytes memory encoded = abi.encode(
@@ -149,12 +179,6 @@ contract Proofs is Ownable, IProofs {
         return keccak256(encoded);
     }
 
-    function store(ProofOfAuthority memory poa, bytes memory signature) public {
-        require(recover(poa.message, signature) == poa.message.from, 'Invalid signature');
-        // require(validate(message));
-        // save(message);
-    }
-
     function recover(
         ProofOfAuthorityMsg memory message,
         bytes memory signature
@@ -164,6 +188,51 @@ contract Proofs is Ownable, IProofs {
         bytes32 packetHash = hash(message);
         bytes32 digest = keccak256(abi.encodePacked('\x19\x01', DOMAIN_HASH, packetHash));
         return digest.recover(signature);
+    }
+
+    function validate(ProofOfAuthorityMsg memory message) internal view returns (bool) {
+        require(message.name.equal('Proof-of-Authority'), 'Invalid name');
+        // require(message.from == signer, 'Invalid from address');
+        require(message.agreementFileCID.length() == 46, 'Invalid CID length');
+        require(message.app.equal('daosign'), 'Invalid app');
+        require(
+            message.timestamp <=
+                block.timestamp /*&& message.timestamp >= block.timestamp - 3 hours */,
+            'Invalid timestamp'
+        );
+
+        for (uint256 i = 0; i < message.signers.length; i++) {
+            require(message.signers[i].addr != address(0), 'Invalid signer');
+        }
+
+        return true;
+    }
+
+    function save(
+        ProofOfAuthorityMsg memory message,
+        bytes memory signature,
+        string memory version
+    ) internal {
+        proofs[keccak256(abi.encode(message))] = abi.encode(
+            ProofOfAuthorityShrinked(signature, version, message)
+        );
+    }
+
+    function get(
+        ProofOfAuthorityMsg memory message
+    ) public view returns (ProofOfAuthorityShrinked memory) {
+        // TODO: Why would I need to know the whole message to get the proof? Create additional mapping signer -> message
+        return abi.decode(proofs[keccak256(abi.encode(message))], (ProofOfAuthorityShrinked));
+    }
+
+    function store(
+        ProofOfAuthorityMsg memory message,
+        bytes memory signature,
+        string memory version
+    ) public {
+        require(recover(message, signature) == message.from, 'Invalid signature');
+        require(validate(message));
+        save(message, signature, version);
     }
 
     /**

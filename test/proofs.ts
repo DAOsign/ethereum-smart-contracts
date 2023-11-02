@@ -632,10 +632,10 @@ describe('Proofs', () => {
       message: {
         name: 'Proof-of-Authority',
         from: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-        agreementFileCID: '<Agreement File CID>',
+        agreementFileCID: 'Qmeura2H46RCpDRHDHgnQ5QVk7iKnZANDhfLmSKCkDr5vv',
         signers: [{ addr: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266', metadata: '{}' }],
         app: 'daosign',
-        timestamp: 12345,
+        timestamp: Math.floor(Date.now() / 1000),
         metadata: '{}',
       },
     };
@@ -757,7 +757,10 @@ describe('Proofs', () => {
         message: poaData.message,
         signature,
       });
-      const res = await proofs.store(proof, signature);
+      await proofs.store(poaData.message, signature, poaData.domain.version);
+      const res = await proofs.get(poaData.message);
+      console.log(res);
+
       // const res = await proofs.recover(poaData.message, signature);
       // expect(res).equal(creator.address);
 

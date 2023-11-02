@@ -96,16 +96,23 @@ struct ProofOfAuthorityMsg {
 }
 ```
 
-### ProofOfAuthority
+### ProofOfAuthorityShrinked
 
 ```solidity
-struct ProofOfAuthority {
-  address addr;
+struct ProofOfAuthorityShrinked {
   bytes sig;
   string version;
   struct Proofs.ProofOfAuthorityMsg message;
 }
 ```
+
+### domain
+
+```solidity
+struct Proofs.EIP712Domain domain
+```
+
+constructor
 
 ### EIP712DOMAIN_TYPEHASH
 
@@ -123,6 +130,12 @@ bytes32 PROOF_AUTHORITY_TYPEHASH
 
 ```solidity
 bytes32 SIGNER_TYPEHASH
+```
+
+### proofs
+
+```solidity
+mapping(bytes32 => bytes) proofs
 ```
 
 ### hash
@@ -149,16 +162,34 @@ function hash(struct Proofs.Signer[] _input) public pure returns (bytes32)
 function hash(struct Proofs.ProofOfAuthorityMsg _input) public pure returns (bytes32)
 ```
 
-### store
-
-```solidity
-function store(struct Proofs.ProofOfAuthority poa, bytes signature) public
-```
-
 ### recover
 
 ```solidity
 function recover(struct Proofs.ProofOfAuthorityMsg message, bytes signature) public pure returns (address)
+```
+
+### validate
+
+```solidity
+function validate(struct Proofs.ProofOfAuthorityMsg message) internal view returns (bool)
+```
+
+### save
+
+```solidity
+function save(struct Proofs.ProofOfAuthorityMsg message, bytes signature, string version) internal
+```
+
+### get
+
+```solidity
+function get(struct Proofs.ProofOfAuthorityMsg message) public view returns (struct Proofs.ProofOfAuthorityShrinked)
+```
+
+### store
+
+```solidity
+function store(struct Proofs.ProofOfAuthorityMsg message, bytes signature, string version) public
 ```
 
 ### storeProofOfSignature
