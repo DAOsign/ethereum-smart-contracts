@@ -37,7 +37,7 @@ abstract contract Proofs {
         string metadata;
     }
 
-    struct ProofOfAuthority {
+    struct ProofOfAuthorityMsg {
         string name;
         address from;
         string filecid;
@@ -47,7 +47,13 @@ abstract contract Proofs {
         string metadata;
     }
 
-    struct ProofOfSignature {
+    struct ProofOfAuthorityShrinked {
+        bytes sig;
+        string version;
+        ProofOfAuthorityMsg message;
+    }
+
+    struct ProofOfSignatureMsg {
         string name;
         address signer;
         string filecid;
@@ -56,17 +62,28 @@ abstract contract Proofs {
         string metadata;
     }
 
+    struct ProofOfSignatureShrinked {
+        bytes sig;
+        string version;
+        ProofOfSignatureMsg message;
+    }
+
     struct Filecid {
         string addr;
         string data;
     }
 
-    struct ProofOfAgreement {
+    struct ProofOfAgreementMsg {
         string filecid;
         Filecid[] signcids;
         string app;
         uint256 timestamp;
         string metadata;
+    }
+
+    struct ProofOfAgreementShrinked {
+        string version;
+        ProofOfSignatureMsg message;
     }
 
     constructor() {
@@ -99,7 +116,7 @@ abstract contract Proofs {
         return keccak256(encoded);
     }
 
-    function hash(ProofOfAuthority memory _input) internal pure returns (bytes32) {
+    function hash(ProofOfAuthorityMsg memory _input) internal pure returns (bytes32) {
         bytes memory encoded = abi.encode(
             PROOF_AUTHORITY_TYPEHASH,
             keccak256(bytes(_input.name)),
@@ -113,7 +130,7 @@ abstract contract Proofs {
         return keccak256(encoded);
     }
 
-    function hash(ProofOfSignature memory _input) internal pure returns (bytes32) {
+    function hash(ProofOfSignatureMsg memory _input) internal pure returns (bytes32) {
         bytes memory encoded = abi.encode(
             PROOF_SIGNATURE_TYPEHASH,
             keccak256(bytes(_input.name)),
@@ -143,7 +160,7 @@ abstract contract Proofs {
         return keccak256(encoded);
     }
 
-    function hash(ProofOfAgreement memory _input) internal pure returns (bytes32) {
+    function hash(ProofOfAgreementMsg memory _input) internal pure returns (bytes32) {
         bytes memory encoded = abi.encode(
             PROOF_AGREEMENT_TYPEHASH,
             keccak256(bytes(_input.filecid)),
@@ -156,7 +173,7 @@ abstract contract Proofs {
     }
 
     function recover(
-        ProofOfAuthority memory message,
+        ProofOfAuthorityMsg memory message,
         bytes memory signature
     ) public view returns (address) {
         bytes32 packetHash = hash(message);
@@ -165,7 +182,7 @@ abstract contract Proofs {
     }
 
     function recover(
-        ProofOfSignature memory message,
+        ProofOfSignatureMsg memory message,
         bytes memory signature
     ) public view returns (address) {
         bytes32 packetHash = hash(message);
@@ -174,7 +191,7 @@ abstract contract Proofs {
     }
 
     function recover(
-        ProofOfAgreement memory message,
+        ProofOfAgreementMsg memory message,
         bytes memory signature
     ) public view returns (address) {
         bytes32 packetHash = hash(message);
@@ -182,33 +199,32 @@ abstract contract Proofs {
         return ECDSA.recover(digest, signature);
     }
 
-    function store(ProofOfAuthority memory message, bytes memory signature) public {
-        require(recover(message, signature) == message.from);
-        require(validate(message));
-        save(message);
+    function store(ProofOfAuthorityShrinked memory data) public {
+        require(recover(data.message, data.sig) == data.message.from);
+        require(validate(data));
+        save(data);
     }
 
-    function store(ProofOfSignature memory message, bytes memory signature) public {
-        require(recover(message, signature) == message.signer);
-        require(validate(message));
-        save(message);
+    function store(ProofOfSignatureShrinked memory data) public {
+        require(recover(data.message, data.sig) == data.message.signer);
+        require(validate(data));
+        save(data);
     }
 
-    function store(ProofOfAgreement memory message, bytes memory signature) public {
-        require(recover(message, signature) == msg.sender);
-        require(validate(message));
-        save(message);
+    function store(ProofOfAgreementShrinked memory data) public {
+        require(validate(data));
+        save(data);
     }
 
-    function validate(ProofOfAuthority memory) internal view virtual returns (bool);
+    function validate(ProofOfAuthorityShrinked memory) internal view virtual returns (bool);
 
-    function validate(ProofOfSignature memory) internal view virtual returns (bool);
+    function validate(ProofOfSignatureShrinked memory) internal view virtual returns (bool);
 
-    function validate(ProofOfAgreement memory) internal view virtual returns (bool);
+    function validate(ProofOfAgreementShrinked memory) internal view virtual returns (bool);
 
-    function save(ProofOfAuthority memory) internal virtual;
+    function save(ProofOfAuthorityShrinked memory) internal virtual;
 
-    function save(ProofOfSignature memory) internal virtual;
+    function save(ProofOfSignatureShrinked memory) internal virtual;
 
-    function save(ProofOfAgreement memory) internal virtual;
+    function save(ProofOfAgreementShrinked memory) internal virtual;
 }

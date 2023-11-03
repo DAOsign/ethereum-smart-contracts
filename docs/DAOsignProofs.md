@@ -9,36 +9,36 @@ mapping(bytes32 => bytes) data
 ### validate
 
 ```solidity
-function validate(struct Proofs.ProofOfAuthority) internal pure returns (bool)
+function validate(struct Proofs.ProofOfAuthorityShrinked) internal pure returns (bool)
 ```
 
 ### validate
 
 ```solidity
-function validate(struct Proofs.ProofOfSignature) internal pure returns (bool)
+function validate(struct Proofs.ProofOfSignatureShrinked) internal pure returns (bool)
 ```
 
 ### validate
 
 ```solidity
-function validate(struct Proofs.ProofOfAgreement) internal pure returns (bool)
+function validate(struct Proofs.ProofOfAgreementShrinked) internal pure returns (bool)
 ```
 
 ### save
 
 ```solidity
-function save(struct Proofs.ProofOfAuthority message) internal
+function save(struct Proofs.ProofOfAuthorityShrinked message) internal
 ```
 
 ### save
 
 ```solidity
-function save(struct Proofs.ProofOfSignature message) internal
+function save(struct Proofs.ProofOfSignatureShrinked message) internal
 ```
 
 ### save
 
 ```solidity
-function save(struct Proofs.ProofOfAgreement message) internal
+function save(struct Proofs.ProofOfAgreementShrinked message) internal
 ```
 

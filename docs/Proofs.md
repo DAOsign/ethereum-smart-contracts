@@ -70,10 +70,10 @@ struct Signer {
 }
 ```
 
-### ProofOfAuthority
+### ProofOfAuthorityMsg
 
 ```solidity
-struct ProofOfAuthority {
+struct ProofOfAuthorityMsg {
   string name;
   address from;
   string filecid;
@@ -84,16 +84,36 @@ struct ProofOfAuthority {
 }
 ```
 
-### ProofOfSignature
+### ProofOfAuthorityShrinked
 
 ```solidity
-struct ProofOfSignature {
+struct ProofOfAuthorityShrinked {
+  bytes sig;
+  string version;
+  struct Proofs.ProofOfAuthorityMsg message;
+}
+```
+
+### ProofOfSignatureMsg
+
+```solidity
+struct ProofOfSignatureMsg {
   string name;
   address signer;
   string filecid;
   string app;
   uint256 timestamp;
   string metadata;
+}
+```
+
+### ProofOfSignatureShrinked
+
+```solidity
+struct ProofOfSignatureShrinked {
+  bytes sig;
+  string version;
+  struct Proofs.ProofOfSignatureMsg message;
 }
 ```
 
@@ -106,15 +126,24 @@ struct Filecid {
 }
 ```
 
-### ProofOfAgreement
+### ProofOfAgreementMsg
 
 ```solidity
-struct ProofOfAgreement {
+struct ProofOfAgreementMsg {
   string filecid;
   struct Proofs.Filecid[] signcids;
   string app;
   uint256 timestamp;
   string metadata;
+}
+```
+
+### ProofOfAgreementShrinked
+
+```solidity
+struct ProofOfAgreementShrinked {
+  string version;
+  struct Proofs.ProofOfSignatureMsg message;
 }
 ```
 
@@ -145,13 +174,13 @@ function hash(struct Proofs.Signer[] _input) internal pure returns (bytes32)
 ### hash
 
 ```solidity
-function hash(struct Proofs.ProofOfAuthority _input) internal pure returns (bytes32)
+function hash(struct Proofs.ProofOfAuthorityMsg _input) internal pure returns (bytes32)
 ```
 
 ### hash
 
 ```solidity
-function hash(struct Proofs.ProofOfSignature _input) internal pure returns (bytes32)
+function hash(struct Proofs.ProofOfSignatureMsg _input) internal pure returns (bytes32)
 ```
 
 ### hash
@@ -169,78 +198,78 @@ function hash(struct Proofs.Filecid[] _input) internal pure returns (bytes32)
 ### hash
 
 ```solidity
-function hash(struct Proofs.ProofOfAgreement _input) internal pure returns (bytes32)
+function hash(struct Proofs.ProofOfAgreementMsg _input) internal pure returns (bytes32)
 ```
 
 ### recover
 
 ```solidity
-function recover(struct Proofs.ProofOfAuthority message, bytes signature) public view returns (address)
+function recover(struct Proofs.ProofOfAuthorityMsg message, bytes signature) public view returns (address)
 ```
 
 ### recover
 
 ```solidity
-function recover(struct Proofs.ProofOfSignature message, bytes signature) public view returns (address)
+function recover(struct Proofs.ProofOfSignatureMsg message, bytes signature) public view returns (address)
 ```
 
 ### recover
 
 ```solidity
-function recover(struct Proofs.ProofOfAgreement message, bytes signature) public view returns (address)
+function recover(struct Proofs.ProofOfAgreementMsg message, bytes signature) public view returns (address)
 ```
 
 ### store
 
 ```solidity
-function store(struct Proofs.ProofOfAuthority message, bytes signature) public
+function store(struct Proofs.ProofOfAuthorityShrinked data) public
 ```
 
 ### store
 
 ```solidity
-function store(struct Proofs.ProofOfSignature message, bytes signature) public
+function store(struct Proofs.ProofOfSignatureShrinked data) public
 ```
 
 ### store
 
 ```solidity
-function store(struct Proofs.ProofOfAgreement message, bytes signature) public
+function store(struct Proofs.ProofOfAgreementShrinked data) public
 ```
 
 ### validate
 
 ```solidity
-function validate(struct Proofs.ProofOfAuthority) internal view virtual returns (bool)
+function validate(struct Proofs.ProofOfAuthorityShrinked) internal view virtual returns (bool)
 ```
 
 ### validate
 
 ```solidity
-function validate(struct Proofs.ProofOfSignature) internal view virtual returns (bool)
+function validate(struct Proofs.ProofOfSignatureShrinked) internal view virtual returns (bool)
 ```
 
 ### validate
 
 ```solidity
-function validate(struct Proofs.ProofOfAgreement) internal view virtual returns (bool)
+function validate(struct Proofs.ProofOfAgreementShrinked) internal view virtual returns (bool)
 ```
 
 ### save
 
 ```solidity
-function save(struct Proofs.ProofOfAuthority) internal virtual
+function save(struct Proofs.ProofOfAuthorityShrinked) internal virtual
 ```
 
 ### save
 
 ```solidity
-function save(struct Proofs.ProofOfSignature) internal virtual
+function save(struct Proofs.ProofOfSignatureShrinked) internal virtual
 ```
 
 ### save
 
 ```solidity
-function save(struct Proofs.ProofOfAgreement) internal virtual
+function save(struct Proofs.ProofOfAgreementShrinked) internal virtual
 ```
 
