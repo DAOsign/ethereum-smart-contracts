@@ -84,8 +84,8 @@ describe('Proofs', () => {
     return { privateKey, signer, proofs };
   }
 
-  describe('ProofOfAuthority', () => {
-    it.only('recover', async () => {
+  describe.only('ProofOfAuthority', () => {
+    it('recover', async () => {
       const { privateKey, signer, proofs } = await loadFixture(deployProofsFixture);
       const recover =
         proofs['recover((string,address,string,(address,string)[],string,uint64,string),bytes)'];
@@ -103,11 +103,10 @@ describe('Proofs', () => {
       };
       const signature = signProofOfAuthority(privateKey, message);
       const recovered = await recover(message, signature);
-      console.log({ recovered, signer: signer.address });
       expect(recovered).eq(signer.address);
     });
 
-    it.only('store', async () => {
+    it('store', async () => {
       const { privateKey, signer, proofs } = await loadFixture(deployProofsFixture);
       const message = {
         name: 'Proof-of-Authority',
@@ -121,6 +120,7 @@ describe('Proofs', () => {
         timestamp: Math.floor(Date.now() / 1000),
         metadata: '{}',
       };
+      const proofCID = 'QmP4EKzg4ba8U3vmuJjJSRifvPqTasYvdfea4ZgYK3dXXp';
       const sig = signProofOfAuthority(privateKey, message);
 
       const poaShrinked = {
@@ -128,7 +128,7 @@ describe('Proofs', () => {
         version: '0.1.0',
         message,
       };
-      await proofs.storeProofOfAuthority(poaShrinked);
+      await proofs.storeProofOfAuthority(poaShrinked, proofCID);
     });
   });
 

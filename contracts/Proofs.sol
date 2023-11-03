@@ -2,8 +2,11 @@
 pragma solidity ^0.8.19;
 
 import { ECDSA } from '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
+import { StringUtils } from './lib/StringUtils.sol';
 
 abstract contract Proofs {
+    using StringUtils for string;
+
     bytes32 public constant EIP712DOMAIN_TYPEHASH =
         keccak256('EIP712Domain(string name,string version)');
     bytes32 public constant SIGNER_TYPEHASH = keccak256('Signer(address addr,string metadata)');
@@ -19,7 +22,7 @@ abstract contract Proofs {
         keccak256('AgreementSignProof(string proofCID)');
     bytes32 public constant PROOF_AGREEMENT_TYPEHASH =
         keccak256(
-            'ProofOfAgreement(string agreementFileProofCID,AgreementSignProof[] agreementSignProofs,uint64 timestamp)AgreementSignProof(string proofCID)'
+            'ProofOfAgreement(string agreementFileProofCID,AgreementSignProof[] agreementSignProofs,uint64 timestamp,string metadata)AgreementSignProof(string proofCID)'
         );
     bytes32 public DOMAIN_HASH;
 
@@ -68,16 +71,16 @@ abstract contract Proofs {
         string proofCID;
     }
 
-    struct ProofOfAgreementMsg {
+    struct ProofOfAgreement {
         string agreementFileProofCID;
         AgreementSignProof[] agreementSignProofs;
         uint64 timestamp;
+        string metadata;
     }
 
-    struct ProofOfAgreementShrinked {
-        string version;
-        ProofOfSignatureMsg message;
-    }
+    event NewProofOfAuthority(ProofOfAuthorityShrinked indexed proof);
+    event NewProofOfSignature(ProofOfSignatureShrinked indexed proof);
+    event NewProofOfAgreement(ProofOfAgreement indexed proof);
 
     constructor() {
         DOMAIN_HASH = hash(EIP712Domain({ name: 'daosign', version: '0.1.0' }));
@@ -152,7 +155,7 @@ abstract contract Proofs {
         return keccak256(encoded);
     }
 
-    function hash(ProofOfAgreementMsg memory _input) internal pure returns (bytes32) {
+    function hash(ProofOfAgreement memory _input) internal pure returns (bytes32) {
         bytes memory encoded = abi.encode(
             PROOF_AGREEMENT_TYPEHASH,
             keccak256(bytes(_input.agreementFileProofCID)),
@@ -180,29 +183,34 @@ abstract contract Proofs {
         return ECDSA.recover(digest, signature);
     }
 
-    function recover(
-        ProofOfAgreementMsg memory message,
-        bytes memory signature
-    ) public view returns (address) {
-        bytes32 packetHash = hash(message);
-        bytes32 digest = keccak256(abi.encodePacked('\x19\x01', DOMAIN_HASH, packetHash));
-        return ECDSA.recover(digest, signature);
+    // function recover(
+    //     ProofOfAgreement memory message,
+    //     bytes memory signature
+    // ) public view returns (address) {
+    //     bytes32 packetHash = hash(message);
+    //     bytes32 digest = keccak256(abi.encodePacked('\x19\x01', DOMAIN_HASH, packetHash));
+    //     return ECDSA.recover(digest, signature);
+    // }
+
+    function storeProofOfAuthority(
+        ProofOfAuthorityShrinked memory _proof,
+        string memory _proofCID
+    ) public {
+        require(_proofCID.length() == 46, 'Invalid proof CID');
+        require(recover(_proof.message, _proof.sig) == _proof.message.from, 'Invalid signature');
+        require(validate(_proof), 'Invalid input params');
+        save(_proof, _proofCID);
     }
 
-    function storeProofOfAuthority(ProofOfAuthorityShrinked memory _proof) public {
-        require(recover(_proof.message, _proof.sig) == _proof.message.from, 'Invalid signature');
+    function storeProofOfSignature(ProofOfSignatureShrinked memory _proof) public {
+        require(recover(_proof.message, _proof.sig) == _proof.message.signer, 'Invalid signature');
         require(validate(_proof), 'Invalid input params');
         save(_proof);
     }
 
-    function storeProofOfSignature(ProofOfSignatureShrinked memory _proof) public {
-        require(recover(_proof.message, _proof.sig) == _proof.message.signer);
-        require(validate(_proof));
-        save(_proof);
-    }
-
-    function storeProofOfAgreement(ProofOfAgreementShrinked memory _proof) public {
-        require(validate(_proof));
+    // TODO: call this function automatically once the last Proof-of-Signature is generated
+    function storeProofOfAgreement(ProofOfAgreement memory _proof) public {
+        require(validate(_proof), 'Invalid input params');
         save(_proof);
     }
 
@@ -210,16 +218,16 @@ abstract contract Proofs {
 
     function validate(ProofOfSignatureShrinked memory) internal view virtual returns (bool);
 
-    function validate(ProofOfAgreementShrinked memory) internal view virtual returns (bool);
+    function validate(ProofOfAgreement memory) internal view virtual returns (bool);
 
-    function save(ProofOfAuthorityShrinked memory) public virtual;
+    function save(ProofOfAuthorityShrinked memory, string memory) internal virtual;
 
-    function save(ProofOfSignatureShrinked memory) public virtual;
+    function save(ProofOfSignatureShrinked memory) internal virtual;
 
-    function save(ProofOfAgreementShrinked memory) public virtual;
+    function save(ProofOfAgreement memory) internal virtual;
 
-    function get(
-        ProofOfAuthorityMsg memory
+    function getProofOfAuthority(
+        string memory
     ) public virtual returns (ProofOfAuthorityShrinked memory);
 
     // function get(ProofOfSignatureMsg memory) public virtual returns (ProofOfAuthorityShrinked memory);

@@ -115,23 +115,33 @@ struct AgreementSignProof {
 }
 ```
 
-### ProofOfAgreementMsg
+### ProofOfAgreement
 
 ```solidity
-struct ProofOfAgreementMsg {
+struct ProofOfAgreement {
   string agreementFileProofCID;
   struct Proofs.AgreementSignProof[] agreementSignProofs;
   uint64 timestamp;
+  string metadata;
 }
 ```
 
-### ProofOfAgreementShrinked
+### NewProofOfAuthority
 
 ```solidity
-struct ProofOfAgreementShrinked {
-  string version;
-  struct Proofs.ProofOfSignatureMsg message;
-}
+event NewProofOfAuthority(struct Proofs.ProofOfAuthorityShrinked proof)
+```
+
+### NewProofOfSignature
+
+```solidity
+event NewProofOfSignature(struct Proofs.ProofOfSignatureShrinked proof)
+```
+
+### NewProofOfAgreement
+
+```solidity
+event NewProofOfAgreement(struct Proofs.ProofOfAgreement proof)
 ```
 
 ### constructor
@@ -185,7 +195,7 @@ function hash(struct Proofs.AgreementSignProof[] _input) internal pure returns (
 ### hash
 
 ```solidity
-function hash(struct Proofs.ProofOfAgreementMsg _input) internal pure returns (bytes32)
+function hash(struct Proofs.ProofOfAgreement _input) internal pure returns (bytes32)
 ```
 
 ### recover
@@ -200,16 +210,10 @@ function recover(struct Proofs.ProofOfAuthorityMsg message, bytes signature) pub
 function recover(struct Proofs.ProofOfSignatureMsg message, bytes signature) public view returns (address)
 ```
 
-### recover
-
-```solidity
-function recover(struct Proofs.ProofOfAgreementMsg message, bytes signature) public view returns (address)
-```
-
 ### storeProofOfAuthority
 
 ```solidity
-function storeProofOfAuthority(struct Proofs.ProofOfAuthorityShrinked _proof) public
+function storeProofOfAuthority(struct Proofs.ProofOfAuthorityShrinked _proof, string _proofCID) public
 ```
 
 ### storeProofOfSignature
@@ -221,7 +225,7 @@ function storeProofOfSignature(struct Proofs.ProofOfSignatureShrinked _proof) pu
 ### storeProofOfAgreement
 
 ```solidity
-function storeProofOfAgreement(struct Proofs.ProofOfAgreementShrinked _proof) public
+function storeProofOfAgreement(struct Proofs.ProofOfAgreement _proof) public
 ```
 
 ### validate
@@ -239,30 +243,30 @@ function validate(struct Proofs.ProofOfSignatureShrinked) internal view virtual 
 ### validate
 
 ```solidity
-function validate(struct Proofs.ProofOfAgreementShrinked) internal view virtual returns (bool)
+function validate(struct Proofs.ProofOfAgreement) internal view virtual returns (bool)
 ```
 
 ### save
 
 ```solidity
-function save(struct Proofs.ProofOfAuthorityShrinked) public virtual
+function save(struct Proofs.ProofOfAuthorityShrinked, string) internal virtual
 ```
 
 ### save
 
 ```solidity
-function save(struct Proofs.ProofOfSignatureShrinked) public virtual
+function save(struct Proofs.ProofOfSignatureShrinked) internal virtual
 ```
 
 ### save
 
 ```solidity
-function save(struct Proofs.ProofOfAgreementShrinked) public virtual
+function save(struct Proofs.ProofOfAgreement) internal virtual
 ```
 
-### get
+### getProofOfAuthority
 
 ```solidity
-function get(struct Proofs.ProofOfAuthorityMsg) public virtual returns (struct Proofs.ProofOfAuthorityShrinked)
+function getProofOfAuthority(string) public virtual returns (struct Proofs.ProofOfAuthorityShrinked)
 ```
 

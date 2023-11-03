@@ -3,66 +3,48 @@
 ### proofs
 
 ```solidity
-mapping(bytes32 => bytes) proofs
-```
-
-### myProofKeys
-
-```solidity
-mapping(address => bytes32[]) myProofKeys
+mapping(string => bytes) proofs
 ```
 
 ### validate
 
 ```solidity
-function validate(struct Proofs.ProofOfAuthorityShrinked _data) internal view returns (bool)
+function validate(struct Proofs.ProofOfAuthorityShrinked _proof) internal view returns (bool)
 ```
 
 ### validate
 
 ```solidity
-function validate(struct Proofs.ProofOfSignatureShrinked _data) internal view returns (bool)
+function validate(struct Proofs.ProofOfSignatureShrinked _proof) internal view returns (bool)
 ```
 
 ### validate
 
 ```solidity
-function validate(struct Proofs.ProofOfAgreementShrinked) internal pure returns (bool)
+function validate(struct Proofs.ProofOfAgreement _proof) internal view returns (bool)
 ```
 
 ### save
 
 ```solidity
-function save(struct Proofs.ProofOfAuthorityShrinked _proof) public
+function save(struct Proofs.ProofOfAuthorityShrinked _proof, string _proofCID) internal
 ```
 
 ### save
 
 ```solidity
-function save(struct Proofs.ProofOfSignatureShrinked message) public
+function save(struct Proofs.ProofOfSignatureShrinked _proof) internal
 ```
 
 ### save
 
 ```solidity
-function save(struct Proofs.ProofOfAgreementShrinked message) public
+function save(struct Proofs.ProofOfAgreement _proof) internal
 ```
 
-### myProofKeysLen
+### getProofOfAuthority
 
 ```solidity
-function myProofKeysLen(address _addr) public view returns (uint256)
-```
-
-### get
-
-```solidity
-function get(struct Proofs.ProofOfAuthorityMsg message) public view returns (struct Proofs.ProofOfAuthorityShrinked)
-```
-
-### getLastProofOfAuthority
-
-```solidity
-function getLastProofOfAuthority(address _addr) external view returns (struct Proofs.ProofOfAuthorityShrinked _proof)
+function getProofOfAuthority(string _proofCID) public view returns (struct Proofs.ProofOfAuthorityShrinked)
 ```
 
