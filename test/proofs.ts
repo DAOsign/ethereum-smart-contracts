@@ -22,7 +22,7 @@ function signProofOfAuthority(pkey: Buffer, message: ProofOfAuthorityStruct): st
         ],
         Signer: [
           { name: 'addr', type: 'address' },
-          { name: 'data', type: 'string' },
+          { name: 'metadata', type: 'string' },
         ],
         ProofOfAuthority: [
           { name: 'name', type: 'string' },
@@ -91,8 +91,8 @@ describe('Proofs', () => {
         from: signer.address,
         filecid: 'some file cid',
         signers: [
-          { addr: signer.address, data: 'data 1' },
-          { addr: signer.address, data: 'data 2' },
+          { addr: signer.address, metadata: 'data 1' },
+          { addr: signer.address, metadata: 'data 2' },
         ],
         app: 'daosign',
         timestamp: Math.floor(Date.now() / 1000),

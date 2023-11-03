@@ -66,7 +66,7 @@ struct EIP712Domain {
 ```solidity
 struct Signer {
   address addr;
-  string data;
+  string metadata;
 }
 ```
 

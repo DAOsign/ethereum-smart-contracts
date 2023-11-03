@@ -5,10 +5,10 @@ import { ECDSA } from '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
 
 abstract contract Proofs {
     bytes32 constant EIP712DOMAIN_TYPEHASH = keccak256('EIP712Domain(string name,string version)');
-    bytes32 constant SIGNER_TYPEHASH = keccak256('Signer(address addr,string data)');
+    bytes32 constant SIGNER_TYPEHASH = keccak256('Signer(address addr,string metadata)');
     bytes32 constant PROOF_AUTHORITY_TYPEHASH =
         keccak256(
-            'ProofOfAuthority(string name,address from,string filecid,Signer[] signers,string app,uint256 timestamp,string metadata)Signer(address addr,string data)'
+            'ProofOfAuthority(string name,address from,string filecid,Signer[] signers,string app,uint256 timestamp,string metadata)Signer(address addr,string metadata)'
         );
     bytes32 constant PROOF_SIGNATURE_TYPEHASH =
         keccak256(
@@ -34,7 +34,7 @@ abstract contract Proofs {
 
     struct Signer {
         address addr;
-        string data;
+        string metadata;
     }
 
     struct ProofOfAuthority {
@@ -86,7 +86,7 @@ abstract contract Proofs {
         bytes memory encoded = abi.encode(
             SIGNER_TYPEHASH,
             _input.addr,
-            keccak256(bytes(_input.data))
+            keccak256(bytes(_input.metadata))
         );
         return keccak256(encoded);
     }
