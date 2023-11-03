@@ -70,7 +70,10 @@ function signProofOfSignature(pkey: Buffer, message: ProofOfSignatureStruct): st
 
 describe('Proofs', () => {
   async function deployProofsFixture() {
-    const Proofs = await ethers.getContractFactory('DAOsignProofs');
+    const StringUtils = await (await ethers.getContractFactory('StringUtils')).deploy();
+    const Proofs = await ethers.getContractFactory('DAOsignProofs', {
+      libraries: { StringUtils: await StringUtils.getAddress() },
+    });
 
     const [[signer], proofs] = await Promise.all([ethers.getSigners(), Proofs.deploy()]);
 
