@@ -206,22 +206,22 @@ function recover(struct Proofs.ProofOfSignatureMsg message, bytes signature) pub
 function recover(struct Proofs.ProofOfAgreementMsg message, bytes signature) public view returns (address)
 ```
 
-### store
+### storeProofOfAuthority
 
 ```solidity
-function store(struct Proofs.ProofOfAuthorityShrinked data) public
+function storeProofOfAuthority(struct Proofs.ProofOfAuthorityShrinked _proof) public
 ```
 
-### store
+### storeProofOfSignature
 
 ```solidity
-function store(struct Proofs.ProofOfSignatureShrinked data) public
+function storeProofOfSignature(struct Proofs.ProofOfSignatureShrinked _proof) public
 ```
 
-### store
+### storeProofOfAgreement
 
 ```solidity
-function store(struct Proofs.ProofOfAgreementShrinked data) public
+function storeProofOfAgreement(struct Proofs.ProofOfAgreementShrinked _proof) public
 ```
 
 ### validate
@@ -245,18 +245,24 @@ function validate(struct Proofs.ProofOfAgreementShrinked) internal view virtual 
 ### save
 
 ```solidity
-function save(struct Proofs.ProofOfAuthorityShrinked) internal virtual
+function save(struct Proofs.ProofOfAuthorityShrinked) public virtual
 ```
 
 ### save
 
 ```solidity
-function save(struct Proofs.ProofOfSignatureShrinked) internal virtual
+function save(struct Proofs.ProofOfSignatureShrinked) public virtual
 ```
 
 ### save
 
 ```solidity
-function save(struct Proofs.ProofOfAgreementShrinked) internal virtual
+function save(struct Proofs.ProofOfAgreementShrinked) public virtual
+```
+
+### get
+
+```solidity
+function get(struct Proofs.ProofOfAuthorityMsg) public virtual returns (struct Proofs.ProofOfAuthorityShrinked)
 ```
 

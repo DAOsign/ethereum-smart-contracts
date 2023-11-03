@@ -4,22 +4,24 @@ pragma solidity ^0.8.19;
 import { ECDSA } from '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
 
 abstract contract Proofs {
-    bytes32 constant EIP712DOMAIN_TYPEHASH = keccak256('EIP712Domain(string name,string version)');
-    bytes32 constant SIGNER_TYPEHASH = keccak256('Signer(address addr,string metadata)');
-    bytes32 constant PROOF_AUTHORITY_TYPEHASH =
+    bytes32 public constant EIP712DOMAIN_TYPEHASH =
+        keccak256('EIP712Domain(string name,string version)');
+    bytes32 public constant SIGNER_TYPEHASH = keccak256('Signer(address addr,string metadata)');
+    bytes32 public constant PROOF_AUTHORITY_TYPEHASH =
         keccak256(
             'ProofOfAuthority(string name,address from,string agreementFileCID,Signer[] signers,string app,uint64 timestamp,string metadata)Signer(address addr,string metadata)'
         );
-    bytes32 constant PROOF_SIGNATURE_TYPEHASH =
+    bytes32 public constant PROOF_SIGNATURE_TYPEHASH =
         keccak256(
             'ProofOfSignature(string name,address signer,string agreementFileProofCID,string app,uint64 timestamp,string metadata)'
         );
-    bytes32 constant AGR_SIGN_PROOF_TYPEHASH = keccak256('AgreementSignProof(string proofCID)');
-    bytes32 constant PROOF_AGREEMENT_TYPEHASH =
+    bytes32 public constant AGR_SIGN_PROOF_TYPEHASH =
+        keccak256('AgreementSignProof(string proofCID)');
+    bytes32 public constant PROOF_AGREEMENT_TYPEHASH =
         keccak256(
             'ProofOfAgreement(string agreementFileProofCID,AgreementSignProof[] agreementSignProofs,uint64 timestamp)AgreementSignProof(string proofCID)'
         );
-    bytes32 DOMAIN_HASH;
+    bytes32 public DOMAIN_HASH;
 
     struct EIP712Domain {
         string name;
@@ -187,21 +189,21 @@ abstract contract Proofs {
         return ECDSA.recover(digest, signature);
     }
 
-    function store(ProofOfAuthorityShrinked memory data) public {
-        require(recover(data.message, data.sig) == data.message.from);
-        require(validate(data));
-        save(data);
+    function storeProofOfAuthority(ProofOfAuthorityShrinked memory _proof) public {
+        require(recover(_proof.message, _proof.sig) == _proof.message.from, 'Invalid signature');
+        require(validate(_proof), 'Invalid input params');
+        save(_proof);
     }
 
-    function store(ProofOfSignatureShrinked memory data) public {
-        require(recover(data.message, data.sig) == data.message.signer);
-        require(validate(data));
-        save(data);
+    function storeProofOfSignature(ProofOfSignatureShrinked memory _proof) public {
+        require(recover(_proof.message, _proof.sig) == _proof.message.signer);
+        require(validate(_proof));
+        save(_proof);
     }
 
-    function store(ProofOfAgreementShrinked memory data) public {
-        require(validate(data));
-        save(data);
+    function storeProofOfAgreement(ProofOfAgreementShrinked memory _proof) public {
+        require(validate(_proof));
+        save(_proof);
     }
 
     function validate(ProofOfAuthorityShrinked memory) internal view virtual returns (bool);
@@ -210,9 +212,17 @@ abstract contract Proofs {
 
     function validate(ProofOfAgreementShrinked memory) internal view virtual returns (bool);
 
-    function save(ProofOfAuthorityShrinked memory) internal virtual;
+    function save(ProofOfAuthorityShrinked memory) public virtual;
 
-    function save(ProofOfSignatureShrinked memory) internal virtual;
+    function save(ProofOfSignatureShrinked memory) public virtual;
 
-    function save(ProofOfAgreementShrinked memory) internal virtual;
+    function save(ProofOfAgreementShrinked memory) public virtual;
+
+    function get(
+        ProofOfAuthorityMsg memory
+    ) public virtual returns (ProofOfAuthorityShrinked memory);
+
+    // function get(ProofOfSignatureMsg memory) public virtual returns (ProofOfAuthorityShrinked memory);
+
+    // function get(ProofOfAgreementMsg memory) public virtual returns (ProofOfAuthorityShrinked memory);
 }

@@ -79,14 +79,14 @@ describe('Proofs', () => {
 
     const accounts = config.networks.hardhat.accounts as HardhatNetworkHDAccountsConfig;
     const wallet = ethers.Wallet.fromPhrase(accounts.mnemonic);
-    const pkey = Buffer.from(wallet.privateKey.slice(2), 'hex');
+    const privateKey = Buffer.from(wallet.privateKey.slice(2), 'hex');
 
-    return { pkey, signer, proofs };
+    return { privateKey, signer, proofs };
   }
 
   describe('ProofOfAuthority', () => {
-    it('recover', async () => {
-      const { pkey, signer, proofs } = await loadFixture(deployProofsFixture);
+    it.only('recover', async () => {
+      const { privateKey, signer, proofs } = await loadFixture(deployProofsFixture);
       const recover =
         proofs['recover((string,address,string,(address,string)[],string,uint64,string),bytes)'];
       const message: ProofOfAuthorityStruct = {
@@ -101,15 +101,40 @@ describe('Proofs', () => {
         timestamp: Math.floor(Date.now() / 1000),
         metadata: 'proof metadata',
       };
-      const signature = signProofOfAuthority(pkey, message);
+      const signature = signProofOfAuthority(privateKey, message);
       const recovered = await recover(message, signature);
+      console.log({ recovered, signer: signer.address });
       expect(recovered).eq(signer.address);
+    });
+
+    it.only('store', async () => {
+      const { privateKey, signer, proofs } = await loadFixture(deployProofsFixture);
+      const message = {
+        name: 'Proof-of-Authority',
+        from: signer.address,
+        agreementFileCID: 'Qmeura2H46RCpDRHDHgnQ5QVk7iKnZANDhfLmSKCkDr5vv',
+        signers: [
+          { addr: signer.address, metadata: '{}' },
+          { addr: signer.address, metadata: '{}' },
+        ],
+        app: 'daosign',
+        timestamp: Math.floor(Date.now() / 1000),
+        metadata: '{}',
+      };
+      const sig = signProofOfAuthority(privateKey, message);
+
+      const poaShrinked = {
+        sig,
+        version: '0.1.0',
+        message,
+      };
+      await proofs.storeProofOfAuthority(poaShrinked);
     });
   });
 
   describe('ProofOfSignature', () => {
     it('recover', async () => {
-      const { pkey, signer, proofs } = await loadFixture(deployProofsFixture);
+      const { privateKey, signer, proofs } = await loadFixture(deployProofsFixture);
       const recover = proofs['recover((string,address,string,string,uint64,string),bytes)'];
       const message: ProofOfSignatureStruct = {
         name: 'Proof-of-Signature',
@@ -119,7 +144,7 @@ describe('Proofs', () => {
         timestamp: Math.floor(Date.now() / 1000),
         metadata: 'proof metadata',
       };
-      const signature = signProofOfSignature(pkey, message);
+      const signature = signProofOfSignature(privateKey, message);
       const recovered = await recover(message, signature);
       expect(recovered).eq(signer.address);
     });
