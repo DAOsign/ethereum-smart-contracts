@@ -42,16 +42,6 @@ bytes32 PROOF_AGREEMENT_TYPEHASH
 bytes32 DOMAIN_HASH
 ```
 
-### ProofKind
-
-```solidity
-enum ProofKind {
-  Authority,
-  Signature,
-  Agreement
-}
-```
-
 ### EIP712Domain
 
 ```solidity
@@ -76,7 +66,7 @@ struct Signer {
 struct ProofOfAuthorityMsg {
   string name;
   address from;
-  string filecid;
+  string agreementFileCID;
   struct Proofs.Signer[] signers;
   string app;
   uint64 timestamp;

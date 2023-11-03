@@ -8,7 +8,7 @@ abstract contract Proofs {
     bytes32 constant SIGNER_TYPEHASH = keccak256('Signer(address addr,string metadata)');
     bytes32 constant PROOF_AUTHORITY_TYPEHASH =
         keccak256(
-            'ProofOfAuthority(string name,address from,string filecid,Signer[] signers,string app,uint64 timestamp,string metadata)Signer(address addr,string metadata)'
+            'ProofOfAuthority(string name,address from,string agreementFileCID,Signer[] signers,string app,uint64 timestamp,string metadata)Signer(address addr,string metadata)'
         );
     bytes32 constant PROOF_SIGNATURE_TYPEHASH =
         keccak256(
@@ -20,12 +20,6 @@ abstract contract Proofs {
             'ProofOfAgreement(string filecid,Filecid[] signcids,string app,uint64 timestamp,string metadata)Filecid(string addr,string data)'
         );
     bytes32 DOMAIN_HASH;
-
-    enum ProofKind {
-        Authority,
-        Signature,
-        Agreement
-    }
 
     struct EIP712Domain {
         string name;
@@ -40,7 +34,7 @@ abstract contract Proofs {
     struct ProofOfAuthorityMsg {
         string name;
         address from;
-        string filecid;
+        string agreementFileCID;
         Signer[] signers;
         string app;
         uint64 timestamp;
@@ -121,7 +115,7 @@ abstract contract Proofs {
             PROOF_AUTHORITY_TYPEHASH,
             keccak256(bytes(_input.name)),
             _input.from,
-            keccak256(bytes(_input.filecid)),
+            keccak256(bytes(_input.agreementFileCID)),
             hash(_input.signers),
             keccak256(bytes(_input.app)),
             _input.timestamp,

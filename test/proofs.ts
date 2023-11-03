@@ -27,7 +27,7 @@ function signProofOfAuthority(pkey: Buffer, message: ProofOfAuthorityStruct): st
         ProofOfAuthority: [
           { name: 'name', type: 'string' },
           { name: 'from', type: 'address' },
-          { name: 'filecid', type: 'string' },
+          { name: 'agreementFileCID', type: 'string' },
           { name: 'signers', type: 'Signer[]' },
           { name: 'app', type: 'string' },
           { name: 'timestamp', type: 'uint64' },
@@ -89,7 +89,7 @@ describe('Proofs', () => {
       const message: ProofOfAuthorityStruct = {
         name: 'Proof-of-Authority',
         from: signer.address,
-        filecid: 'some file cid',
+        agreementFileCID: 'some file cid',
         signers: [
           { addr: signer.address, metadata: 'data 1' },
           { addr: signer.address, metadata: 'data 2' },
