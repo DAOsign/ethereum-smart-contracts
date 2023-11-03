@@ -57,7 +57,7 @@ function signProofOfSignature(pkey: Buffer, message: ProofOfSignatureStruct): st
         ProofOfSignature: [
           { name: 'name', type: 'string' },
           { name: 'signer', type: 'address' },
-          { name: 'filecid', type: 'string' },
+          { name: 'agreementFileProofCID', type: 'string' },
           { name: 'app', type: 'string' },
           { name: 'timestamp', type: 'uint64' },
           { name: 'metadata', type: 'string' },
@@ -111,7 +111,7 @@ describe('Proofs', () => {
       const message: ProofOfSignatureStruct = {
         name: 'Proof-of-Signature',
         signer: signer.address,
-        filecid: 'some file cid',
+        agreementFileProofCID: 'some file cid',
         app: 'daosign',
         timestamp: Math.floor(Date.now() / 1000),
         metadata: 'proof metadata',

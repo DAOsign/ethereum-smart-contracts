@@ -90,7 +90,7 @@ struct ProofOfAuthorityShrinked {
 struct ProofOfSignatureMsg {
   string name;
   address signer;
-  string filecid;
+  string agreementFileProofCID;
   string app;
   uint64 timestamp;
   string metadata;

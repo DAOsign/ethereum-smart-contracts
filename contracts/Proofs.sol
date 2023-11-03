@@ -12,7 +12,7 @@ abstract contract Proofs {
         );
     bytes32 constant PROOF_SIGNATURE_TYPEHASH =
         keccak256(
-            'ProofOfSignature(string name,address signer,string filecid,string app,uint64 timestamp,string metadata)'
+            'ProofOfSignature(string name,address signer,string agreementFileProofCID,string app,uint64 timestamp,string metadata)'
         );
     bytes32 constant FILECID_TYPEHASH = keccak256('Filecid(string addr,string data)');
     bytes32 constant PROOF_AGREEMENT_TYPEHASH =
@@ -50,7 +50,7 @@ abstract contract Proofs {
     struct ProofOfSignatureMsg {
         string name;
         address signer;
-        string filecid;
+        string agreementFileProofCID;
         string app;
         uint64 timestamp;
         string metadata;
@@ -129,7 +129,7 @@ abstract contract Proofs {
             PROOF_SIGNATURE_TYPEHASH,
             keccak256(bytes(_input.name)),
             _input.signer,
-            keccak256(bytes(_input.filecid)),
+            keccak256(bytes(_input.agreementFileProofCID)),
             keccak256(bytes(_input.app)),
             _input.timestamp,
             keccak256(bytes(_input.metadata))
