@@ -14,10 +14,10 @@ abstract contract Proofs {
         keccak256(
             'ProofOfSignature(string name,address signer,string agreementFileProofCID,string app,uint64 timestamp,string metadata)'
         );
-    bytes32 constant FILECID_TYPEHASH = keccak256('Filecid(string addr,string data)');
+    bytes32 constant AGR_SIGN_PROOF_TYPEHASH = keccak256('AgreementSignProof(string proofCID)');
     bytes32 constant PROOF_AGREEMENT_TYPEHASH =
         keccak256(
-            'ProofOfAgreement(string filecid,Filecid[] signcids,string app,uint64 timestamp,string metadata)Filecid(string addr,string data)'
+            'ProofOfAgreement(string agreementFileProofCID,AgreementSignProof[] agreementSignProofs,uint64 timestamp)AgreementSignProof(string proofCID)'
         );
     bytes32 DOMAIN_HASH;
 
@@ -62,17 +62,14 @@ abstract contract Proofs {
         ProofOfSignatureMsg message;
     }
 
-    struct Filecid {
-        string addr;
-        string data;
+    struct AgreementSignProof {
+        string proofCID;
     }
 
     struct ProofOfAgreementMsg {
-        string filecid;
-        Filecid[] signcids;
-        string app;
+        string agreementFileProofCID;
+        AgreementSignProof[] agreementSignProofs;
         uint64 timestamp;
-        string metadata;
     }
 
     struct ProofOfAgreementShrinked {
@@ -137,16 +134,15 @@ abstract contract Proofs {
         return keccak256(encoded);
     }
 
-    function hash(Filecid memory _input) internal pure returns (bytes32) {
+    function hash(AgreementSignProof memory _input) internal pure returns (bytes32) {
         bytes memory encoded = abi.encode(
-            FILECID_TYPEHASH,
-            keccak256(bytes(_input.addr)),
-            keccak256(bytes(_input.data))
+            AGR_SIGN_PROOF_TYPEHASH,
+            keccak256(bytes(_input.proofCID))
         );
         return keccak256(encoded);
     }
 
-    function hash(Filecid[] memory _input) internal pure returns (bytes32) {
+    function hash(AgreementSignProof[] memory _input) internal pure returns (bytes32) {
         bytes memory encoded;
         for (uint i = 0; i < _input.length; i++) {
             encoded = abi.encodePacked(encoded, hash(_input[i]));
@@ -157,11 +153,9 @@ abstract contract Proofs {
     function hash(ProofOfAgreementMsg memory _input) internal pure returns (bytes32) {
         bytes memory encoded = abi.encode(
             PROOF_AGREEMENT_TYPEHASH,
-            keccak256(bytes(_input.filecid)),
-            hash(_input.signcids),
-            keccak256(bytes(_input.app)),
-            _input.timestamp,
-            keccak256(bytes(_input.metadata))
+            keccak256(bytes(_input.agreementFileProofCID)),
+            hash(_input.agreementSignProofs),
+            _input.timestamp
         );
         return keccak256(encoded);
     }

@@ -24,10 +24,10 @@ bytes32 PROOF_AUTHORITY_TYPEHASH
 bytes32 PROOF_SIGNATURE_TYPEHASH
 ```
 
-### FILECID_TYPEHASH
+### AGR_SIGN_PROOF_TYPEHASH
 
 ```solidity
-bytes32 FILECID_TYPEHASH
+bytes32 AGR_SIGN_PROOF_TYPEHASH
 ```
 
 ### PROOF_AGREEMENT_TYPEHASH
@@ -107,12 +107,11 @@ struct ProofOfSignatureShrinked {
 }
 ```
 
-### Filecid
+### AgreementSignProof
 
 ```solidity
-struct Filecid {
-  string addr;
-  string data;
+struct AgreementSignProof {
+  string proofCID;
 }
 ```
 
@@ -120,11 +119,9 @@ struct Filecid {
 
 ```solidity
 struct ProofOfAgreementMsg {
-  string filecid;
-  struct Proofs.Filecid[] signcids;
-  string app;
+  string agreementFileProofCID;
+  struct Proofs.AgreementSignProof[] agreementSignProofs;
   uint64 timestamp;
-  string metadata;
 }
 ```
 
@@ -176,13 +173,13 @@ function hash(struct Proofs.ProofOfSignatureMsg _input) internal pure returns (b
 ### hash
 
 ```solidity
-function hash(struct Proofs.Filecid _input) internal pure returns (bytes32)
+function hash(struct Proofs.AgreementSignProof _input) internal pure returns (bytes32)
 ```
 
 ### hash
 
 ```solidity
-function hash(struct Proofs.Filecid[] _input) internal pure returns (bytes32)
+function hash(struct Proofs.AgreementSignProof[] _input) internal pure returns (bytes32)
 ```
 
 ### hash
