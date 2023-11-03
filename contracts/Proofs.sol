@@ -8,16 +8,16 @@ abstract contract Proofs {
     bytes32 constant SIGNER_TYPEHASH = keccak256('Signer(address addr,string metadata)');
     bytes32 constant PROOF_AUTHORITY_TYPEHASH =
         keccak256(
-            'ProofOfAuthority(string name,address from,string filecid,Signer[] signers,string app,uint256 timestamp,string metadata)Signer(address addr,string metadata)'
+            'ProofOfAuthority(string name,address from,string filecid,Signer[] signers,string app,uint64 timestamp,string metadata)Signer(address addr,string metadata)'
         );
     bytes32 constant PROOF_SIGNATURE_TYPEHASH =
         keccak256(
-            'ProofOfSignature(string name,address signer,string filecid,string app,uint256 timestamp,string metadata)'
+            'ProofOfSignature(string name,address signer,string filecid,string app,uint64 timestamp,string metadata)'
         );
     bytes32 constant FILECID_TYPEHASH = keccak256('Filecid(string addr,string data)');
     bytes32 constant PROOF_AGREEMENT_TYPEHASH =
         keccak256(
-            'ProofOfAgreement(string filecid,Filecid[] signcids,string app,uint256 timestamp,string metadata)Filecid(string addr,string data)'
+            'ProofOfAgreement(string filecid,Filecid[] signcids,string app,uint64 timestamp,string metadata)Filecid(string addr,string data)'
         );
     bytes32 DOMAIN_HASH;
 
@@ -43,7 +43,7 @@ abstract contract Proofs {
         string filecid;
         Signer[] signers;
         string app;
-        uint256 timestamp;
+        uint64 timestamp;
         string metadata;
     }
 
@@ -58,7 +58,7 @@ abstract contract Proofs {
         address signer;
         string filecid;
         string app;
-        uint256 timestamp;
+        uint64 timestamp;
         string metadata;
     }
 
@@ -77,7 +77,7 @@ abstract contract Proofs {
         string filecid;
         Filecid[] signcids;
         string app;
-        uint256 timestamp;
+        uint64 timestamp;
         string metadata;
     }
 

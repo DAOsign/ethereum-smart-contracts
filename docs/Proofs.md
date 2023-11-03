@@ -79,7 +79,7 @@ struct ProofOfAuthorityMsg {
   string filecid;
   struct Proofs.Signer[] signers;
   string app;
-  uint256 timestamp;
+  uint64 timestamp;
   string metadata;
 }
 ```
@@ -102,7 +102,7 @@ struct ProofOfSignatureMsg {
   address signer;
   string filecid;
   string app;
-  uint256 timestamp;
+  uint64 timestamp;
   string metadata;
 }
 ```
@@ -133,7 +133,7 @@ struct ProofOfAgreementMsg {
   string filecid;
   struct Proofs.Filecid[] signcids;
   string app;
-  uint256 timestamp;
+  uint64 timestamp;
   string metadata;
 }
 ```

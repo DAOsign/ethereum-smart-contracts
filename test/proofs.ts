@@ -30,7 +30,7 @@ function signProofOfAuthority(pkey: Buffer, message: ProofOfAuthorityStruct): st
           { name: 'filecid', type: 'string' },
           { name: 'signers', type: 'Signer[]' },
           { name: 'app', type: 'string' },
-          { name: 'timestamp', type: 'uint256' },
+          { name: 'timestamp', type: 'uint64' },
           { name: 'metadata', type: 'string' },
         ],
       },
@@ -59,7 +59,7 @@ function signProofOfSignature(pkey: Buffer, message: ProofOfSignatureStruct): st
           { name: 'signer', type: 'address' },
           { name: 'filecid', type: 'string' },
           { name: 'app', type: 'string' },
-          { name: 'timestamp', type: 'uint256' },
+          { name: 'timestamp', type: 'uint64' },
           { name: 'metadata', type: 'string' },
         ],
       },
@@ -85,7 +85,7 @@ describe('Proofs', () => {
     it('recover', async () => {
       const { pkey, signer, proofs } = await loadFixture(deployProofsFixture);
       const recover =
-        proofs['recover((string,address,string,(address,string)[],string,uint256,string),bytes)'];
+        proofs['recover((string,address,string,(address,string)[],string,uint64,string),bytes)'];
       const message: ProofOfAuthorityStruct = {
         name: 'Proof-of-Authority',
         from: signer.address,
@@ -107,7 +107,7 @@ describe('Proofs', () => {
   describe('ProofOfSignature', () => {
     it('recover', async () => {
       const { pkey, signer, proofs } = await loadFixture(deployProofsFixture);
-      const recover = proofs['recover((string,address,string,string,uint256,string),bytes)'];
+      const recover = proofs['recover((string,address,string,string,uint64,string),bytes)'];
       const message: ProofOfSignatureStruct = {
         name: 'Proof-of-Signature',
         signer: signer.address,
