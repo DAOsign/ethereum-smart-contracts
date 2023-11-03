@@ -624,7 +624,7 @@ describe('Proofs', () => {
           { name: 'metadata', type: 'string' },
         ],
       },
-      primaryType: 'ProofOfAuthorityMsg',
+      primaryType: 'ProofOfAuthorityMsg' as 'ProofOfAuthorityMsg' | 'EIP712Domain' | 'Signer',
       domain: {
         name: 'daosign',
         version: '0.1.0',
@@ -646,28 +646,6 @@ describe('Proofs', () => {
       signers = [signer1.address, signer2.address, signer3.address];
 
       creator = owner;
-
-      // const dataSig = await creator.signMessage(
-      //   ethers.getBytes(
-      //     ethers.keccak256(
-      //       ethers.solidityPacked(
-      //         ['address', 'address[]', 'string', 'string'],
-      //         [creator.address, signers, fileCID, version],
-      //       ),
-      //     ),
-      //   ),
-      // );
-
-      // await proofs.fetchProofOfAuthorityData(creator.address, signers, fileCID, version, dataSig);
-      // const data = await proofs.fetchProofOfAuthorityData.staticCall(
-      //   creator.address,
-      //   signers,
-      //   fileCID,
-      //   version,
-      //   dataSig,
-      // );
-
-      // console.log(util.inspect(JSON.parse(data), false, null, true));
 
       const accounts = hre.config.networks.hardhat.accounts as HardhatNetworkHDAccountsConfig;
       const wallet = ethers.Wallet.fromPhrase(accounts.mnemonic);
