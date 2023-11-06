@@ -84,7 +84,7 @@ describe('Proofs', () => {
     return { privateKey, signer, proofs };
   }
 
-  describe.only('ProofOfAuthority', () => {
+  describe('ProofOfAuthority', () => {
     it('recover', async () => {
       const { privateKey, signer, proofs } = await loadFixture(deployProofsFixture);
       const recover =

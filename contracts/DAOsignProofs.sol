@@ -4,16 +4,30 @@ pragma solidity ^0.8.19;
 import { Proofs } from './Proofs.sol';
 import { StringUtils } from './lib/StringUtils.sol';
 
-// TODO: make upgradeable
 contract DAOsignProofs is Proofs {
     using StringUtils for string;
 
-    // mapping(bytes32 => bytes) public proofs;
     mapping(string => bytes) public proofs;
 
-    // mapping(address => bytes32[]) public myProofKeys;
+    function getProofOfAuthority(
+        string memory _proofCID
+    ) public view override returns (ProofOfAuthorityShrinked memory) {
+        return abi.decode(proofs[_proofCID], (ProofOfAuthorityShrinked));
+    }
 
-    function validate(
+    function getProofOfSignature(
+        string memory _proofCID
+    ) public view override returns (ProofOfSignatureShrinked memory) {
+        return abi.decode(proofs[_proofCID], (ProofOfSignatureShrinked));
+    }
+
+    function getProofOfAgreement(
+        string memory _proofCID
+    ) public view override returns (ProofOfAgreement memory) {
+        return abi.decode(proofs[_proofCID], (ProofOfAgreement));
+    }
+
+    function _validate(
         ProofOfAuthorityShrinked memory _proof
     ) internal view override returns (bool) {
         require(_proof.version.length() > 0, 'Invalid version');
@@ -33,7 +47,7 @@ contract DAOsignProofs is Proofs {
         return true;
     }
 
-    function validate(
+    function _validate(
         ProofOfSignatureShrinked memory _proof
     ) internal view override returns (bool) {
         require(_proof.version.length() > 0, 'Invalid version');
@@ -49,7 +63,7 @@ contract DAOsignProofs is Proofs {
         return true;
     }
 
-    function validate(ProofOfAgreement memory _proof) internal view override returns (bool) {
+    function _validate(ProofOfAgreement memory _proof) internal view override returns (bool) {
         require(_proof.agreementFileProofCID.length() == 46, 'Invalid Proof-of-Authority CID');
         for (uint256 i = 0; i < _proof.agreementSignProofs.length; i++) {
             require(
@@ -64,61 +78,35 @@ contract DAOsignProofs is Proofs {
         return true;
     }
 
-    function save(
+    function _store(
         ProofOfAuthorityShrinked memory _proof,
         string memory _proofCID
     ) internal override {
-        // bytes32 key = keccak256(abi.encode(_proof.message));
-        // proofs[_proofCID] = abi.encode(
-        //     ProofOfAuthorityShrinked(_proof.sig, _proof.version, _proof.message)
-        // );
-        // myProofKeys[_proof.message.from].push(key);
         proofs[_proofCID] = abi.encode(
             ProofOfAuthorityShrinked(_proof.sig, _proof.version, _proof.message)
         );
         emit NewProofOfAuthority(_proof);
     }
 
-    function save(ProofOfSignatureShrinked memory _proof) internal override {
-        // bytes32 key = keccak256(abi.encode(_proof.message));
-        // proofs[key] = abi.encode(
-        //     ProofOfSignatureShrinked(_proof.sig, _proof.version, _proof.message)
-        // );
-        // myProofKeys[_proof.message.signer].push(key);
+    function _store(
+        ProofOfSignatureShrinked memory _proof,
+        string memory _proofCID
+    ) internal override {
+        proofs[_proofCID] = abi.encode(
+            ProofOfSignatureShrinked(_proof.sig, _proof.version, _proof.message)
+        );
         emit NewProofOfSignature(_proof);
     }
 
-    function save(ProofOfAgreement memory _proof) internal override {
-        // bytes32 key = keccak256(abi.encode(_proof.message));
-        // proofs[key] = abi.encode(
-        //     ProofOfAgreement(_proof.sig, _proof.version, _proof.message)
-        // );
-        // myProofKeys[_proof.message.from].push(key);
+    function _store(ProofOfAgreement memory _proof, string memory _proofCID) internal override {
+        proofs[_proofCID] = abi.encode(
+            ProofOfAgreement(
+                _proof.agreementFileProofCID,
+                _proof.agreementSignProofs,
+                _proof.timestamp,
+                _proof.metadata
+            )
+        );
         emit NewProofOfAgreement(_proof);
     }
-
-    function getProofOfAuthority(
-        string memory _proofCID
-    ) public view override returns (ProofOfAuthorityShrinked memory) {
-        return abi.decode(proofs[_proofCID], (ProofOfAuthorityShrinked));
-    }
-
-    // function myProofKeysLen(address _addr) public view returns (uint256) {
-    //     return myProofKeys[_addr].length;
-    // }
-
-    // function get(
-    //     ProofOfAuthorityMsg memory message
-    // ) public view override returns (ProofOfAuthorityShrinked memory) {
-    //     return abi.decode(proofs[keccak256(abi.encode(message))], (ProofOfAuthorityShrinked));
-    // }
-
-    // function getLastProofOfAuthority(
-    //     address _addr
-    // ) external view returns (ProofOfAuthorityShrinked memory _proof) {
-    //     _proof = abi.decode(
-    //         proofs[myProofKeys[_addr][myProofKeysLen(_addr) - 1]],
-    //         (ProofOfAuthorityShrinked)
-    //     );
-    // }
 }

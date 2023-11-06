@@ -144,58 +144,112 @@ event NewProofOfSignature(struct Proofs.ProofOfSignatureShrinked proof)
 event NewProofOfAgreement(struct Proofs.ProofOfAgreement proof)
 ```
 
-### constructor
+### DomainHashUpdated
 
 ```solidity
-constructor() internal
+event DomainHashUpdated(struct Proofs.EIP712Domain domain)
 ```
 
-### hash
+### EIP712DomainTypeHashUpdated
 
 ```solidity
-function hash(struct Proofs.EIP712Domain _input) internal pure returns (bytes32)
+event EIP712DomainTypeHashUpdated(string eip712DomainTypeHash)
 ```
 
-### hash
+### SignerTypeHashUpdated
 
 ```solidity
-function hash(struct Proofs.Signer _input) internal pure returns (bytes32)
+event SignerTypeHashUpdated(string signerTypeHash)
 ```
 
-### hash
+### ProofAuthorityTypeHashUpdated
 
 ```solidity
-function hash(struct Proofs.Signer[] _input) internal pure returns (bytes32)
+event ProofAuthorityTypeHashUpdated(string proofAuthorityTypeHash)
 ```
 
-### hash
+### ProofSignatureTypeHashUpdated
 
 ```solidity
-function hash(struct Proofs.ProofOfAuthorityMsg _input) internal pure returns (bytes32)
+event ProofSignatureTypeHashUpdated(string proofSignatureTypeHash)
 ```
 
-### hash
+### AgrSignProofTypeHashUpdated
 
 ```solidity
-function hash(struct Proofs.ProofOfSignatureMsg _input) internal pure returns (bytes32)
+event AgrSignProofTypeHashUpdated(string agrSignProofTypeHash)
 ```
 
-### hash
+### ProofAgreementTypeHashUpdated
 
 ```solidity
-function hash(struct Proofs.AgreementSignProof _input) internal pure returns (bytes32)
+event ProofAgreementTypeHashUpdated(string proofAgreementTypeHash)
 ```
 
-### hash
+### initialize
 
 ```solidity
-function hash(struct Proofs.AgreementSignProof[] _input) internal pure returns (bytes32)
+function initialize(address _owner) public
 ```
 
-### hash
+### updateDomainHash
 
 ```solidity
-function hash(struct Proofs.ProofOfAgreement _input) internal pure returns (bytes32)
+function updateDomainHash(struct Proofs.EIP712Domain _domain) external
+```
+
+### updateEIP712DomainTypeHash
+
+```solidity
+function updateEIP712DomainTypeHash(string _eip712Domain) external
+```
+
+### updateSignerTypeHash
+
+```solidity
+function updateSignerTypeHash(string _signerType) external
+```
+
+### updateProofAuthorityTypeHash
+
+```solidity
+function updateProofAuthorityTypeHash(string _proofAuthorityType) external
+```
+
+### updateProofSignatureTypeHash
+
+```solidity
+function updateProofSignatureTypeHash(string _proofSignatureType) external
+```
+
+### updateAgrSignProofTypeHash
+
+```solidity
+function updateAgrSignProofTypeHash(string _agrSignProofType) external
+```
+
+### updateProofAgreementTypeHash
+
+```solidity
+function updateProofAgreementTypeHash(string _proofAgreementType) external
+```
+
+### storeProofOfAuthority
+
+```solidity
+function storeProofOfAuthority(struct Proofs.ProofOfAuthorityShrinked _proof, string _proofCID) external
+```
+
+### storeProofOfSignature
+
+```solidity
+function storeProofOfSignature(struct Proofs.ProofOfSignatureShrinked _proof, string _proofCID) external
+```
+
+### storeProofOfAgreement
+
+```solidity
+function storeProofOfAgreement(struct Proofs.ProofOfAgreement _proof, string _proofCID) external
 ```
 
 ### recover
@@ -210,63 +264,105 @@ function recover(struct Proofs.ProofOfAuthorityMsg message, bytes signature) pub
 function recover(struct Proofs.ProofOfSignatureMsg message, bytes signature) public view returns (address)
 ```
 
-### storeProofOfAuthority
+### hash
 
 ```solidity
-function storeProofOfAuthority(struct Proofs.ProofOfAuthorityShrinked _proof, string _proofCID) public
+function hash(struct Proofs.EIP712Domain _input) internal view returns (bytes32)
 ```
 
-### storeProofOfSignature
+### hash
 
 ```solidity
-function storeProofOfSignature(struct Proofs.ProofOfSignatureShrinked _proof) public
+function hash(struct Proofs.Signer _input) internal view returns (bytes32)
 ```
 
-### storeProofOfAgreement
+### hash
 
 ```solidity
-function storeProofOfAgreement(struct Proofs.ProofOfAgreement _proof) public
+function hash(struct Proofs.Signer[] _input) internal view returns (bytes32)
 ```
 
-### validate
+### hash
 
 ```solidity
-function validate(struct Proofs.ProofOfAuthorityShrinked) internal view virtual returns (bool)
+function hash(struct Proofs.ProofOfAuthorityMsg _input) internal view returns (bytes32)
 ```
 
-### validate
+### hash
 
 ```solidity
-function validate(struct Proofs.ProofOfSignatureShrinked) internal view virtual returns (bool)
+function hash(struct Proofs.ProofOfSignatureMsg _input) internal view returns (bytes32)
 ```
 
-### validate
+### hash
 
 ```solidity
-function validate(struct Proofs.ProofOfAgreement) internal view virtual returns (bool)
+function hash(struct Proofs.AgreementSignProof _input) internal view returns (bytes32)
 ```
 
-### save
+### hash
 
 ```solidity
-function save(struct Proofs.ProofOfAuthorityShrinked, string) internal virtual
+function hash(struct Proofs.AgreementSignProof[] _input) internal view returns (bytes32)
 ```
 
-### save
+### hash
 
 ```solidity
-function save(struct Proofs.ProofOfSignatureShrinked) internal virtual
+function hash(struct Proofs.ProofOfAgreement _input) internal view returns (bytes32)
 ```
 
-### save
+### _validate
 
 ```solidity
-function save(struct Proofs.ProofOfAgreement) internal virtual
+function _validate(struct Proofs.ProofOfAuthorityShrinked) internal view virtual returns (bool)
+```
+
+### _validate
+
+```solidity
+function _validate(struct Proofs.ProofOfSignatureShrinked) internal view virtual returns (bool)
+```
+
+### _validate
+
+```solidity
+function _validate(struct Proofs.ProofOfAgreement) internal view virtual returns (bool)
+```
+
+### _store
+
+```solidity
+function _store(struct Proofs.ProofOfAuthorityShrinked, string) internal virtual
+```
+
+### _store
+
+```solidity
+function _store(struct Proofs.ProofOfSignatureShrinked, string) internal virtual
+```
+
+### _store
+
+```solidity
+function _store(struct Proofs.ProofOfAgreement, string) internal virtual
 ```
 
 ### getProofOfAuthority
 
 ```solidity
 function getProofOfAuthority(string) public virtual returns (struct Proofs.ProofOfAuthorityShrinked)
+```
+
+### getProofOfSignature
+
+```solidity
+function getProofOfSignature(string) public virtual returns (struct Proofs.ProofOfSignatureShrinked)
+```
+
+### getProofOfAgreement
+
+```solidity
+function getProofOfAgreement(string) public virtual returns (struct Proofs.ProofOfAgreement)
 ```
 
