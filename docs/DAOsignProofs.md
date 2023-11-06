@@ -1,62 +1,44 @@
 ## DAOsignProofs
 
-### proofs
+### initializeDAOsignProofs
 
 ```solidity
-mapping(string => bytes) proofs
+function initializeDAOsignProofs(address _owner) public
 ```
 
 ### getProofOfAuthority
 
 ```solidity
-function getProofOfAuthority(string _proofCID) public view returns (struct Proofs.ProofOfAuthorityShrinked)
+function getProofOfAuthority(string _proofCID) external view returns (struct Proofs.ProofOfAuthorityShrinked)
 ```
 
 ### getProofOfSignature
 
 ```solidity
-function getProofOfSignature(string _proofCID) public view returns (struct Proofs.ProofOfSignatureShrinked)
+function getProofOfSignature(string _proofCID) external view returns (struct Proofs.ProofOfSignatureShrinked)
 ```
 
 ### getProofOfAgreement
 
 ```solidity
-function getProofOfAgreement(string _proofCID) public view returns (struct Proofs.ProofOfAgreement)
+function getProofOfAgreement(string _proofCID) external view returns (struct Proofs.ProofOfAgreement)
 ```
 
-### _validate
+### storeProofOfAuthority
 
 ```solidity
-function _validate(struct Proofs.ProofOfAuthorityShrinked _proof) internal view returns (bool)
+function storeProofOfAuthority(struct Proofs.ProofOfAuthorityShrinked _proof, string _proofCID) external
 ```
 
-### _validate
+### storeProofOfSignature
 
 ```solidity
-function _validate(struct Proofs.ProofOfSignatureShrinked _proof) internal view returns (bool)
+function storeProofOfSignature(struct Proofs.ProofOfSignatureShrinked _proof, string _proofCID) external
 ```
 
-### _validate
+### storeProofOfAgreement
 
 ```solidity
-function _validate(struct Proofs.ProofOfAgreement _proof) internal view returns (bool)
-```
-
-### _store
-
-```solidity
-function _store(struct Proofs.ProofOfAuthorityShrinked _proof, string _proofCID) internal
-```
-
-### _store
-
-```solidity
-function _store(struct Proofs.ProofOfSignatureShrinked _proof, string _proofCID) internal
-```
-
-### _store
-
-```solidity
-function _store(struct Proofs.ProofOfAgreement _proof, string _proofCID) internal
+function storeProofOfAgreement(struct Proofs.ProofOfAgreement _proof, string _proofCID) external
 ```
 
