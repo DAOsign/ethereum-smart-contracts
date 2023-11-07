@@ -219,16 +219,18 @@ contract ProofsBase is Proofs, Initializable, Ownable {
         // Not needed as we use _proof.agreementFileProofCID later to get Proof-of-Signatures CIDs
         // require(_proof.agreementFileProofCID.length() == 46, 'Invalid Proof-of-Authority CID');
 
-        for (uint256 i = 0; i < _proof.agreementSignProofs.length; i++) {
-            require(
-                _proof.agreementSignProofs[i].proofCID.length() == 46,
-                'Invalid Proof-of-Signature CID'
-            );
-        }
-        require(
-            _proof.timestamp <= block.timestamp && _proof.timestamp >= block.timestamp - 3 hours,
-            'Invalid timestamp'
-        );
+        // Not needed. Proof-of-Signature CIDs will be verified later on in the function
+        // for (uint256 i = 0; i < _proof.agreementSignProofs.length; i++) {
+        //     require(
+        //         _proof.agreementSignProofs[i].proofCID.length() == 46,
+        //         'Invalid Proof-of-Signature CID'
+        //     );
+        // }
+        // Not needed. Timestamp will be verified later on in the function
+        // require(
+        //     _proof.timestamp <= block.timestamp && _proof.timestamp >= block.timestamp - 3 hours,
+        //     'Invalid timestamp'
+        // );
 
         // Check that Proof-of-Authority actually exists and we have all Proofs-of-Signatures for all of the signers in
         // agreement
@@ -275,7 +277,7 @@ contract ProofsBase is Proofs, Initializable, Ownable {
         proofs[_proofCID] = abi.encode(
             ProofOfAuthorityShrinked(_proof.sig, _proof.version, _proof.message)
         );
-        emit NewProofOfAuthority(_proof);
+        emit NewProofOfAuthority(_proof, _proofCID);
     }
 
     function _store(
@@ -286,7 +288,7 @@ contract ProofsBase is Proofs, Initializable, Ownable {
             ProofOfSignatureShrinked(_proof.sig, _proof.version, _proof.message)
         );
         proofsOfSignatureCIDs[_proof.message.agreementFileProofCID].push(_proofCID);
-        emit NewProofOfSignature(_proof);
+        emit NewProofOfSignature(_proof, _proofCID);
     }
 
     function _store(ProofOfAgreement memory _proof, string memory _proofCID) internal override {
@@ -298,6 +300,6 @@ contract ProofsBase is Proofs, Initializable, Ownable {
                 _proof.metadata
             )
         );
-        emit NewProofOfAgreement(_proof);
+        emit NewProofOfAgreement(_proof, _proofCID);
     }
 }

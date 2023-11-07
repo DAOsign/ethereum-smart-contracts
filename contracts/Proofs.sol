@@ -54,9 +54,9 @@ abstract contract Proofs {
         string metadata;
     }
 
-    event NewProofOfAuthority(ProofOfAuthorityShrinked indexed proof);
-    event NewProofOfSignature(ProofOfSignatureShrinked indexed proof);
-    event NewProofOfAgreement(ProofOfAgreement indexed proof);
+    event NewProofOfAuthority(ProofOfAuthorityShrinked indexed proof, string indexed proofCID);
+    event NewProofOfSignature(ProofOfSignatureShrinked indexed proof, string indexed proofCID);
+    event NewProofOfAgreement(ProofOfAgreement indexed proof, string indexed proofCID);
 
     event DomainHashUpdated(EIP712Domain indexed domain);
     event EIP712DomainTypeHashUpdated(string indexed eip712DomainTypeHash);

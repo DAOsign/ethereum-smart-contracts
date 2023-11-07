@@ -87,19 +87,19 @@ struct ProofOfAgreement {
 ### NewProofOfAuthority
 
 ```solidity
-event NewProofOfAuthority(struct Proofs.ProofOfAuthorityShrinked proof)
+event NewProofOfAuthority(struct Proofs.ProofOfAuthorityShrinked proof, string proofCID)
 ```
 
 ### NewProofOfSignature
 
 ```solidity
-event NewProofOfSignature(struct Proofs.ProofOfSignatureShrinked proof)
+event NewProofOfSignature(struct Proofs.ProofOfSignatureShrinked proof, string proofCID)
 ```
 
 ### NewProofOfAgreement
 
 ```solidity
-event NewProofOfAgreement(struct Proofs.ProofOfAgreement proof)
+event NewProofOfAgreement(struct Proofs.ProofOfAgreement proof, string proofCID)
 ```
 
 ### DomainHashUpdated
