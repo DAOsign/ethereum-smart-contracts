@@ -144,64 +144,64 @@ event AgrSignProofTypeHashUpdated(string agrSignProofTypeHash)
 event ProofAgreementTypeHashUpdated(string proofAgreementTypeHash)
 ```
 
-### recover
+### _recover
 
 ```solidity
-function recover(struct Proofs.ProofOfAuthorityMsg message, bytes signature) public view virtual returns (address)
+function _recover(struct Proofs.ProofOfAuthorityMsg message, bytes signature) public view virtual returns (address)
 ```
 
-### recover
+### _recover
 
 ```solidity
-function recover(struct Proofs.ProofOfSignatureMsg message, bytes signature) public view virtual returns (address)
+function _recover(struct Proofs.ProofOfSignatureMsg message, bytes signature) public view virtual returns (address)
 ```
 
-### hash
+### _hash
 
 ```solidity
-function hash(struct Proofs.EIP712Domain _input) internal view virtual returns (bytes32)
+function _hash(struct Proofs.EIP712Domain _input) internal view virtual returns (bytes32)
 ```
 
-### hash
+### _hash
 
 ```solidity
-function hash(struct Proofs.Signer _input) internal view virtual returns (bytes32)
+function _hash(struct Proofs.Signer _input) internal view virtual returns (bytes32)
 ```
 
-### hash
+### _hash
 
 ```solidity
-function hash(struct Proofs.Signer[] _input) internal view virtual returns (bytes32)
+function _hash(struct Proofs.Signer[] _input) internal view virtual returns (bytes32)
 ```
 
-### hash
+### _hash
 
 ```solidity
-function hash(struct Proofs.ProofOfAuthorityMsg _input) internal view virtual returns (bytes32)
+function _hash(struct Proofs.ProofOfAuthorityMsg _input) internal view virtual returns (bytes32)
 ```
 
-### hash
+### _hash
 
 ```solidity
-function hash(struct Proofs.ProofOfSignatureMsg _input) internal view virtual returns (bytes32)
+function _hash(struct Proofs.ProofOfSignatureMsg _input) internal view virtual returns (bytes32)
 ```
 
-### hash
+### _hash
 
 ```solidity
-function hash(struct Proofs.AgreementSignProof _input) internal view virtual returns (bytes32)
+function _hash(struct Proofs.AgreementSignProof _input) internal view virtual returns (bytes32)
 ```
 
-### hash
+### _hash
 
 ```solidity
-function hash(struct Proofs.AgreementSignProof[] _input) internal view virtual returns (bytes32)
+function _hash(struct Proofs.AgreementSignProof[] _input) internal view virtual returns (bytes32)
 ```
 
-### hash
+### _hash
 
 ```solidity
-function hash(struct Proofs.ProofOfAgreement _input) internal view virtual returns (bytes32)
+function _hash(struct Proofs.ProofOfAgreement _input) internal view virtual returns (bytes32)
 ```
 
 ### _validate

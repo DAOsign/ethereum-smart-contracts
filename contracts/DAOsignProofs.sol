@@ -34,9 +34,10 @@ contract DAOsignProofs is ProofsBase {
         string memory _proofCID
     ) external {
         require(_proofCID.length() == 46, 'Invalid proof CID');
-        require(recover(_proof.message, _proof.sig) == _proof.message.from, 'Invalid signature');
+        require(_recover(_proof.message, _proof.sig) == _proof.message.from, 'Invalid signature');
         require(_validate(_proof), 'Invalid input params');
         _store(_proof, _proofCID);
+        // TODO: emit
     }
 
     function storeProofOfSignature(
@@ -44,9 +45,10 @@ contract DAOsignProofs is ProofsBase {
         string memory _proofCID
     ) external {
         require(_proofCID.length() == 46, 'Invalid proof CID');
-        require(recover(_proof.message, _proof.sig) == _proof.message.signer, 'Invalid signature');
+        require(_recover(_proof.message, _proof.sig) == _proof.message.signer, 'Invalid signature');
         require(_validate(_proof), 'Invalid input params');
         _store(_proof, _proofCID);
+        // TODO: emit
     }
 
     // TODO: call this function automatically once the last Proof-of-Signature is generated
@@ -57,5 +59,6 @@ contract DAOsignProofs is ProofsBase {
         require(_proofCID.length() == 46, 'Invalid proof CID');
         require(_validate(_proof), 'Invalid input params');
         _store(_proof, _proofCID);
+        // TODO: emit
     }
 }

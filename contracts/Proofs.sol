@@ -66,31 +66,31 @@ abstract contract Proofs {
     event AgrSignProofTypeHashUpdated(string indexed agrSignProofTypeHash);
     event ProofAgreementTypeHashUpdated(string indexed proofAgreementTypeHash);
 
-    function recover(
+    function _recover(
         ProofOfAuthorityMsg memory message,
         bytes memory signature
     ) public view virtual returns (address);
 
-    function recover(
+    function _recover(
         ProofOfSignatureMsg memory message,
         bytes memory signature
     ) public view virtual returns (address);
 
-    function hash(EIP712Domain memory _input) internal view virtual returns (bytes32);
+    function _hash(EIP712Domain memory _input) internal view virtual returns (bytes32);
 
-    function hash(Signer memory _input) internal view virtual returns (bytes32);
+    function _hash(Signer memory _input) internal view virtual returns (bytes32);
 
-    function hash(Signer[] memory _input) internal view virtual returns (bytes32);
+    function _hash(Signer[] memory _input) internal view virtual returns (bytes32);
 
-    function hash(ProofOfAuthorityMsg memory _input) internal view virtual returns (bytes32);
+    function _hash(ProofOfAuthorityMsg memory _input) internal view virtual returns (bytes32);
 
-    function hash(ProofOfSignatureMsg memory _input) internal view virtual returns (bytes32);
+    function _hash(ProofOfSignatureMsg memory _input) internal view virtual returns (bytes32);
 
-    function hash(AgreementSignProof memory _input) internal view virtual returns (bytes32);
+    function _hash(AgreementSignProof memory _input) internal view virtual returns (bytes32);
 
-    function hash(AgreementSignProof[] memory _input) internal view virtual returns (bytes32);
+    function _hash(AgreementSignProof[] memory _input) internal view virtual returns (bytes32);
 
-    function hash(ProofOfAgreement memory _input) internal view virtual returns (bytes32);
+    function _hash(ProofOfAgreement memory _input) internal view virtual returns (bytes32);
 
     function _validate(ProofOfAuthorityShrinked memory) internal view virtual returns (bool);
 
