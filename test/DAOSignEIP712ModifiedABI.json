@@ -1,0 +1,758 @@
+[
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "string",
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "version",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "chainId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "verifyingContract",
+            "type": "address"
+          }
+        ],
+        "internalType": "struct EIP712Domain",
+        "name": "_domain",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [],
+    "name": "getDomainHash",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "string",
+            "name": "agreementCID",
+            "type": "string"
+          },
+          {
+            "internalType": "string[]",
+            "name": "signatureCIDs",
+            "type": "string[]"
+          },
+          {
+            "internalType": "string",
+            "name": "app",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "metadata",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct ProofOfAgreement",
+        "name": "message",
+        "type": "tuple"
+      }
+    ],
+    "name": "getProofOfAgreementMessage",
+    "outputs": [
+      {
+        "components": [
+          {
+            "components": [
+              {
+                "components": [
+                  {
+                    "internalType": "string",
+                    "name": "name",
+                    "type": "string"
+                  },
+                  {
+                    "internalType": "string",
+                    "name": "type",
+                    "type": "string"
+                  }
+                ],
+                "internalType": "struct EIP712PropertyType[4]",
+                "name": "EIP712Domain",
+                "type": "tuple[4]"
+              },
+              {
+                "components": [
+                  {
+                    "internalType": "string",
+                    "name": "name",
+                    "type": "string"
+                  },
+                  {
+                    "internalType": "string",
+                    "name": "type",
+                    "type": "string"
+                  }
+                ],
+                "internalType": "struct EIP712PropertyType[5]",
+                "name": "ProofOfAgreement",
+                "type": "tuple[5]"
+              }
+            ],
+            "internalType": "struct EIP712ProofOfAgreementTypes",
+            "name": "types",
+            "type": "tuple"
+          },
+          {
+            "components": [
+              {
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "version",
+                "type": "string"
+              },
+              {
+                "internalType": "uint256",
+                "name": "chainId",
+                "type": "uint256"
+              },
+              {
+                "internalType": "address",
+                "name": "verifyingContract",
+                "type": "address"
+              }
+            ],
+            "internalType": "struct EIP712Domain",
+            "name": "domain",
+            "type": "tuple"
+          },
+          {
+            "internalType": "string",
+            "name": "primaryType",
+            "type": "string"
+          },
+          {
+            "components": [
+              {
+                "internalType": "string",
+                "name": "agreementCID",
+                "type": "string"
+              },
+              {
+                "internalType": "string[]",
+                "name": "signatureCIDs",
+                "type": "string[]"
+              },
+              {
+                "internalType": "string",
+                "name": "app",
+                "type": "string"
+              },
+              {
+                "internalType": "uint256",
+                "name": "timestamp",
+                "type": "uint256"
+              },
+              {
+                "internalType": "string",
+                "name": "metadata",
+                "type": "string"
+              }
+            ],
+            "internalType": "struct ProofOfAgreement",
+            "name": "message",
+            "type": "tuple"
+          }
+        ],
+        "internalType": "struct EIP712ProofOfAgreement",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "string",
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "internalType": "address",
+            "name": "from",
+            "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "agreementCID",
+            "type": "string"
+          },
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "addr",
+                "type": "address"
+              },
+              {
+                "internalType": "string",
+                "name": "metadata",
+                "type": "string"
+              }
+            ],
+            "internalType": "struct Signer[]",
+            "name": "signers",
+            "type": "tuple[]"
+          },
+          {
+            "internalType": "string",
+            "name": "app",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "metadata",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct ProofOfAuthority",
+        "name": "message",
+        "type": "tuple"
+      }
+    ],
+    "name": "getProofOfAuthorityMessage",
+    "outputs": [
+      {
+        "components": [
+          {
+            "components": [
+              {
+                "components": [
+                  {
+                    "internalType": "string",
+                    "name": "name",
+                    "type": "string"
+                  },
+                  {
+                    "internalType": "string",
+                    "name": "type",
+                    "type": "string"
+                  }
+                ],
+                "internalType": "struct EIP712PropertyType[4]",
+                "name": "EIP712Domain",
+                "type": "tuple[4]"
+              },
+              {
+                "components": [
+                  {
+                    "internalType": "string",
+                    "name": "name",
+                    "type": "string"
+                  },
+                  {
+                    "internalType": "string",
+                    "name": "type",
+                    "type": "string"
+                  }
+                ],
+                "internalType": "struct EIP712PropertyType[2]",
+                "name": "Signer",
+                "type": "tuple[2]"
+              },
+              {
+                "components": [
+                  {
+                    "internalType": "string",
+                    "name": "name",
+                    "type": "string"
+                  },
+                  {
+                    "internalType": "string",
+                    "name": "type",
+                    "type": "string"
+                  }
+                ],
+                "internalType": "struct EIP712PropertyType[7]",
+                "name": "ProofOfAuthority",
+                "type": "tuple[7]"
+              }
+            ],
+            "internalType": "struct EIP712ProofOfAuthorityTypes",
+            "name": "types",
+            "type": "tuple"
+          },
+          {
+            "components": [
+              {
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "version",
+                "type": "string"
+              },
+              {
+                "internalType": "uint256",
+                "name": "chainId",
+                "type": "uint256"
+              },
+              {
+                "internalType": "address",
+                "name": "verifyingContract",
+                "type": "address"
+              }
+            ],
+            "internalType": "struct EIP712Domain",
+            "name": "domain",
+            "type": "tuple"
+          },
+          {
+            "internalType": "string",
+            "name": "primaryType",
+            "type": "string"
+          },
+          {
+            "components": [
+              {
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
+              },
+              {
+                "internalType": "address",
+                "name": "from",
+                "type": "address"
+              },
+              {
+                "internalType": "string",
+                "name": "agreementCID",
+                "type": "string"
+              },
+              {
+                "components": [
+                  {
+                    "internalType": "address",
+                    "name": "addr",
+                    "type": "address"
+                  },
+                  {
+                    "internalType": "string",
+                    "name": "metadata",
+                    "type": "string"
+                  }
+                ],
+                "internalType": "struct Signer[]",
+                "name": "signers",
+                "type": "tuple[]"
+              },
+              {
+                "internalType": "string",
+                "name": "app",
+                "type": "string"
+              },
+              {
+                "internalType": "uint256",
+                "name": "timestamp",
+                "type": "uint256"
+              },
+              {
+                "internalType": "string",
+                "name": "metadata",
+                "type": "string"
+              }
+            ],
+            "internalType": "struct ProofOfAuthority",
+            "name": "message",
+            "type": "tuple"
+          }
+        ],
+        "internalType": "struct EIP712ProofOfAuthority",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "string",
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "internalType": "address",
+            "name": "signer",
+            "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "agreementCID",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "app",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "metadata",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct ProofOfSignature",
+        "name": "message",
+        "type": "tuple"
+      }
+    ],
+    "name": "getProofOfSignatureMessage",
+    "outputs": [
+      {
+        "components": [
+          {
+            "components": [
+              {
+                "components": [
+                  {
+                    "internalType": "string",
+                    "name": "name",
+                    "type": "string"
+                  },
+                  {
+                    "internalType": "string",
+                    "name": "type",
+                    "type": "string"
+                  }
+                ],
+                "internalType": "struct EIP712PropertyType[4]",
+                "name": "EIP712Domain",
+                "type": "tuple[4]"
+              },
+              {
+                "components": [
+                  {
+                    "internalType": "string",
+                    "name": "name",
+                    "type": "string"
+                  },
+                  {
+                    "internalType": "string",
+                    "name": "type",
+                    "type": "string"
+                  }
+                ],
+                "internalType": "struct EIP712PropertyType[6]",
+                "name": "ProofOfSignature",
+                "type": "tuple[6]"
+              }
+            ],
+            "internalType": "struct EIP712ProofOfSignatureTypes",
+            "name": "types",
+            "type": "tuple"
+          },
+          {
+            "components": [
+              {
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "version",
+                "type": "string"
+              },
+              {
+                "internalType": "uint256",
+                "name": "chainId",
+                "type": "uint256"
+              },
+              {
+                "internalType": "address",
+                "name": "verifyingContract",
+                "type": "address"
+              }
+            ],
+            "internalType": "struct EIP712Domain",
+            "name": "domain",
+            "type": "tuple"
+          },
+          {
+            "internalType": "string",
+            "name": "primaryType",
+            "type": "string"
+          },
+          {
+            "components": [
+              {
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
+              },
+              {
+                "internalType": "address",
+                "name": "signer",
+                "type": "address"
+              },
+              {
+                "internalType": "string",
+                "name": "agreementCID",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "app",
+                "type": "string"
+              },
+              {
+                "internalType": "uint256",
+                "name": "timestamp",
+                "type": "uint256"
+              },
+              {
+                "internalType": "string",
+                "name": "metadata",
+                "type": "string"
+              }
+            ],
+            "internalType": "struct ProofOfSignature",
+            "name": "message",
+            "type": "tuple"
+          }
+        ],
+        "internalType": "struct EIP712ProofOfSignature",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "string",
+            "name": "agreementCID",
+            "type": "string"
+          },
+          {
+            "internalType": "string[]",
+            "name": "signatureCIDs",
+            "type": "string[]"
+          },
+          {
+            "internalType": "string",
+            "name": "app",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "metadata",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct ProofOfAgreement",
+        "name": "message",
+        "type": "tuple"
+      },
+      {
+        "internalType": "bytes",
+        "name": "signature",
+        "type": "bytes"
+      }
+    ],
+    "name": "recoverProofOfAgreement",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "string",
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "internalType": "address",
+            "name": "from",
+            "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "agreementCID",
+            "type": "string"
+          },
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "addr",
+                "type": "address"
+              },
+              {
+                "internalType": "string",
+                "name": "metadata",
+                "type": "string"
+              }
+            ],
+            "internalType": "struct Signer[]",
+            "name": "signers",
+            "type": "tuple[]"
+          },
+          {
+            "internalType": "string",
+            "name": "app",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "metadata",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct ProofOfAuthority",
+        "name": "message",
+        "type": "tuple"
+      },
+      {
+        "internalType": "bytes",
+        "name": "signature",
+        "type": "bytes"
+      }
+    ],
+    "name": "recoverProofOfAuthority",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "string",
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "internalType": "address",
+            "name": "signer",
+            "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "agreementCID",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "app",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "metadata",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct ProofOfSignature",
+        "name": "message",
+        "type": "tuple"
+      },
+      {
+        "internalType": "bytes",
+        "name": "signature",
+        "type": "bytes"
+      }
+    ],
+    "name": "recoverProofOfSignature",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]
