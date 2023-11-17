@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import { Result } from 'ethers';
 import { SignTypedDataVersion, signTypedData } from '@metamask/eth-sig-util';
 import {
+  EIP712PropertyTypeStructOutput,
   ProofOfAuthorityStruct,
   ProofOfSignatureStruct,
   ProofOfAgreementStruct,
@@ -19,7 +20,10 @@ export function paddRigthStr(value: string, ln: number = 46): string {
   );
 }
 
-export function cmp(act: Result, exp: Array<{ name: string; type: string }>) {
+export function cmp(
+  act: Array<EIP712PropertyTypeStructOutput>,
+  exp: Array<{ name: string; type: string }>,
+) {
   expect(act.length).eq(exp.length);
   for (let i = 0; i < exp.length; i++) {
     expect(exp[i].name).eq(act[i].name);

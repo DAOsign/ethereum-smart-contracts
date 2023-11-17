@@ -2,9 +2,7 @@ import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers';
 import { expect } from 'chai';
 import { ethers, config } from 'hardhat';
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
-import { Contract, Result } from 'ethers';
 import { HardhatNetworkHDAccountsConfig } from 'hardhat/types';
-import DAOSignEIP712ABI from './DAOSignEIP712ModifiedABI.json';
 import {
   EIP712DomainStruct,
   ProofOfAuthorityStruct,
@@ -27,8 +25,7 @@ describe('DAOSignEIP712', function () {
   let mocks: {
     privateKey: Buffer;
     signer: HardhatEthersSigner;
-    proofs: MockDAOSignEIP712;
-    mproofs: Contract;
+    app: MockDAOSignEIP712;
   };
 
   async function deployProofsFixture() {
@@ -36,7 +33,6 @@ describe('DAOSignEIP712', function () {
       ethers.getSigners(),
       ethers.getContractFactory('MockDAOSignEIP712'),
     ]);
-    const daoSignEIP712 = await DAOSignEIP712.deploy(domain);
 
     const accounts = config.networks.hardhat.accounts as HardhatNetworkHDAccountsConfig;
     const wallet = ethers.Wallet.fromPhrase(accounts.mnemonic);
@@ -45,8 +41,7 @@ describe('DAOSignEIP712', function () {
     return {
       privateKey: privateKey,
       signer: signer,
-      proofs: daoSignEIP712,
-      mproofs: new ethers.Contract(await daoSignEIP712.getAddress(), DAOSignEIP712ABI, signer),
+      app: await DAOSignEIP712.deploy(domain),
     };
   }
 
@@ -66,7 +61,7 @@ describe('DAOSignEIP712', function () {
         metadata: 'metadata',
       };
 
-      const eip712msg = (await mocks.mproofs.getProofOfAuthorityMessage(msg)) as Result;
+      const eip712msg = await mocks.app.getProofOfAuthorityMessage(msg);
 
       expect(eip712msg.domain.name).eq(domain.name);
       expect(eip712msg.domain.version).eq(domain.version);
@@ -111,7 +106,7 @@ describe('DAOSignEIP712', function () {
         metadata: 'metadata',
       };
 
-      const eip712msg = (await mocks.mproofs.getProofOfSignatureMessage(msg)) as Result;
+      const eip712msg = await mocks.app.getProofOfSignatureMessage(msg);
 
       expect(eip712msg.domain.name).eq(domain.name);
       expect(eip712msg.domain.version).eq(domain.version);
@@ -147,7 +142,7 @@ describe('DAOSignEIP712', function () {
         metadata: 'metadata',
       };
 
-      const eip712msg = (await mocks.mproofs.getProofOfAgreementMessage(msg)) as Result;
+      const eip712msg = await mocks.app.getProofOfAgreementMessage(msg);
 
       expect(eip712msg.domain.name).eq(domain.name);
       expect(eip712msg.domain.version).eq(domain.version);
@@ -177,7 +172,7 @@ describe('DAOSignEIP712', function () {
 
   describe('EIP712 Recover', function () {
     it('ProofOfAuthority', async function () {
-      const { privateKey, signer, proofs } = mocks;
+      const { privateKey, signer, app } = mocks;
       const message: ProofOfAuthorityStruct = {
         name: 'Proof-of-Authority',
         from: signer.address,
@@ -188,12 +183,12 @@ describe('DAOSignEIP712', function () {
         metadata: 'metadata',
       };
       const signature = signMessage(privateKey, 'ProofOfAuthority', message);
-      const recovered = await proofs.recoverProofOfAuthority(message, signature);
+      const recovered = await app.recoverProofOfAuthority(message, signature);
       expect(recovered).eq(signer.address);
     });
 
     it('ProofOfSignature', async function () {
-      const { privateKey, signer, proofs } = mocks;
+      const { privateKey, signer, app } = mocks;
       const message: ProofOfSignatureStruct = {
         name: 'Proof-of-Signature',
         signer: signer.address,
@@ -203,12 +198,12 @@ describe('DAOSignEIP712', function () {
         metadata: 'metadata',
       };
       const signature = signMessage(privateKey, 'ProofOfSignature', message);
-      const recovered = await proofs.recoverProofOfSignature(message, signature);
+      const recovered = await app.recoverProofOfSignature(message, signature);
       expect(recovered).eq(signer.address);
     });
 
     it('ProofOfAgreement', async function () {
-      const { privateKey, signer, proofs } = mocks;
+      const { privateKey, signer, app } = mocks;
       const message: ProofOfAgreementStruct = {
         agreementCID: 'agreementCID',
         signatureCIDs: ['signatureCID0', 'signatureCID1'],
@@ -217,7 +212,7 @@ describe('DAOSignEIP712', function () {
         metadata: 'metadata',
       };
       const signature = signMessage(privateKey, 'ProofOfAgreement', message);
-      const recovered = await proofs.recoverProofOfAgreement(message, signature);
+      const recovered = await app.recoverProofOfAgreement(message, signature);
       expect(recovered).eq(signer.address);
     });
   });

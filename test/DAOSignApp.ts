@@ -2,11 +2,8 @@ import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers';
 import { expect } from 'chai';
 import { ethers, config } from 'hardhat';
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
-import { Contract, Result } from 'ethers';
 import { HardhatNetworkHDAccountsConfig } from 'hardhat/types';
-import DAOSignAppABI from './DAOSignAppModifiedABI.json';
 import {
-  EIP712DomainStruct,
   ProofOfAuthorityStruct,
   ProofOfSignatureStruct,
   ProofOfAgreementStruct,
@@ -15,12 +12,10 @@ import {
 import { cmp, paddRigthStr, signMessage } from './utils';
 
 describe('DAOSignApp', function () {
-  const ZEROADDR = '0x0000000000000000000000000000000000000000';
   let mocks: {
     privateKey: Buffer;
     signer: HardhatEthersSigner;
-    oapp: DAOSignApp;
-    app: Contract;
+    app: DAOSignApp;
   };
 
   async function deployProofsFixture() {
@@ -28,8 +23,6 @@ describe('DAOSignApp', function () {
       ethers.getSigners(),
       ethers.getContractFactory('DAOSignApp'),
     ]);
-    const daoSignEIP712 = await DAOSignApp.deploy();
-
     const accounts = config.networks.hardhat.accounts as HardhatNetworkHDAccountsConfig;
     const wallet = ethers.Wallet.fromPhrase(accounts.mnemonic);
     const privateKey = Buffer.from(wallet.privateKey.slice(2), 'hex');
@@ -37,8 +30,7 @@ describe('DAOSignApp', function () {
     return {
       privateKey: privateKey,
       signer: signer,
-      oapp: daoSignEIP712,
-      app: new ethers.Contract(await daoSignEIP712.getAddress(), DAOSignAppABI, signer),
+      app: await DAOSignApp.deploy(),
     };
   }
 
@@ -58,7 +50,7 @@ describe('DAOSignApp', function () {
     };
     const sig = signMessage(mocks.privateKey, 'ProofOfAuthority', msg);
 
-    const tx = mocks.oapp.storeProofOfAuthority({
+    const tx = mocks.app.storeProofOfAuthority({
       message: msg,
       signature: sig,
       proofCID: paddRigthStr('ProofOfAuthority proof cid'),
@@ -110,7 +102,7 @@ describe('DAOSignApp', function () {
     };
     const sig = signMessage(mocks.privateKey, 'ProofOfSignature', msg);
 
-    const tx = mocks.oapp.storeProofOfSignature({
+    const tx = mocks.app.storeProofOfSignature({
       message: msg,
       signature: sig,
       proofCID: paddRigthStr('ProofOfSignature proof cid'),
