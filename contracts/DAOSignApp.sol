@@ -126,7 +126,8 @@ contract DAOSignApp is DAOSignEIP712, DAOSignBaseApp {
                 posis[data.message.signatureCIDs[i]].message.signer
             ];
             require(
-                poaus[data.message.agreementCID].message.signers[idx].addr != address(0),
+                poaus[data.message.agreementCID].message.signers[idx].addr ==
+                    posis[data.message.signatureCIDs[i]].message.signer,
                 'Invalid sign proofs'
             );
         }
