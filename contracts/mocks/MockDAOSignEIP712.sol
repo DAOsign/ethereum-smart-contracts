@@ -32,6 +32,18 @@ contract MockDAOSignEIP712 is DAOSignEIP712 {
         return toEIP712Message(message);
     }
 
+    function hashProofOfAuthority(ProofOfAuthority memory message) public pure returns (bytes32) {
+        return hash(message);
+    }
+
+    function hashProofOfSignature(ProofOfSignature memory message) public pure returns (bytes32) {
+        return hash(message);
+    }
+
+    function hashProofOfAgreement(ProofOfAgreement memory message) public pure returns (bytes32) {
+        return hash(message);
+    }
+
     function recoverProofOfAuthority(
         ProofOfAuthority memory message,
         bytes memory signature

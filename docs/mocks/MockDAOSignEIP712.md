@@ -30,6 +30,24 @@ function getProofOfSignatureMessage(struct ProofOfSignature message) public view
 function getProofOfAgreementMessage(struct ProofOfAgreement message) public view returns (struct EIP712ProofOfAgreement)
 ```
 
+### hashProofOfAuthority
+
+```solidity
+function hashProofOfAuthority(struct ProofOfAuthority message) public pure returns (bytes32)
+```
+
+### hashProofOfSignature
+
+```solidity
+function hashProofOfSignature(struct ProofOfSignature message) public pure returns (bytes32)
+```
+
+### hashProofOfAgreement
+
+```solidity
+function hashProofOfAgreement(struct ProofOfAgreement message) public pure returns (bytes32)
+```
+
 ### recoverProofOfAuthority
 
 ```solidity
