@@ -1,140 +1,27 @@
-## IPFS_CID_LENGHT
+## DAOSignApp
+
+### IPFS_CID_LENGHT
 
 ```solidity
 uint256 IPFS_CID_LENGHT
 ```
 
-## SignedProofOfAuthority
-
-```solidity
-struct SignedProofOfAuthority {
-  struct ProofOfAuthority message;
-  bytes signature;
-  string proofCID;
-}
-```
-
-## SignedProofOfAuthorityMsg
-
-```solidity
-struct SignedProofOfAuthorityMsg {
-  struct EIP712ProofOfAuthority message;
-  bytes signature;
-}
-```
-
-## SignedProofOfSignature
-
-```solidity
-struct SignedProofOfSignature {
-  struct ProofOfSignature message;
-  bytes signature;
-  string proofCID;
-}
-```
-
-## SignedProofOfSignatureMsg
-
-```solidity
-struct SignedProofOfSignatureMsg {
-  struct EIP712ProofOfSignature message;
-  bytes signature;
-}
-```
-
-## SignedProofOfAgreement
-
-```solidity
-struct SignedProofOfAgreement {
-  struct ProofOfAgreement message;
-  bytes signature;
-  string proofCID;
-}
-```
-
-## SignedProofOfAgreementMsg
-
-```solidity
-struct SignedProofOfAgreementMsg {
-  struct EIP712ProofOfAgreement message;
-  bytes signature;
-}
-```
-
-## DAOSignBaseApp
-
-### NewProofOfAuthority
-
-```solidity
-event NewProofOfAuthority(struct SignedProofOfAuthority data)
-```
-
-### NewProofOfSignature
-
-```solidity
-event NewProofOfSignature(struct SignedProofOfSignature data)
-```
-
-### NewProofOfAgreement
-
-```solidity
-event NewProofOfAgreement(struct SignedProofOfAgreement data)
-```
-
-### getProofOfAuthority
-
-```solidity
-function getProofOfAuthority(string cid) external view returns (struct SignedProofOfAuthorityMsg)
-```
-
-### getProofOfSignature
-
-```solidity
-function getProofOfSignature(string cid) external view returns (struct SignedProofOfSignatureMsg)
-```
-
-### getProofOfAgreement
-
-```solidity
-function getProofOfAgreement(string cid) external view returns (struct SignedProofOfAgreementMsg)
-```
-
-### storeProofOfAuthority
-
-```solidity
-function storeProofOfAuthority(struct SignedProofOfAuthority data) external
-```
-
-### storeProofOfSignature
-
-```solidity
-function storeProofOfSignature(struct SignedProofOfSignature data) external
-```
-
-### storeProofOfAgreement
-
-```solidity
-function storeProofOfAgreement(struct SignedProofOfAgreement data) external
-```
-
-## DAOSignApp
-
 ### poaus
 
 ```solidity
-mapping(string => struct SignedProofOfAuthority) poaus
+mapping(string => struct DAOSignApp.SignedProofOfAuthority) poaus
 ```
 
 ### posis
 
 ```solidity
-mapping(string => struct SignedProofOfSignature) posis
+mapping(string => struct DAOSignApp.SignedProofOfSignature) posis
 ```
 
 ### poags
 
 ```solidity
-mapping(string => struct SignedProofOfAgreement) poags
+mapping(string => struct DAOSignApp.SignedProofOfAgreement) poags
 ```
 
 ### proof2signer
@@ -147,6 +34,81 @@ mapping(string => address) proof2signer
 
 ```solidity
 mapping(string => mapping(address => uint256)) poauSignersIdx
+```
+
+### NewProofOfAuthority
+
+```solidity
+event NewProofOfAuthority(struct DAOSignApp.SignedProofOfAuthority data)
+```
+
+### NewProofOfSignature
+
+```solidity
+event NewProofOfSignature(struct DAOSignApp.SignedProofOfSignature data)
+```
+
+### NewProofOfAgreement
+
+```solidity
+event NewProofOfAgreement(struct DAOSignApp.SignedProofOfAgreement data)
+```
+
+### SignedProofOfAuthority
+
+```solidity
+struct SignedProofOfAuthority {
+  struct DAOSignEIP712.ProofOfAuthority message;
+  bytes signature;
+  string proofCID;
+}
+```
+
+### SignedProofOfAuthorityMsg
+
+```solidity
+struct SignedProofOfAuthorityMsg {
+  struct DAOSignEIP712.EIP712ProofOfAuthority message;
+  bytes signature;
+}
+```
+
+### SignedProofOfSignature
+
+```solidity
+struct SignedProofOfSignature {
+  struct DAOSignEIP712.ProofOfSignature message;
+  bytes signature;
+  string proofCID;
+}
+```
+
+### SignedProofOfSignatureMsg
+
+```solidity
+struct SignedProofOfSignatureMsg {
+  struct DAOSignEIP712.EIP712ProofOfSignature message;
+  bytes signature;
+}
+```
+
+### SignedProofOfAgreement
+
+```solidity
+struct SignedProofOfAgreement {
+  struct DAOSignEIP712.ProofOfAgreement message;
+  bytes signature;
+  string proofCID;
+}
+```
+
+### SignedProofOfAgreementMsg
+
+```solidity
+struct SignedProofOfAgreementMsg {
+  struct DAOSignEIP712.EIP712ProofOfAgreement message;
+  bytes signature;
+}
 ```
 
 ### constructor
@@ -170,54 +132,54 @@ function strcmp(string a, string b) internal pure returns (bool)
 ### validate
 
 ```solidity
-function validate(struct SignedProofOfAuthority data) internal pure returns (bool)
+function validate(struct DAOSignApp.SignedProofOfAuthority data) internal pure returns (bool)
 ```
 
 ### validate
 
 ```solidity
-function validate(struct SignedProofOfSignature data) internal view returns (bool)
+function validate(struct DAOSignApp.SignedProofOfSignature data) internal view returns (bool)
 ```
 
 ### validate
 
 ```solidity
-function validate(struct SignedProofOfAgreement data) internal view returns (bool)
+function validate(struct DAOSignApp.SignedProofOfAgreement data) internal view returns (bool)
 ```
 
 ### storeProofOfAuthority
 
 ```solidity
-function storeProofOfAuthority(struct SignedProofOfAuthority data) external
+function storeProofOfAuthority(struct DAOSignApp.SignedProofOfAuthority data) external
 ```
 
 ### storeProofOfSignature
 
 ```solidity
-function storeProofOfSignature(struct SignedProofOfSignature data) external
+function storeProofOfSignature(struct DAOSignApp.SignedProofOfSignature data) external
 ```
 
 ### storeProofOfAgreement
 
 ```solidity
-function storeProofOfAgreement(struct SignedProofOfAgreement data) external
+function storeProofOfAgreement(struct DAOSignApp.SignedProofOfAgreement data) external
 ```
 
 ### getProofOfAuthority
 
 ```solidity
-function getProofOfAuthority(string cid) external view returns (struct SignedProofOfAuthorityMsg)
+function getProofOfAuthority(string cid) external view returns (struct DAOSignApp.SignedProofOfAuthorityMsg)
 ```
 
 ### getProofOfSignature
 
 ```solidity
-function getProofOfSignature(string cid) external view returns (struct SignedProofOfSignatureMsg)
+function getProofOfSignature(string cid) external view returns (struct DAOSignApp.SignedProofOfSignatureMsg)
 ```
 
 ### getProofOfAgreement
 
 ```solidity
-function getProofOfAgreement(string cid) external view returns (struct SignedProofOfAgreementMsg)
+function getProofOfAgreement(string cid) external view returns (struct DAOSignApp.SignedProofOfAgreementMsg)
 ```
 

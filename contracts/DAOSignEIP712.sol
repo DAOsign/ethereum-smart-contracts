@@ -47,113 +47,111 @@ pragma solidity ^0.8.19;
  * }
  * */
 
-bytes32 constant EIP712DOMAIN_TYPEHASH = keccak256(
-    'EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)'
-);
-
-struct EIP712Domain {
-    string name;
-    string version;
-    uint256 chainId;
-    address verifyingContract;
-}
-
-bytes32 constant SIGNER_TYPEHASH = keccak256('Signer(address addr,string metadata)');
-
-struct Signer {
-    address addr;
-    string metadata;
-}
-
-bytes32 constant PROOF_OF_AUTHORITY_TYPEHASH = keccak256(
-    'ProofOfAuthority(string name,address from,string agreementCID,Signer[] signers,string app,uint256 timestamp,string metadata)Signer(address addr,string metadata)'
-);
-
-struct ProofOfAuthority {
-    string name;
-    address from;
-    string agreementCID;
-    Signer[] signers;
-    string app;
-    uint256 timestamp;
-    string metadata;
-}
-
-bytes32 constant PROOF_OF_SIGNATURE_TYPEHASH = keccak256(
-    'ProofOfSignature(string name,address signer,string agreementCID,string app,uint256 timestamp,string metadata)'
-);
-
-struct ProofOfSignature {
-    string name;
-    address signer;
-    string agreementCID;
-    string app;
-    uint256 timestamp;
-    string metadata;
-}
-
-bytes32 constant PROOF_OF_AGREEMENT_TYPEHASH = keccak256(
-    'ProofOfAgreement(string agreementCID,string[] signatureCIDs,string app,uint256 timestamp,string metadata)'
-);
-
-struct ProofOfAgreement {
-    string agreementCID;
-    string[] signatureCIDs;
-    string app;
-    uint256 timestamp;
-    string metadata;
-}
-
-struct EIP712PropertyType {
-    string name;
-    string kind;
-}
-
-struct EIP712ProofOfAuthorityTypes {
-    EIP712PropertyType[4] EIP712Domain;
-    EIP712PropertyType[2] Signer;
-    EIP712PropertyType[7] ProofOfAuthority;
-}
-
-struct EIP712ProofOfAuthority {
-    EIP712ProofOfAuthorityTypes types;
-    EIP712Domain domain;
-    string primaryType;
-    ProofOfAuthority message;
-}
-
-struct EIP712ProofOfSignatureTypes {
-    EIP712PropertyType[4] EIP712Domain;
-    EIP712PropertyType[6] ProofOfSignature;
-}
-
-struct EIP712ProofOfSignature {
-    EIP712ProofOfSignatureTypes types;
-    EIP712Domain domain;
-    string primaryType;
-    ProofOfSignature message;
-}
-
-struct EIP712ProofOfAgreementTypes {
-    EIP712PropertyType[4] EIP712Domain;
-    EIP712PropertyType[5] ProofOfAgreement;
-}
-
-struct EIP712ProofOfAgreement {
-    EIP712ProofOfAgreementTypes types;
-    EIP712Domain domain;
-    string primaryType;
-    ProofOfAgreement message;
-}
-
 contract DAOSignEIP712 {
+    bytes32 constant EIP712DOMAIN_TYPEHASH =
+        keccak256(
+            'EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)'
+        );
+    bytes32 constant SIGNER_TYPEHASH = keccak256('Signer(address addr,string metadata)');
+    bytes32 constant PROOF_OF_AUTHORITY_TYPEHASH =
+        keccak256(
+            'ProofOfAuthority(string name,address from,string agreementCID,Signer[] signers,string app,uint256 timestamp,string metadata)Signer(address addr,string metadata)'
+        );
+    bytes32 constant PROOF_OF_SIGNATURE_TYPEHASH =
+        keccak256(
+            'ProofOfSignature(string name,address signer,string agreementCID,string app,uint256 timestamp,string metadata)'
+        );
+    bytes32 constant PROOF_OF_AGREEMENT_TYPEHASH =
+        keccak256(
+            'ProofOfAgreement(string agreementCID,string[] signatureCIDs,string app,uint256 timestamp,string metadata)'
+        );
+
     bytes32 DOMAIN_HASH;
-
     EIP712Domain domain;
-
     EIP712ProofOfAuthority proofOfAuthorityDoc;
     EIP712ProofOfSignature proofOfSignatureDoc;
     EIP712ProofOfAgreement proofOfAgreementDoc;
+
+    struct EIP712Domain {
+        string name;
+        string version;
+        uint256 chainId;
+        address verifyingContract;
+    }
+
+    struct Signer {
+        address addr;
+        string metadata;
+    }
+
+    struct ProofOfAuthority {
+        string name;
+        address from;
+        string agreementCID;
+        Signer[] signers;
+        string app;
+        uint256 timestamp;
+        string metadata;
+    }
+
+    struct ProofOfSignature {
+        string name;
+        address signer;
+        string agreementCID;
+        string app;
+        uint256 timestamp;
+        string metadata;
+    }
+
+    struct ProofOfAgreement {
+        string agreementCID;
+        string[] signatureCIDs;
+        string app;
+        uint256 timestamp;
+        string metadata;
+    }
+
+    struct EIP712PropertyType {
+        string name;
+        string kind;
+    }
+
+    struct EIP712ProofOfAuthorityTypes {
+        EIP712PropertyType[4] EIP712Domain;
+        EIP712PropertyType[2] Signer;
+        EIP712PropertyType[7] ProofOfAuthority;
+    }
+
+    struct EIP712ProofOfAuthority {
+        EIP712ProofOfAuthorityTypes types;
+        EIP712Domain domain;
+        string primaryType;
+        ProofOfAuthority message;
+    }
+
+    struct EIP712ProofOfSignatureTypes {
+        EIP712PropertyType[4] EIP712Domain;
+        EIP712PropertyType[6] ProofOfSignature;
+    }
+
+    struct EIP712ProofOfSignature {
+        EIP712ProofOfSignatureTypes types;
+        EIP712Domain domain;
+        string primaryType;
+        ProofOfSignature message;
+    }
+
+    struct EIP712ProofOfAgreementTypes {
+        EIP712PropertyType[4] EIP712Domain;
+        EIP712PropertyType[5] ProofOfAgreement;
+    }
+
+    struct EIP712ProofOfAgreement {
+        EIP712ProofOfAgreementTypes types;
+        EIP712Domain domain;
+        string primaryType;
+        ProofOfAgreement message;
+    }
 
     function initEIP712Types() internal {
         EIP712PropertyType memory domain0Doc = EIP712PropertyType({ name: 'name', kind: 'string' });

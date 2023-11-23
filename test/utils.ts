@@ -82,7 +82,7 @@ export function signMessage(
           { name: 'metadata', type: 'string' },
         ],
       },
-      primaryType: primaryType,
+      primaryType,
       message,
     },
   });
