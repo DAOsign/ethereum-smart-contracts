@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.19;
 
-import './DAOSignEIP712.sol';
+import { DAOSignEIP712 } from './DAOSignEIP712.sol';
 
 contract DAOSignApp is DAOSignEIP712 {
-    uint constant IPFS_CID_LENGHT = 46;
+    uint256 internal constant IPFS_CID_LENGHT = 46;
 
-    mapping(string => SignedProofOfAuthority) poaus;
-    mapping(string => SignedProofOfSignature) posis;
-    mapping(string => SignedProofOfAgreement) poags;
-    mapping(string => address) proof2signer;
-    mapping(string => mapping(address => uint256)) poauSignersIdx;
+    mapping(string => SignedProofOfAuthority) internal poaus;
+    mapping(string => SignedProofOfSignature) internal posis;
+    mapping(string => SignedProofOfAgreement) internal poags;
+    mapping(string => address) internal proof2signer;
+    mapping(string => mapping(address => uint256)) internal poauSignersIdx;
 
     event NewProofOfAuthority(SignedProofOfAuthority indexed data);
     event NewProofOfSignature(SignedProofOfSignature indexed data);
