@@ -3,71 +3,51 @@ pragma solidity ^0.8.19;
 
 import './DAOSignEIP712.sol';
 
-uint constant IPFS_CID_LENGHT = 46;
+contract DAOSignApp is DAOSignEIP712 {
+    uint constant IPFS_CID_LENGHT = 46;
 
-struct SignedProofOfAuthority {
-    ProofOfAuthority message;
-    bytes signature;
-    string proofCID;
-}
-
-struct SignedProofOfAuthorityMsg {
-    EIP712ProofOfAuthority message;
-    bytes signature;
-}
-
-struct SignedProofOfSignature {
-    ProofOfSignature message;
-    bytes signature;
-    string proofCID;
-}
-
-struct SignedProofOfSignatureMsg {
-    EIP712ProofOfSignature message;
-    bytes signature;
-}
-
-struct SignedProofOfAgreement {
-    ProofOfAgreement message;
-    bytes signature;
-    string proofCID;
-}
-
-struct SignedProofOfAgreementMsg {
-    EIP712ProofOfAgreement message;
-    bytes signature;
-}
-
-interface DAOSignBaseApp {
-    event NewProofOfAuthority(SignedProofOfAuthority indexed data);
-    event NewProofOfSignature(SignedProofOfSignature indexed data);
-    event NewProofOfAgreement(SignedProofOfAgreement indexed data);
-
-    function getProofOfAuthority(
-        string memory cid
-    ) external view returns (SignedProofOfAuthorityMsg memory);
-
-    function getProofOfSignature(
-        string memory cid
-    ) external view returns (SignedProofOfSignatureMsg memory);
-
-    function getProofOfAgreement(
-        string memory cid
-    ) external view returns (SignedProofOfAgreementMsg memory);
-
-    function storeProofOfAuthority(SignedProofOfAuthority memory data) external;
-
-    function storeProofOfSignature(SignedProofOfSignature memory data) external;
-
-    function storeProofOfAgreement(SignedProofOfAgreement memory data) external;
-}
-
-contract DAOSignApp is DAOSignEIP712, DAOSignBaseApp {
     mapping(string => SignedProofOfAuthority) poaus;
     mapping(string => SignedProofOfSignature) posis;
     mapping(string => SignedProofOfAgreement) poags;
     mapping(string => address) proof2signer;
     mapping(string => mapping(address => uint256)) poauSignersIdx;
+
+    event NewProofOfAuthority(SignedProofOfAuthority indexed data);
+    event NewProofOfSignature(SignedProofOfSignature indexed data);
+    event NewProofOfAgreement(SignedProofOfAgreement indexed data);
+
+    struct SignedProofOfAuthority {
+        ProofOfAuthority message;
+        bytes signature;
+        string proofCID;
+    }
+
+    struct SignedProofOfAuthorityMsg {
+        EIP712ProofOfAuthority message;
+        bytes signature;
+    }
+
+    struct SignedProofOfSignature {
+        ProofOfSignature message;
+        bytes signature;
+        string proofCID;
+    }
+
+    struct SignedProofOfSignatureMsg {
+        EIP712ProofOfSignature message;
+        bytes signature;
+    }
+
+    struct SignedProofOfAgreement {
+        ProofOfAgreement message;
+        bytes signature;
+        string proofCID;
+    }
+
+    struct SignedProofOfAgreementMsg {
+        EIP712ProofOfAgreement message;
+        bytes signature;
+    }
 
     constructor() {
         domain.name = 'daosign';

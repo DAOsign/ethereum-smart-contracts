@@ -11,7 +11,7 @@ import {
 } from '../typechain-types/DAOSignApp.sol/DAOSignApp';
 import { cmp, paddRigthStr, signMessage } from './utils';
 
-describe('DAOSignApp', function () {
+describe('DAOSignApp', () => {
   let mocks: {
     privateKey: Buffer;
     signer: HardhatEthersSigner;
@@ -28,17 +28,17 @@ describe('DAOSignApp', function () {
     const privateKey = Buffer.from(wallet.privateKey.slice(2), 'hex');
 
     return {
-      privateKey: privateKey,
-      signer: signer,
+      privateKey,
+      signer,
       app: await DAOSignApp.deploy(),
     };
   }
 
-  before(async function () {
+  before(async () => {
     mocks = await loadFixture(deployProofsFixture);
   });
 
-  it('ProofOfAuthority', async function () {
+  it('ProofOfAuthority', async () => {
     const msg: ProofOfAuthorityStruct = {
       name: 'Proof-of-Authority',
       from: mocks.signer.address,
@@ -91,7 +91,7 @@ describe('DAOSignApp', function () {
     expect(msgdoc.message.message.metadata).eq(msg.metadata);
   });
 
-  it('ProofOfSignature', async function () {
+  it('ProofOfSignature', async () => {
     const msg: ProofOfSignatureStruct = {
       name: 'Proof-of-Signature',
       signer: mocks.signer.address,
@@ -136,7 +136,7 @@ describe('DAOSignApp', function () {
     expect(msgdoc.message.message.metadata).eq(msg.metadata);
   });
 
-  it('ProofOfAgreement', async function () {
+  it('ProofOfAgreement', async () => {
     const msg: ProofOfAgreementStruct = {
       agreementCID: paddRigthStr('ProofOfAuthority proof cid'),
       signatureCIDs: [paddRigthStr('ProofOfSignature proof cid')],

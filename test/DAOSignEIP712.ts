@@ -12,7 +12,7 @@ import {
 } from '../typechain-types/mocks/MockDAOSignEIP712';
 import { cmp, signMessage } from './utils';
 
-describe('DAOSignEIP712', function () {
+describe('DAOSignEIP712', () => {
   const ZEROADDR = '0x0000000000000000000000000000000000000000';
 
   const domain: EIP712DomainStruct = {
@@ -39,18 +39,18 @@ describe('DAOSignEIP712', function () {
     const privateKey = Buffer.from(wallet.privateKey.slice(2), 'hex');
 
     return {
-      privateKey: privateKey,
-      signer: signer,
+      privateKey,
+      signer,
       app: await DAOSignEIP712.deploy(domain),
     };
   }
 
-  before(async function () {
+  before(async () => {
     mocks = await loadFixture(deployProofsFixture);
   });
 
-  describe('EIP712 Messages', function () {
-    it('EIP712ProofOfAuthority', async function () {
+  describe('EIP712 Messages', () => {
+    it('EIP712ProofOfAuthority', async () => {
       const msg: ProofOfAuthorityStruct = {
         name: 'name',
         from: ZEROADDR,
@@ -96,7 +96,7 @@ describe('DAOSignEIP712', function () {
       expect(eip712msg.message.metadata).eq(msg.metadata);
     });
 
-    it('EIP712ProofOfSignature', async function () {
+    it('EIP712ProofOfSignature', async () => {
       const msg: ProofOfSignatureStruct = {
         name: 'name',
         signer: ZEROADDR,
@@ -133,7 +133,7 @@ describe('DAOSignEIP712', function () {
       expect(eip712msg.message.metadata).eq(msg.metadata);
     });
 
-    it('EIP712ProofOfAgreement', async function () {
+    it('EIP712ProofOfAgreement', async () => {
       const msg: ProofOfAgreementStruct = {
         agreementCID: 'agreementCID',
         signatureCIDs: ['signatureCID0', 'signatureCID1'],
@@ -170,8 +170,8 @@ describe('DAOSignEIP712', function () {
     });
   });
 
-  describe('EIP712 Recover', function () {
-    it('ProofOfAuthority', async function () {
+  describe('EIP712 Recover', () => {
+    it('ProofOfAuthority', async () => {
       const { privateKey, signer, app } = mocks;
       const message: ProofOfAuthorityStruct = {
         name: 'Proof-of-Authority',
@@ -187,7 +187,7 @@ describe('DAOSignEIP712', function () {
       expect(recovered).eq(signer.address);
     });
 
-    it('ProofOfSignature', async function () {
+    it('ProofOfSignature', async () => {
       const { privateKey, signer, app } = mocks;
       const message: ProofOfSignatureStruct = {
         name: 'Proof-of-Signature',
@@ -202,7 +202,7 @@ describe('DAOSignEIP712', function () {
       expect(recovered).eq(signer.address);
     });
 
-    it('ProofOfAgreement', async function () {
+    it('ProofOfAgreement', async () => {
       const { privateKey, signer, app } = mocks;
       const message: ProofOfAgreementStruct = {
         agreementCID: 'agreementCID',
