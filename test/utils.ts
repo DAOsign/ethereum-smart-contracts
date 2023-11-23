@@ -1,6 +1,6 @@
 import { expect } from 'chai';
-import { Result } from 'ethers';
 import { SignTypedDataVersion, signTypedData } from '@metamask/eth-sig-util';
+import { ethers } from 'hardhat';
 import {
   EIP712PropertyTypeStructOutput,
   ProofOfAuthorityStruct,
@@ -44,7 +44,7 @@ export function signMessage(
         name: 'daosign',
         version: '0.1.0',
         chainId: 0,
-        verifyingContract: '0x0000000000000000000000000000000000000000',
+        verifyingContract: ethers.ZeroAddress,
       },
       types: {
         EIP712Domain: [

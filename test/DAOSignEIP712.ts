@@ -13,13 +13,11 @@ import {
 import { cmp, signMessage } from './utils';
 
 describe('DAOSignEIP712', () => {
-  const ZEROADDR = '0x0000000000000000000000000000000000000000';
-
   const domain: EIP712DomainStruct = {
     name: 'daosign',
     version: '0.1.0',
     chainId: 0,
-    verifyingContract: ZEROADDR,
+    verifyingContract: ethers.ZeroAddress,
   };
 
   let mocks: {
@@ -53,9 +51,9 @@ describe('DAOSignEIP712', () => {
     it('EIP712ProofOfAuthority', async () => {
       const msg: ProofOfAuthorityStruct = {
         name: 'name',
-        from: ZEROADDR,
+        from: ethers.ZeroAddress,
         agreementCID: 'agreementCID',
-        signers: [{ addr: ZEROADDR, metadata: 'metadata' }],
+        signers: [{ addr: ethers.ZeroAddress, metadata: 'metadata' }],
         app: 'daosign',
         timestamp: 123,
         metadata: 'metadata',
@@ -99,7 +97,7 @@ describe('DAOSignEIP712', () => {
     it('EIP712ProofOfSignature', async () => {
       const msg: ProofOfSignatureStruct = {
         name: 'name',
-        signer: ZEROADDR,
+        signer: ethers.ZeroAddress,
         agreementCID: 'agreementCID',
         app: 'daosign',
         timestamp: 123,
