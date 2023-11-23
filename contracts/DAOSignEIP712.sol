@@ -47,7 +47,7 @@ pragma solidity ^0.8.19;
  * }
  * */
 
-contract DAOSignEIP712 {
+abstract contract DAOSignEIP712 {
     bytes32 internal constant EIP712DOMAIN_TYPEHASH =
         keccak256(
             'EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)'
