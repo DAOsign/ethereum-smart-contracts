@@ -207,16 +207,15 @@ describe('DAOSignApp', () => {
     });
 
     it('error: Invalid proof CID', async () => {
-      const msg: ProofOfSignatureStruct = {
-        name: 'Proof-of-Signature',
-        signer: signer.address,
-        agreementCID: paddRigthStr('POA CID'),
-        app: 'daosign',
-        timestamp: Math.floor(Date.now() / 1000),
-        metadata: '{}',
-      };
       const data = {
-        message: msg,
+        message: {
+          name: 'Proof-of-Signature',
+          signer: signer.address,
+          agreementCID: paddRigthStr('POA CID'),
+          app: 'daosign',
+          timestamp: Math.floor(Date.now() / 1000),
+          metadata: '{}',
+        },
         signature: Buffer.from(''),
         proofCID: 'too short',
       };
@@ -225,16 +224,15 @@ describe('DAOSignApp', () => {
     });
 
     it('error: Invalid app name', async () => {
-      const msg: ProofOfSignatureStruct = {
-        name: 'Proof-of-Signature',
-        signer: signer.address,
-        agreementCID: paddRigthStr('POA CID'),
-        app: 'daosign ',
-        timestamp: Math.floor(Date.now() / 1000),
-        metadata: '{}',
-      };
       const data = {
-        message: msg,
+        message: {
+          name: 'Proof-of-Signature',
+          signer: signer.address,
+          agreementCID: paddRigthStr('POA CID'),
+          app: 'daosign ',
+          timestamp: Math.floor(Date.now() / 1000),
+          metadata: '{}',
+        },
         signature: Buffer.from(''),
         proofCID: paddRigthStr('POS CID'),
       };
@@ -243,16 +241,15 @@ describe('DAOSignApp', () => {
     });
 
     it('error: Invalid proof name', async () => {
-      const msg: ProofOfSignatureStruct = {
-        name: 'Proof-of-Authority',
-        signer: signer.address,
-        agreementCID: paddRigthStr('POA CID'),
-        app: 'daosign',
-        timestamp: Math.floor(Date.now() / 1000),
-        metadata: '{}',
-      };
       const data = {
-        message: msg,
+        message: {
+          name: 'Proof-of-Authority',
+          signer: signer.address,
+          agreementCID: paddRigthStr('POA CID'),
+          app: 'daosign',
+          timestamp: Math.floor(Date.now() / 1000),
+          metadata: '{}',
+        },
         signature: Buffer.from(''),
         proofCID: paddRigthStr('POS CID'),
       };
@@ -261,16 +258,15 @@ describe('DAOSignApp', () => {
     });
 
     it('error: Invalid signer', async () => {
-      const msg: ProofOfSignatureStruct = {
-        name: 'Proof-of-Signature',
-        signer: someone.address,
-        agreementCID: paddRigthStr('POA CID'),
-        app: 'daosign',
-        timestamp: Math.floor(Date.now() / 1000),
-        metadata: '{}',
-      };
       const data = {
-        message: msg,
+        message: {
+          name: 'Proof-of-Signature',
+          signer: someone.address,
+          agreementCID: paddRigthStr('POA CID'),
+          app: 'daosign',
+          timestamp: Math.floor(Date.now() / 1000),
+          metadata: '{}',
+        },
         signature: Buffer.from(''),
         proofCID: paddRigthStr('POS CID'),
       };
@@ -279,16 +275,15 @@ describe('DAOSignApp', () => {
     });
 
     it('success', async () => {
-      const msg: ProofOfSignatureStruct = {
-        name: 'Proof-of-Signature',
-        signer: signer.address,
-        agreementCID: paddRigthStr('POA CID'),
-        app: 'daosign',
-        timestamp: Math.floor(Date.now() / 1000),
-        metadata: '{}',
-      };
       const data = {
-        message: msg,
+        message: {
+          name: 'Proof-of-Signature',
+          signer: signer.address,
+          agreementCID: paddRigthStr('POA CID'),
+          app: 'daosign',
+          timestamp: Math.floor(Date.now() / 1000),
+          metadata: '{}',
+        },
         signature: Buffer.from(''),
         proofCID: paddRigthStr('POS CID'),
       };
@@ -297,7 +292,166 @@ describe('DAOSignApp', () => {
     });
   });
 
+  describe('validate Proof-of-Agreement', () => {
+    let app: MockDAOSignApp;
+    let signer: SignerWithAddress;
+    let signer2: SignerWithAddress;
+
+    before(async () => {
+      ({ app, signer, signer2 } = await loadFixture(deployProofsFixture));
+
+      // Mock store Proof-of-Authority
+      const data: SignedProofOfAuthority = {
+        message: {
+          name: 'Proof-of-Authority',
+          from: signer.address,
+          agreementCID: paddRigthStr('agreement file cid'),
+          signers: [
+            { addr: signer.address, metadata: 'some metadata' },
+            { addr: signer2.address, metadata: 'some metadata' },
+          ],
+          app: 'daosign',
+          timestamp: Math.floor(Date.now() / 1000),
+          metadata: 'proof metadata',
+        },
+        signature: Buffer.from(''),
+        proofCID: paddRigthStr('POA CID'),
+      };
+      await app.onlyStoreProofOfAuthority(data);
+
+      // Mock store 2 Proof-of-Signatures
+      const data1 = {
+        message: {
+          name: 'Proof-of-Signature',
+          signer: signer.address,
+          agreementCID: paddRigthStr('POA CID'),
+          app: 'daosign',
+          timestamp: Math.floor(Date.now() / 1000),
+          metadata: '{}',
+        },
+        signature: Buffer.from(''),
+        proofCID: paddRigthStr('POS CID 1'),
+      };
+      await app.onlyStoreProofOfSignature(data1);
+
+      const data2 = {
+        message: {
+          name: 'Proof-of-Signature',
+          signer: signer2.address,
+          agreementCID: paddRigthStr('POA CID'),
+          app: 'daosign',
+          timestamp: Math.floor(Date.now() / 1000),
+          metadata: '{}',
+        },
+        signature: Buffer.from(''),
+        proofCID: paddRigthStr('POS CID 2'),
+      };
+      await app.onlyStoreProofOfSignature(data2);
+    });
+
+    it('error: Invalid proof CID', async () => {
+      const data = {
+        message: {
+          agreementCID: paddRigthStr('POA CID'),
+          signatureCIDs: [paddRigthStr('POS CID 1'), paddRigthStr('POS CID 2')],
+          app: 'daosign',
+          timestamp: Math.floor(Date.now() / 1000),
+          metadata: 'proof metadata',
+        },
+        signature: Buffer.from(''),
+        proofCID: 'invalid length CID',
+      };
+
+      await expect(app.storeProofOfAgreement(data)).revertedWith('Invalid proof CID');
+    });
+
+    it('error: Invalid app name', async () => {
+      const data = {
+        message: {
+          agreementCID: paddRigthStr('POA CID'),
+          signatureCIDs: [paddRigthStr('POS CID 1'), paddRigthStr('POS CID 2')],
+          app: 'daosign s',
+          timestamp: Math.floor(Date.now() / 1000),
+          metadata: 'proof metadata',
+        },
+        signature: Buffer.from(''),
+        proofCID: paddRigthStr('POAG CID'),
+      };
+
+      await expect(app.storeProofOfAgreement(data)).revertedWith('Invalid app name');
+    });
+
+    it('error: Invalid Proof-of-Authority name', async () => {
+      const data = {
+        message: {
+          agreementCID: paddRigthStr('...invalid'),
+          signatureCIDs: [paddRigthStr('POS CID 1'), paddRigthStr('POS CID 2')],
+          app: 'daosign',
+          timestamp: Math.floor(Date.now() / 1000),
+          metadata: 'proof metadata',
+        },
+        signature: Buffer.from(''),
+        proofCID: paddRigthStr('POAG CID'),
+      };
+
+      await expect(app.storeProofOfAgreement(data)).revertedWith('Invalid Proof-of-Authority name');
+    });
+
+    it('error: Invalid Proofs-of-Signatures length', async () => {
+      const data = {
+        message: {
+          agreementCID: paddRigthStr('POA CID'),
+          signatureCIDs: [paddRigthStr('POS CID 1')],
+          app: 'daosign',
+          timestamp: Math.floor(Date.now() / 1000),
+          metadata: 'proof metadata',
+        },
+        signature: Buffer.from(''),
+        proofCID: paddRigthStr('POAG CID'),
+      };
+
+      await expect(app.storeProofOfAgreement(data)).revertedWith(
+        'Invalid Proofs-of-Signatures length',
+      );
+    });
+
+    it('error: Invalid Proofs-of-Signature signer', async () => {
+      const data = {
+        message: {
+          agreementCID: paddRigthStr('POA CID'),
+          signatureCIDs: [paddRigthStr('POS CID 1'), paddRigthStr('...invalid')],
+          app: 'daosign',
+          timestamp: Math.floor(Date.now() / 1000),
+          metadata: 'proof metadata',
+        },
+        signature: Buffer.from(''),
+        proofCID: paddRigthStr('POAG CID'),
+      };
+
+      await expect(app.storeProofOfAgreement(data)).revertedWith(
+        'Invalid Proofs-of-Signature signer',
+      );
+    });
+
+    it('success', async () => {
+      const data = {
+        message: {
+          agreementCID: paddRigthStr('POA CID'),
+          signatureCIDs: [paddRigthStr('POS CID 1'), paddRigthStr('POS CID 2')],
+          app: 'daosign',
+          timestamp: Math.floor(Date.now() / 1000),
+          metadata: 'proof metadata',
+        },
+        signature: Buffer.from(''),
+        proofCID: paddRigthStr('POAG CID'),
+      };
+
+      await app.storeProofOfAgreement(data);
+    });
+  });
+
   describe('Store Proofs', () => {
+    // TODO: before -> beforeEach & fix errors
     before(async () => {
       mocks = await loadFixture(deployProofsFixture);
     });

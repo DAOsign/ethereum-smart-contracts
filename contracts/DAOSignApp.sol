@@ -130,7 +130,7 @@ contract DAOSignApp is DAOSignEIP712, IDAOSignApp {
         require(bytes(data.proofCID).length == IPFS_CID_LENGTH, 'Invalid proof CID');
         require(strcmp(data.message.app, 'daosign'), 'Invalid app name');
         require(
-            strcmp(poaus[data.message.agreementCID].message.name, 'Proof-of-Agreement'),
+            strcmp(poaus[data.message.agreementCID].message.name, 'Proof-of-Authority'),
             'Invalid Proof-of-Authority name'
         );
         require(

@@ -24,3 +24,9 @@ function validateProofOfAgreement(struct DAOSignApp.SignedProofOfAgreement data)
 function onlyStoreProofOfAuthority(struct DAOSignApp.SignedProofOfAuthority data) external
 ```
 
+### onlyStoreProofOfSignature
+
+```solidity
+function onlyStoreProofOfSignature(struct DAOSignApp.SignedProofOfSignature data) external
+```
+
