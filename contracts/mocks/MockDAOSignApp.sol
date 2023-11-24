@@ -37,4 +37,9 @@ contract MockDAOSignApp is DAOSignApp {
         poaus[data.proofCID].proofCID = data.proofCID;
         proof2signer[data.proofCID] = data.message.from;
     }
+
+    function onlyStoreProofOfSignature(SignedProofOfSignature memory data) external {
+        posis[data.proofCID] = data;
+        proof2signer[data.proofCID] = data.message.signer;
+    }
 }

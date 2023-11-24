@@ -94,15 +94,15 @@ contract DAOSignApp is DAOSignEIP712 {
 
     function validate(SignedProofOfAgreement memory data) internal view returns (bool) {
         require(bytes(data.proofCID).length == IPFS_CID_LENGTH, 'Invalid proof CID');
-        require(strcmp(data.message.app, 'daosign'), 'Invalid struct name');
+        require(strcmp(data.message.app, 'daosign'), 'Invalid app name');
         require(
             strcmp(poaus[data.message.agreementCID].message.name, 'Proof-of-Authority'),
-            'Invalid agreementCID'
+            'Invalid Proof-of-Authority name'
         );
         require(
             poaus[data.message.agreementCID].message.signers.length ==
                 data.message.signatureCIDs.length,
-            'Invalid sign proofs'
+            'Invalid Proofs-of-Signatures length'
         );
         for (uint i = 0; i < data.message.signatureCIDs.length; i++) {
             uint idx = poauSignersIdx[data.message.agreementCID][
@@ -111,7 +111,7 @@ contract DAOSignApp is DAOSignEIP712 {
             require(
                 poaus[data.message.agreementCID].message.signers[idx].addr ==
                     posis[data.message.signatureCIDs[i]].message.signer,
-                'Invalid sign proofs'
+                'Invalid Proofs-of-Signature signer'
             );
         }
         return true;
