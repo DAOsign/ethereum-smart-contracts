@@ -5,6 +5,7 @@ extendEnvironment((hre) => {
   const fnames = [
     './artifacts/contracts/DAOSignApp.sol/DAOSignApp.json',
     './artifacts/contracts/mocks/MockDAOSignEIP712.sol/MockDAOSignEIP712.json',
+    './artifacts/contracts/mocks/MockDAOSignApp.sol/MockDAOSignApp.json',
   ];
   const { action } = hre.tasks['typechain:generate-types'];
   hre.tasks['typechain:generate-types'].setAction(async (...params) => {
