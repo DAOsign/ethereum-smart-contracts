@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.19;
 
-import { DAOSignEIP712 } from './DAOSignEIP712.sol';
+import { DAOSignEIP712, ProofOfAuthority, EIP712ProofOfAuthority, ProofOfSignature, EIP712ProofOfSignature, ProofOfAgreement, EIP712ProofOfAgreement } from './DAOSignEIP712.sol';
+import { IDAOSignApp, SignedProofOfAuthority, SignedProofOfSignature, SignedProofOfAgreement, SignedProofOfAuthorityMsg, SignedProofOfSignatureMsg, SignedProofOfAgreementMsg } from './interfaces/IDAOSignApp.sol';
 
-contract DAOSignApp is DAOSignEIP712 {
+contract DAOSignApp is DAOSignEIP712, IDAOSignApp {
     uint256 internal constant IPFS_CID_LENGTH = 46;
 
     mapping(string => SignedProofOfAuthority) internal poaus;
@@ -12,106 +13,13 @@ contract DAOSignApp is DAOSignEIP712 {
     mapping(string => address) internal proof2signer;
     mapping(string => mapping(address => uint256)) internal poauSignersIdx;
 
-    event NewProofOfAuthority(SignedProofOfAuthority indexed data);
-    event NewProofOfSignature(SignedProofOfSignature indexed data);
-    event NewProofOfAgreement(SignedProofOfAgreement indexed data);
-
-    struct SignedProofOfAuthority {
-        ProofOfAuthority message;
-        bytes signature;
-        string proofCID;
-    }
-
-    struct SignedProofOfAuthorityMsg {
-        EIP712ProofOfAuthority message;
-        bytes signature;
-    }
-
-    struct SignedProofOfSignature {
-        ProofOfSignature message;
-        bytes signature;
-        string proofCID;
-    }
-
-    struct SignedProofOfSignatureMsg {
-        EIP712ProofOfSignature message;
-        bytes signature;
-    }
-
-    struct SignedProofOfAgreement {
-        ProofOfAgreement message;
-        bytes signature;
-        string proofCID;
-    }
-
-    struct SignedProofOfAgreementMsg {
-        EIP712ProofOfAgreement message;
-        bytes signature;
-    }
-
     constructor() {
         domain.name = 'daosign';
         domain.version = '0.1.0';
+        domain.chainId = 0;
+        domain.verifyingContract = address(0);
         DOMAIN_HASH = hash(domain);
         initEIP712Types();
-    }
-
-    function memcmp(bytes memory a, bytes memory b) internal pure returns (bool) {
-        return (a.length == b.length) && (keccak256(a) == keccak256(b));
-    }
-
-    function strcmp(string memory a, string memory b) internal pure returns (bool) {
-        return memcmp(bytes(a), bytes(b));
-    }
-
-    function validate(SignedProofOfAuthority memory data) internal pure returns (bool) {
-        require(bytes(data.proofCID).length == IPFS_CID_LENGTH, 'Invalid proof CID');
-        require(strcmp(data.message.app, 'daosign'), 'Invalid app name');
-        require(strcmp(data.message.name, 'Proof-of-Authority'), 'Invalid struct name');
-        require(bytes(data.message.agreementCID).length == IPFS_CID_LENGTH, 'Invalid CID length');
-        for (uint256 i = 0; i < data.message.signers.length; i++) {
-            require(data.message.signers[i].addr != address(0), 'Invalid signer');
-        }
-        return true;
-    }
-
-    function validate(SignedProofOfSignature memory data) internal view returns (bool) {
-        require(bytes(data.proofCID).length == IPFS_CID_LENGTH, 'Invalid proof CID');
-        require(strcmp(data.message.app, 'daosign'), 'Invalid app name');
-        require(strcmp(data.message.name, 'Proof-of-Signature'), 'Invalid struct name');
-
-        uint i = poauSignersIdx[data.message.agreementCID][data.message.signer];
-        require(
-            poaus[data.message.agreementCID].message.signers[i].addr == data.message.signer,
-            'Invalid signer'
-        );
-
-        return true;
-    }
-
-    function validate(SignedProofOfAgreement memory data) internal view returns (bool) {
-        require(bytes(data.proofCID).length == IPFS_CID_LENGTH, 'Invalid proof CID');
-        require(strcmp(data.message.app, 'daosign'), 'Invalid app name');
-        require(
-            strcmp(poaus[data.message.agreementCID].message.name, 'Proof-of-Authority'),
-            'Invalid agreementCID'
-        );
-        require(
-            poaus[data.message.agreementCID].message.signers.length ==
-                data.message.signatureCIDs.length,
-            'Invalid sign proofs'
-        );
-        for (uint i = 0; i < data.message.signatureCIDs.length; i++) {
-            uint idx = poauSignersIdx[data.message.agreementCID][
-                posis[data.message.signatureCIDs[i]].message.signer
-            ];
-            require(
-                poaus[data.message.agreementCID].message.signers[idx].addr ==
-                    posis[data.message.signatureCIDs[i]].message.signer,
-                'Invalid sign proofs'
-            );
-        }
-        return true;
     }
 
     function storeProofOfAuthority(SignedProofOfAuthority memory data) external {
@@ -180,5 +88,66 @@ contract DAOSignApp is DAOSignEIP712 {
                 message: toEIP712Message(data.message),
                 signature: data.signature
             });
+    }
+
+    function memcmp(bytes memory a, bytes memory b) internal pure returns (bool) {
+        return (a.length == b.length) && (keccak256(a) == keccak256(b));
+    }
+
+    function strcmp(string memory a, string memory b) internal pure returns (bool) {
+        return memcmp(bytes(a), bytes(b));
+    }
+
+    function validate(SignedProofOfAuthority memory data) internal pure returns (bool) {
+        require(bytes(data.proofCID).length == IPFS_CID_LENGTH, 'Invalid proof CID');
+        require(strcmp(data.message.app, 'daosign'), 'Invalid app name');
+        require(strcmp(data.message.name, 'Proof-of-Authority'), 'Invalid proof name');
+        require(
+            bytes(data.message.agreementCID).length == IPFS_CID_LENGTH,
+            'Invalid agreement CID'
+        );
+        for (uint256 i = 0; i < data.message.signers.length; i++) {
+            require(data.message.signers[i].addr != address(0), 'Invalid signer');
+        }
+        return true;
+    }
+
+    function validate(SignedProofOfSignature memory data) internal view returns (bool) {
+        require(bytes(data.proofCID).length == IPFS_CID_LENGTH, 'Invalid proof CID');
+        require(strcmp(data.message.app, 'daosign'), 'Invalid app name');
+        require(strcmp(data.message.name, 'Proof-of-Signature'), 'Invalid proof name');
+
+        uint i = poauSignersIdx[data.message.agreementCID][data.message.signer];
+        require(
+            poaus[data.message.agreementCID].message.signers[i].addr == data.message.signer,
+            'Invalid signer'
+        );
+
+        return true;
+    }
+
+    function validate(SignedProofOfAgreement memory data) internal view returns (bool) {
+        require(bytes(data.proofCID).length == IPFS_CID_LENGTH, 'Invalid proof CID');
+        require(strcmp(data.message.app, 'daosign'), 'Invalid app name');
+        require(
+            strcmp(poaus[data.message.agreementCID].message.name, 'Proof-of-Agreement'),
+            'Invalid Proof-of-Authority name'
+        );
+        require(
+            poaus[data.message.agreementCID].message.signers.length ==
+                data.message.signatureCIDs.length,
+            'Invalid Proofs-of-Signatures length'
+        );
+        for (uint i = 0; i < data.message.signatureCIDs.length; i++) {
+            uint idx = poauSignersIdx[data.message.agreementCID][
+                posis[data.message.signatureCIDs[i]].message.signer
+            ];
+            require(
+                poaus[data.message.agreementCID].message.signers[idx].addr ==
+                    posis[data.message.signatureCIDs[i]].message.signer,
+                'Invalid Proofs-of-Signature signer'
+            );
+        }
+        return true;
     }
 }
