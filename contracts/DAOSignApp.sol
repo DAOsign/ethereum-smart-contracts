@@ -86,7 +86,7 @@ contract DAOSignApp is DAOSignEIP712, DAOSignBaseApp {
 
     function validate(SignedProofOfAuthority memory data) internal pure returns (bool) {
         require(bytes(data.proofCID).length == IPFS_CID_LENGHT, 'Invalid proof CID');
-        require(strcmp(data.message.app, 'daosign'), 'Invalid struct name');
+        require(strcmp(data.message.app, 'daosign'), 'Invalid app name');
         require(strcmp(data.message.name, 'Proof-of-Authority'), 'Invalid struct name');
         require(bytes(data.message.agreementCID).length == IPFS_CID_LENGHT, 'Invalid CID length');
         for (uint256 i = 0; i < data.message.signers.length; i++) {
@@ -97,7 +97,7 @@ contract DAOSignApp is DAOSignEIP712, DAOSignBaseApp {
 
     function validate(SignedProofOfSignature memory data) internal view returns (bool) {
         require(bytes(data.proofCID).length == IPFS_CID_LENGHT, 'Invalid proof CID');
-        require(strcmp(data.message.app, 'daosign'), 'Invalid struct name');
+        require(strcmp(data.message.app, 'daosign'), 'Invalid app name');
         require(strcmp(data.message.name, 'Proof-of-Signature'), 'Invalid struct name');
 
         uint i = poauSignersIdx[data.message.agreementCID][data.message.signer];
@@ -111,7 +111,7 @@ contract DAOSignApp is DAOSignEIP712, DAOSignBaseApp {
 
     function validate(SignedProofOfAgreement memory data) internal view returns (bool) {
         require(bytes(data.proofCID).length == IPFS_CID_LENGHT, 'Invalid proof CID');
-        require(strcmp(data.message.app, 'daosign'), 'Invalid struct name');
+        require(strcmp(data.message.app, 'daosign'), 'Invalid app name');
         require(
             strcmp(poaus[data.message.agreementCID].message.name, 'Proof-of-Authority'),
             'Invalid agreementCID'
