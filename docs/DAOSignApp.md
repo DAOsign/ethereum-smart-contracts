@@ -1,9 +1,9 @@
 ## DAOSignApp
 
-### IPFS_CID_LENGHT
+### IPFS_CID_LENGTH
 
 ```solidity
-uint256 IPFS_CID_LENGHT
+uint256 IPFS_CID_LENGTH
 ```
 
 ### poaus
