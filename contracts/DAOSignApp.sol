@@ -80,8 +80,8 @@ contract DAOSignApp is DAOSignEIP712 {
 
     function validate(SignedProofOfSignature memory data) internal view returns (bool) {
         require(bytes(data.proofCID).length == IPFS_CID_LENGTH, 'Invalid proof CID');
-        require(strcmp(data.message.app, 'daosign'), 'Invalid struct name');
-        require(strcmp(data.message.name, 'Proof-of-Signature'), 'Invalid struct name');
+        require(strcmp(data.message.app, 'daosign'), 'Invalid app name');
+        require(strcmp(data.message.name, 'Proof-of-Signature'), 'Invalid proof name');
 
         uint i = poauSignersIdx[data.message.agreementCID][data.message.signer];
         require(

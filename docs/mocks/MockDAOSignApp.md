@@ -18,3 +18,9 @@ function validateProofOfSignature(struct DAOSignApp.SignedProofOfSignature data)
 function validateProofOfAgreement(struct DAOSignApp.SignedProofOfAgreement data) public view returns (bool)
 ```
 
+### onlyStoreProofOfAuthority
+
+```solidity
+function onlyStoreProofOfAuthority(struct DAOSignApp.SignedProofOfAuthority data) external
+```
+
