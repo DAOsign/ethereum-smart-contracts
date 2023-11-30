@@ -52,6 +52,8 @@ contract DAOSignApp is DAOSignEIP712 {
     constructor() {
         domain.name = 'daosign';
         domain.version = '0.1.0';
+        domain.chainId = 0;
+        domain.verifyingContract = address(0);
         DOMAIN_HASH = hash(domain);
         initEIP712Types();
     }
