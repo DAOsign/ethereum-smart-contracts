@@ -47,6 +47,14 @@ describe('DAOSignEIP712', () => {
     mocks = await loadFixture(deployProofsFixture);
   });
 
+  it.only('test initialization', async () => {
+    console.log({ EIP712DOMAIN_TYPEHASH: await mocks.app.EIP712DOMAIN_TYPEHASH() });
+    console.log({ SIGNER_TYPEHASH: await mocks.app.SIGNER_TYPEHASH() });
+    console.log({ PROOF_OF_AUTHORITY_TYPEHASH: await mocks.app.PROOF_OF_AUTHORITY_TYPEHASH() });
+    console.log({ PROOF_OF_SIGNATURE_TYPEHASH: await mocks.app.PROOF_OF_SIGNATURE_TYPEHASH() });
+    console.log({ PROOF_OF_AGREEMENT_TYPEHASH: await mocks.app.PROOF_OF_AGREEMENT_TYPEHASH() });
+  });
+
   describe('EIP712 Messages', () => {
     it('EIP712ProofOfAuthority', async () => {
       const msg: ProofOfAuthorityStruct = {
