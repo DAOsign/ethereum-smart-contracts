@@ -50,25 +50,25 @@ import 'hardhat/console.sol';
  * */
 
 abstract contract DAOSignEIP712 {
-    bytes32 public constant EIP712DOMAIN_TYPEHASH =
+    bytes32 internal constant EIP712DOMAIN_TYPEHASH =
         keccak256(
             'EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)'
         );
-    bytes32 public constant SIGNER_TYPEHASH = keccak256('Signer(address addr,string metadata)');
-    bytes32 public constant PROOF_OF_AUTHORITY_TYPEHASH =
+    bytes32 internal constant SIGNER_TYPEHASH = keccak256('Signer(address addr,string metadata)');
+    bytes32 internal constant PROOF_OF_AUTHORITY_TYPEHASH =
         keccak256(
             'ProofOfAuthority(string name,address from,string agreementCID,Signer[] signers,string app,uint256 timestamp,string metadata)Signer(address addr,string metadata)'
         );
-    bytes32 public constant PROOF_OF_SIGNATURE_TYPEHASH =
+    bytes32 internal constant PROOF_OF_SIGNATURE_TYPEHASH =
         keccak256(
             'ProofOfSignature(string name,address signer,string agreementCID,string app,uint256 timestamp,string metadata)'
         );
-    bytes32 public constant PROOF_OF_AGREEMENT_TYPEHASH =
+    bytes32 internal constant PROOF_OF_AGREEMENT_TYPEHASH =
         keccak256(
             'ProofOfAgreement(string agreementCID,string[] signatureCIDs,string app,uint256 timestamp,string metadata)'
         );
 
-    bytes32 public DOMAIN_HASH;
+    bytes32 internal DOMAIN_HASH;
     EIP712Domain internal domain;
     EIP712ProofOfAuthority internal proofOfAuthorityDoc;
     EIP712ProofOfSignature internal proofOfSignatureDoc;

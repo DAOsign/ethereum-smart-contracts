@@ -37,11 +37,6 @@ describe('DAOSignApp', () => {
     };
   }
 
-  it.only('test initialization', async () => {
-    const { app } = await loadFixture(deployProofsFixture);
-    console.log({ DOMAIN_HASH: await app.DOMAIN_HASH() });
-  });
-
   describe('validate Proof-of-Authority', () => {
     let app: MockDAOSignApp;
     let signer: SignerWithAddress;
