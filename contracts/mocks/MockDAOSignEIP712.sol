@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.19;
 
-import { DAOSignEIP712 } from '../DAOSignEIP712.sol';
+import { DAOSignEIP712, EIP712Domain, ProofOfAuthority, EIP712ProofOfAuthority, ProofOfSignature, EIP712ProofOfSignature, ProofOfAgreement, EIP712ProofOfAgreement } from '../DAOSignEIP712.sol';
 
 contract MockDAOSignEIP712 is DAOSignEIP712 {
     constructor(EIP712Domain memory _domain) {

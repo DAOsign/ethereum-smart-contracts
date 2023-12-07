@@ -3,30 +3,30 @@
 ### validateProofOfAuthority
 
 ```solidity
-function validateProofOfAuthority(struct DAOSignApp.SignedProofOfAuthority data) public pure returns (bool)
+function validateProofOfAuthority(struct SignedProofOfAuthority data) public pure returns (bool)
 ```
 
 ### validateProofOfSignature
 
 ```solidity
-function validateProofOfSignature(struct DAOSignApp.SignedProofOfSignature data) public view returns (bool)
+function validateProofOfSignature(struct SignedProofOfSignature data) public view returns (bool)
 ```
 
 ### validateProofOfAgreement
 
 ```solidity
-function validateProofOfAgreement(struct DAOSignApp.SignedProofOfAgreement data) public view returns (bool)
+function validateProofOfAgreement(struct SignedProofOfAgreement data) public view returns (bool)
 ```
 
 ### onlyStoreProofOfAuthority
 
 ```solidity
-function onlyStoreProofOfAuthority(struct DAOSignApp.SignedProofOfAuthority data) external
+function onlyStoreProofOfAuthority(struct SignedProofOfAuthority data) external
 ```
 
 ### onlyStoreProofOfSignature
 
 ```solidity
-function onlyStoreProofOfSignature(struct DAOSignApp.SignedProofOfSignature data) external
+function onlyStoreProofOfSignature(struct SignedProofOfSignature data) external
 ```
 

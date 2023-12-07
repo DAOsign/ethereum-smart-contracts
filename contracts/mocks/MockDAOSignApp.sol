@@ -2,6 +2,7 @@
 pragma solidity ^0.8.19;
 
 import { DAOSignApp } from '../DAOSignApp.sol';
+import { SignedProofOfAuthority, SignedProofOfSignature, SignedProofOfAgreement } from '../interfaces/IDAOSignApp.sol';
 
 contract MockDAOSignApp is DAOSignApp {
     function validateProofOfAuthority(
