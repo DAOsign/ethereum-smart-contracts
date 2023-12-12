@@ -47,10 +47,6 @@ pragma solidity ^0.8.19;
  * }
  * */
 
-bytes32 constant EIP712DOMAIN_TYPEHASH = keccak256(
-    'EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)'
-);
-
 struct EIP712Domain {
     string name;
     string version;
@@ -58,16 +54,10 @@ struct EIP712Domain {
     address verifyingContract;
 }
 
-bytes32 constant SIGNER_TYPEHASH = keccak256('Signer(address addr,string metadata)');
-
 struct Signer {
     address addr;
     string metadata;
 }
-
-bytes32 constant PROOF_OF_AUTHORITY_TYPEHASH = keccak256(
-    'ProofOfAuthority(string name,address from,string agreementCID,Signer[] signers,string app,uint256 timestamp,string metadata)Signer(address addr,string metadata)'
-);
 
 struct ProofOfAuthority {
     string name;
@@ -79,10 +69,6 @@ struct ProofOfAuthority {
     string metadata;
 }
 
-bytes32 constant PROOF_OF_SIGNATURE_TYPEHASH = keccak256(
-    'ProofOfSignature(string name,address signer,string agreementCID,string app,uint256 timestamp,string metadata)'
-);
-
 struct ProofOfSignature {
     string name;
     address signer;
@@ -91,10 +77,6 @@ struct ProofOfSignature {
     uint256 timestamp;
     string metadata;
 }
-
-bytes32 constant PROOF_OF_AGREEMENT_TYPEHASH = keccak256(
-    'ProofOfAgreement(string agreementCID,string[] signatureCIDs,string app,uint256 timestamp,string metadata)'
-);
 
 struct ProofOfAgreement {
     string agreementCID;
@@ -146,14 +128,26 @@ struct EIP712ProofOfAgreement {
     ProofOfAgreement message;
 }
 
-contract DAOSignEIP712 {
-    bytes32 DOMAIN_HASH;
+bytes32 constant EIP712DOMAIN_TYPEHASH = keccak256(
+    'EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)'
+);
+bytes32 constant SIGNER_TYPEHASH = keccak256('Signer(address addr,string metadata)');
+bytes32 constant PROOF_OF_AUTHORITY_TYPEHASH = keccak256(
+    'ProofOfAuthority(string name,address from,string agreementCID,Signer[] signers,string app,uint256 timestamp,string metadata)Signer(address addr,string metadata)'
+);
+bytes32 constant PROOF_OF_SIGNATURE_TYPEHASH = keccak256(
+    'ProofOfSignature(string name,address signer,string agreementCID,string app,uint256 timestamp,string metadata)'
+);
+bytes32 constant PROOF_OF_AGREEMENT_TYPEHASH = keccak256(
+    'ProofOfAgreement(string agreementCID,string[] signatureCIDs,string app,uint256 timestamp,string metadata)'
+);
 
-    EIP712Domain domain;
-
-    EIP712ProofOfAuthority proofOfAuthorityDoc;
-    EIP712ProofOfSignature proofOfSignatureDoc;
-    EIP712ProofOfAgreement proofOfAgreementDoc;
+abstract contract DAOSignEIP712 {
+    bytes32 internal DOMAIN_HASH;
+    EIP712Domain internal domain;
+    EIP712ProofOfAuthority internal proofOfAuthorityDoc;
+    EIP712ProofOfSignature internal proofOfSignatureDoc;
+    EIP712ProofOfAgreement internal proofOfAgreementDoc;
 
     function initEIP712Types() internal {
         EIP712PropertyType memory domain0Doc = EIP712PropertyType({ name: 'name', kind: 'string' });

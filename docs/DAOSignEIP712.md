@@ -1,9 +1,3 @@
-## EIP712DOMAIN_TYPEHASH
-
-```solidity
-bytes32 EIP712DOMAIN_TYPEHASH
-```
-
 ## EIP712Domain
 
 ```solidity
@@ -15,12 +9,6 @@ struct EIP712Domain {
 }
 ```
 
-## SIGNER_TYPEHASH
-
-```solidity
-bytes32 SIGNER_TYPEHASH
-```
-
 ## Signer
 
 ```solidity
@@ -28,12 +16,6 @@ struct Signer {
   address addr;
   string metadata;
 }
-```
-
-## PROOF_OF_AUTHORITY_TYPEHASH
-
-```solidity
-bytes32 PROOF_OF_AUTHORITY_TYPEHASH
 ```
 
 ## ProofOfAuthority
@@ -50,12 +32,6 @@ struct ProofOfAuthority {
 }
 ```
 
-## PROOF_OF_SIGNATURE_TYPEHASH
-
-```solidity
-bytes32 PROOF_OF_SIGNATURE_TYPEHASH
-```
-
 ## ProofOfSignature
 
 ```solidity
@@ -67,12 +43,6 @@ struct ProofOfSignature {
   uint256 timestamp;
   string metadata;
 }
-```
-
-## PROOF_OF_AGREEMENT_TYPEHASH
-
-```solidity
-bytes32 PROOF_OF_AGREEMENT_TYPEHASH
 ```
 
 ## ProofOfAgreement
@@ -155,6 +125,36 @@ struct EIP712ProofOfAgreement {
   string primaryType;
   struct ProofOfAgreement message;
 }
+```
+
+## EIP712DOMAIN_TYPEHASH
+
+```solidity
+bytes32 EIP712DOMAIN_TYPEHASH
+```
+
+## SIGNER_TYPEHASH
+
+```solidity
+bytes32 SIGNER_TYPEHASH
+```
+
+## PROOF_OF_AUTHORITY_TYPEHASH
+
+```solidity
+bytes32 PROOF_OF_AUTHORITY_TYPEHASH
+```
+
+## PROOF_OF_SIGNATURE_TYPEHASH
+
+```solidity
+bytes32 PROOF_OF_SIGNATURE_TYPEHASH
+```
+
+## PROOF_OF_AGREEMENT_TYPEHASH
+
+```solidity
+bytes32 PROOF_OF_AGREEMENT_TYPEHASH
 ```
 
 ## DAOSignEIP712
