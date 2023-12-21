@@ -291,7 +291,7 @@ abstract contract DAOSignEIP712 {
         return keccak256(encoded);
     }
 
-    function hash(ProofOfAuthority memory data) internal pure returns (bytes32) {
+    function hash(ProofOfAuthority memory data) internal pure virtual returns (bytes32) {
         bytes memory encoded = abi.encode(
             PROOF_OF_AUTHORITY_TYPEHASH,
             keccak256(bytes(data.name)),
@@ -305,7 +305,7 @@ abstract contract DAOSignEIP712 {
         return keccak256(encoded);
     }
 
-    function hash(ProofOfSignature memory data) internal pure returns (bytes32) {
+    function hash(ProofOfSignature memory data) internal pure virtual returns (bytes32) {
         bytes memory encoded = abi.encode(
             PROOF_OF_SIGNATURE_TYPEHASH,
             keccak256(bytes(data.name)),
@@ -326,7 +326,7 @@ abstract contract DAOSignEIP712 {
         return keccak256(encoded);
     }
 
-    function hash(ProofOfAgreement memory data) internal pure returns (bytes32) {
+    function hash(ProofOfAgreement memory data) internal pure virtual returns (bytes32) {
         bytes memory encoded = abi.encode(
             PROOF_OF_AGREEMENT_TYPEHASH,
             keccak256(bytes(data.agreementCID)),
@@ -370,27 +370,27 @@ abstract contract DAOSignEIP712 {
     function recover(
         ProofOfAuthority memory data,
         bytes memory signature
-    ) internal view returns (address) {
-        bytes32 packetHash = hash(data);
-        bytes32 digest = keccak256(abi.encodePacked('\x19\x01', DOMAIN_HASH, packetHash));
+    ) internal view virtual returns (address) {
+        bytes32 packedHash = hash(data);
+        bytes32 digest = keccak256(abi.encodePacked('\x19\x01', DOMAIN_HASH, packedHash));
         return recover(digest, signature);
     }
 
     function recover(
         ProofOfSignature memory data,
         bytes memory signature
-    ) internal view returns (address) {
-        bytes32 packetHash = hash(data);
-        bytes32 digest = keccak256(abi.encodePacked('\x19\x01', DOMAIN_HASH, packetHash));
+    ) internal view virtual returns (address) {
+        bytes32 packedHash = hash(data);
+        bytes32 digest = keccak256(abi.encodePacked('\x19\x01', DOMAIN_HASH, packedHash));
         return recover(digest, signature);
     }
 
     function recover(
         ProofOfAgreement memory data,
         bytes memory signature
-    ) internal view returns (address) {
-        bytes32 packetHash = hash(data);
-        bytes32 digest = keccak256(abi.encodePacked('\x19\x01', DOMAIN_HASH, packetHash));
+    ) internal view virtual returns (address) {
+        bytes32 packedHash = hash(data);
+        bytes32 digest = keccak256(abi.encodePacked('\x19\x01', DOMAIN_HASH, packedHash));
         return recover(digest, signature);
     }
 

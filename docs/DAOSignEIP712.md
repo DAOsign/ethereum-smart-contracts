@@ -216,13 +216,13 @@ function hash(struct Signer[] data) internal pure returns (bytes32)
 ### hash
 
 ```solidity
-function hash(struct ProofOfAuthority data) internal pure returns (bytes32)
+function hash(struct ProofOfAuthority data) internal pure virtual returns (bytes32)
 ```
 
 ### hash
 
 ```solidity
-function hash(struct ProofOfSignature data) internal pure returns (bytes32)
+function hash(struct ProofOfSignature data) internal pure virtual returns (bytes32)
 ```
 
 ### hash
@@ -234,7 +234,7 @@ function hash(string[] data) internal pure returns (bytes32)
 ### hash
 
 ```solidity
-function hash(struct ProofOfAgreement data) internal pure returns (bytes32)
+function hash(struct ProofOfAgreement data) internal pure virtual returns (bytes32)
 ```
 
 ### recover
@@ -246,19 +246,19 @@ function recover(bytes32 message, bytes sig) internal pure returns (address)
 ### recover
 
 ```solidity
-function recover(struct ProofOfAuthority data, bytes signature) internal view returns (address)
+function recover(struct ProofOfAuthority data, bytes signature) internal view virtual returns (address)
 ```
 
 ### recover
 
 ```solidity
-function recover(struct ProofOfSignature data, bytes signature) internal view returns (address)
+function recover(struct ProofOfSignature data, bytes signature) internal view virtual returns (address)
 ```
 
 ### recover
 
 ```solidity
-function recover(struct ProofOfAgreement data, bytes signature) internal view returns (address)
+function recover(struct ProofOfAgreement data, bytes signature) internal view virtual returns (address)
 ```
 
 ### toEIP712Message

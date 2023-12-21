@@ -10,7 +10,7 @@ import {
   ProofOfAgreementStruct,
   MockDAOSignEIP712,
 } from '../typechain-types/mocks/MockDAOSignEIP712';
-import { cmp, signMessage } from './utils';
+import { cmp, paddRigthStr, signMessage } from './utils';
 
 describe('DAOSignEIP712', () => {
   const domain: EIP712DomainStruct = {
@@ -174,11 +174,11 @@ describe('DAOSignEIP712', () => {
       const message: ProofOfAuthorityStruct = {
         name: 'Proof-of-Authority',
         from: signer.address,
-        agreementCID: 'agreementCID',
+        agreementCID: paddRigthStr('agreementCID'),
         signers: [{ addr: signer.address, metadata: 'metadata' }],
         app: 'daosign',
         timestamp: (Date.now() / 1000) | 0,
-        metadata: 'metadata',
+        metadata: 'metadatas',
       };
       const signature = signMessage(privateKey, 'ProofOfAuthority', message);
       const recovered = await app.recoverProofOfAuthority(message, signature);
@@ -190,7 +190,7 @@ describe('DAOSignEIP712', () => {
       const message: ProofOfSignatureStruct = {
         name: 'Proof-of-Signature',
         signer: signer.address,
-        agreementCID: 'agreementCID',
+        agreementCID: paddRigthStr('agreementCID'),
         app: 'daosign',
         timestamp: (Date.now() / 1000) | 0,
         metadata: 'metadata',
@@ -203,8 +203,8 @@ describe('DAOSignEIP712', () => {
     it('ProofOfAgreement', async () => {
       const { privateKey, signer, app } = mocks;
       const message: ProofOfAgreementStruct = {
-        agreementCID: 'agreementCID',
-        signatureCIDs: ['signatureCID0', 'signatureCID1'],
+        agreementCID: paddRigthStr('agreementCID'),
+        signatureCIDs: [paddRigthStr('signatureCID0'), paddRigthStr('signatureCID1')],
         app: 'daosign',
         timestamp: (Date.now() / 1000) | 0,
         metadata: 'metadata',
