@@ -1,14 +1,13 @@
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers';
 import { expect } from 'chai';
 import { ethers, config } from 'hardhat';
-import { HardhatEthersSigner, SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
+import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { HardhatNetworkHDAccountsConfig } from 'hardhat/types';
 import util from 'util';
 import {
   ProofOfAuthorityStruct,
   ProofOfSignatureStruct,
   ProofOfAgreementStruct,
-  SignedProofOfAuthority,
 } from '../typechain-types/DAOSignApp.sol/DAOSignApp';
 import { cmp, paddRigthStr, signMessage } from './utils';
 import { MockDAOSignApp } from '../typechain-types';
