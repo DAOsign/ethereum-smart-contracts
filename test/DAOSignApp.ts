@@ -484,8 +484,6 @@ describe('DAOSignApp', () => {
       cmp(msgdoc.message.types.EIP712Domain, [
         { name: 'name', type: 'string' },
         { name: 'version', type: 'string' },
-        { name: 'chainId', type: 'uint256' },
-        { name: 'verifyingContract', type: 'address' },
       ]);
       cmp(msgdoc.message.types.Signer, [
         { name: 'addr', type: 'address' },
@@ -538,8 +536,6 @@ describe('DAOSignApp', () => {
       cmp(msgdoc.message.types.EIP712Domain, [
         { name: 'name', type: 'string' },
         { name: 'version', type: 'string' },
-        { name: 'chainId', type: 'uint256' },
-        { name: 'verifyingContract', type: 'address' },
       ]);
       cmp(msgdoc.message.types.ProofOfSignature, [
         { name: 'name', type: 'string' },
@@ -584,8 +580,6 @@ describe('DAOSignApp', () => {
       cmp(msgdoc.message.types.EIP712Domain, [
         { name: 'name', type: 'string' },
         { name: 'version', type: 'string' },
-        { name: 'chainId', type: 'uint256' },
-        { name: 'verifyingContract', type: 'address' },
       ]);
       cmp(msgdoc.message.types.ProofOfAgreement, [
         { name: 'agreementCID', type: 'string' },

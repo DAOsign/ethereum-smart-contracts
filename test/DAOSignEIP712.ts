@@ -16,8 +16,6 @@ describe('DAOSignEIP712', () => {
   const domain: EIP712DomainStruct = {
     name: 'daosign',
     version: '0.1.0',
-    chainId: 0,
-    verifyingContract: ethers.ZeroAddress,
   };
 
   let mocks: {
@@ -66,8 +64,6 @@ describe('DAOSignEIP712', () => {
       cmp(eip712msg.types.EIP712Domain, [
         { name: 'name', type: 'string' },
         { name: 'version', type: 'string' },
-        { name: 'chainId', type: 'uint256' },
-        { name: 'verifyingContract', type: 'address' },
       ]);
       cmp(eip712msg.types.Signer, [
         { name: 'addr', type: 'address' },
@@ -111,8 +107,6 @@ describe('DAOSignEIP712', () => {
       cmp(eip712msg.types.EIP712Domain, [
         { name: 'name', type: 'string' },
         { name: 'version', type: 'string' },
-        { name: 'chainId', type: 'uint256' },
-        { name: 'verifyingContract', type: 'address' },
       ]);
       cmp(eip712msg.types.ProofOfSignature, [
         { name: 'name', type: 'string' },
@@ -147,8 +141,6 @@ describe('DAOSignEIP712', () => {
       cmp(eip712msg.types.EIP712Domain, [
         { name: 'name', type: 'string' },
         { name: 'version', type: 'string' },
-        { name: 'chainId', type: 'uint256' },
-        { name: 'verifyingContract', type: 'address' },
       ]);
       cmp(eip712msg.types.ProofOfAgreement, [
         { name: 'agreementCID', type: 'string' },

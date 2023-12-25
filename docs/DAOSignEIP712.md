@@ -4,8 +4,6 @@
 struct EIP712Domain {
   string name;
   string version;
-  uint256 chainId;
-  address verifyingContract;
 }
 ```
 
@@ -70,7 +68,7 @@ struct EIP712PropertyType {
 
 ```solidity
 struct EIP712ProofOfAuthorityTypes {
-  struct EIP712PropertyType[4] EIP712Domain;
+  struct EIP712PropertyType[2] EIP712Domain;
   struct EIP712PropertyType[2] Signer;
   struct EIP712PropertyType[7] ProofOfAuthority;
 }
@@ -91,7 +89,7 @@ struct EIP712ProofOfAuthority {
 
 ```solidity
 struct EIP712ProofOfSignatureTypes {
-  struct EIP712PropertyType[4] EIP712Domain;
+  struct EIP712PropertyType[2] EIP712Domain;
   struct EIP712PropertyType[6] ProofOfSignature;
 }
 ```
@@ -111,7 +109,7 @@ struct EIP712ProofOfSignature {
 
 ```solidity
 struct EIP712ProofOfAgreementTypes {
-  struct EIP712PropertyType[4] EIP712Domain;
+  struct EIP712PropertyType[2] EIP712Domain;
   struct EIP712PropertyType[5] ProofOfAgreement;
 }
 ```
