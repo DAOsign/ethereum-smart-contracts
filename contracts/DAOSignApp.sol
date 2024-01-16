@@ -81,11 +81,7 @@ contract DAOSignApp is DAOSignEIP712, IDAOSignApp {
         string memory cid
     ) external view returns (SignedProofOfAgreementMsg memory) {
         SignedProofOfAgreement memory data = poags[cid];
-        return
-            SignedProofOfAgreementMsg({
-                message: toEIP712Message(data.message),
-                signature: data.signature
-            });
+        return SignedProofOfAgreementMsg({ message: toEIP712Message(data.message) });
     }
 
     function memcmp(bytes memory a, bytes memory b) internal pure returns (bool) {

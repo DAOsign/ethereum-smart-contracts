@@ -562,11 +562,9 @@ describe('DAOSignApp', () => {
         timestamp: Math.floor(Date.now() / 1000),
         metadata: 'proof metadata',
       };
-      const sig = signMessage(mocks.privateKey, 'ProofOfAgreement', msg);
 
       const tx = mocks.app.storeProofOfAgreement({
         message: msg,
-        signature: sig,
         proofCID: paddRigthStr('ProofOfAgreement proof cid'),
       });
       await expect(tx).emit(mocks.app, 'NewProofOfAgreement');
@@ -574,7 +572,6 @@ describe('DAOSignApp', () => {
       const msgdoc = await mocks.app.getProofOfAgreement(
         paddRigthStr('ProofOfAgreement proof cid'),
       );
-      expect(msgdoc.signature).eq(sig);
       expect(msgdoc.message.domain.name).eq('daosign');
       expect(msgdoc.message.domain.version).eq('0.1.0');
       cmp(msgdoc.message.types.EIP712Domain, [
