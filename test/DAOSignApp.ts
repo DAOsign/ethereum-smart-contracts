@@ -211,7 +211,7 @@ describe('DAOSignApp', () => {
         message: {
           name: 'Proof-of-Signature',
           signer: signer.address,
-          agreementCID: paddRigthStr('POA CID'),
+          authorityCID: paddRigthStr('POA CID'),
           app: 'daosign',
           timestamp: Math.floor(Date.now() / 1000),
           metadata: '{}',
@@ -228,7 +228,7 @@ describe('DAOSignApp', () => {
         message: {
           name: 'Proof-of-Signature',
           signer: signer.address,
-          agreementCID: paddRigthStr('POA CID'),
+          authorityCID: paddRigthStr('POA CID'),
           app: 'daosign ',
           timestamp: Math.floor(Date.now() / 1000),
           metadata: '{}',
@@ -245,7 +245,7 @@ describe('DAOSignApp', () => {
         message: {
           name: 'Proof-of-Authority',
           signer: signer.address,
-          agreementCID: paddRigthStr('POA CID'),
+          authorityCID: paddRigthStr('POA CID'),
           app: 'daosign',
           timestamp: Math.floor(Date.now() / 1000),
           metadata: '{}',
@@ -262,7 +262,7 @@ describe('DAOSignApp', () => {
         message: {
           name: 'Proof-of-Signature',
           signer: someone.address,
-          agreementCID: paddRigthStr('POA CID'),
+          authorityCID: paddRigthStr('POA CID'),
           app: 'daosign',
           timestamp: Math.floor(Date.now() / 1000),
           metadata: '{}',
@@ -279,7 +279,7 @@ describe('DAOSignApp', () => {
         message: {
           name: 'Proof-of-Signature',
           signer: signer.address,
-          agreementCID: paddRigthStr('POA CID'),
+          authorityCID: paddRigthStr('POA CID'),
           app: 'daosign',
           timestamp: Math.floor(Date.now() / 1000),
           metadata: '{}',
@@ -324,7 +324,7 @@ describe('DAOSignApp', () => {
         message: {
           name: 'Proof-of-Signature',
           signer: signer.address,
-          agreementCID: paddRigthStr('POA CID'),
+          authorityCID: paddRigthStr('POA CID'),
           app: 'daosign',
           timestamp: Math.floor(Date.now() / 1000),
           metadata: '{}',
@@ -338,7 +338,7 @@ describe('DAOSignApp', () => {
         message: {
           name: 'Proof-of-Signature',
           signer: signer2.address,
-          agreementCID: paddRigthStr('POA CID'),
+          authorityCID: paddRigthStr('POA CID'),
           app: 'daosign',
           timestamp: Math.floor(Date.now() / 1000),
           metadata: '{}',
@@ -352,7 +352,7 @@ describe('DAOSignApp', () => {
     it('error: Invalid proof CID', async () => {
       const data = {
         message: {
-          agreementCID: paddRigthStr('POA CID'),
+          authorityCID: paddRigthStr('POA CID'),
           signatureCIDs: [paddRigthStr('POS CID 1'), paddRigthStr('POS CID 2')],
           app: 'daosign',
           timestamp: Math.floor(Date.now() / 1000),
@@ -368,7 +368,7 @@ describe('DAOSignApp', () => {
     it('error: Invalid app name', async () => {
       const data = {
         message: {
-          agreementCID: paddRigthStr('POA CID'),
+          authorityCID: paddRigthStr('POA CID'),
           signatureCIDs: [paddRigthStr('POS CID 1'), paddRigthStr('POS CID 2')],
           app: 'daosign s',
           timestamp: Math.floor(Date.now() / 1000),
@@ -384,7 +384,7 @@ describe('DAOSignApp', () => {
     it('error: Invalid Proof-of-Authority name', async () => {
       const data = {
         message: {
-          agreementCID: paddRigthStr('...invalid'),
+          authorityCID: paddRigthStr('...invalid'),
           signatureCIDs: [paddRigthStr('POS CID 1'), paddRigthStr('POS CID 2')],
           app: 'daosign',
           timestamp: Math.floor(Date.now() / 1000),
@@ -400,7 +400,7 @@ describe('DAOSignApp', () => {
     it('error: Invalid Proofs-of-Signatures length', async () => {
       const data = {
         message: {
-          agreementCID: paddRigthStr('POA CID'),
+          authorityCID: paddRigthStr('POA CID'),
           signatureCIDs: [paddRigthStr('POS CID 1')],
           app: 'daosign',
           timestamp: Math.floor(Date.now() / 1000),
@@ -418,7 +418,7 @@ describe('DAOSignApp', () => {
     it('error: Invalid Proofs-of-Signature signer', async () => {
       const data = {
         message: {
-          agreementCID: paddRigthStr('POA CID'),
+          authorityCID: paddRigthStr('POA CID'),
           signatureCIDs: [paddRigthStr('POS CID 1'), paddRigthStr('...invalid')],
           app: 'daosign',
           timestamp: Math.floor(Date.now() / 1000),
@@ -436,7 +436,7 @@ describe('DAOSignApp', () => {
     it('success', async () => {
       const data = {
         message: {
-          agreementCID: paddRigthStr('POA CID'),
+          authorityCID: paddRigthStr('POA CID'),
           signatureCIDs: [paddRigthStr('POS CID 1'), paddRigthStr('POS CID 2')],
           app: 'daosign',
           timestamp: Math.floor(Date.now() / 1000),
@@ -513,7 +513,7 @@ describe('DAOSignApp', () => {
       const msg: ProofOfSignatureStruct = {
         name: 'Proof-of-Signature',
         signer: mocks.signer.address,
-        agreementCID: paddRigthStr('ProofOfAuthority proof cid'),
+        authorityCID: paddRigthStr('ProofOfAuthority proof cid'),
         app: 'daosign',
         timestamp: Math.floor(Date.now() / 1000),
         metadata: 'proof metadata',
@@ -540,7 +540,7 @@ describe('DAOSignApp', () => {
       cmp(msgdoc.message.types.ProofOfSignature, [
         { name: 'name', type: 'string' },
         { name: 'signer', type: 'address' },
-        { name: 'agreementCID', type: 'string' },
+        { name: 'authorityCID', type: 'string' },
         { name: 'app', type: 'string' },
         { name: 'timestamp', type: 'uint256' },
         { name: 'metadata', type: 'string' },
@@ -548,7 +548,7 @@ describe('DAOSignApp', () => {
       expect(msgdoc.message.primaryType).eq('ProofOfSignature');
       expect(msgdoc.message.message.name).eq(msg.name);
       expect(msgdoc.message.message.signer).eq(msg.signer);
-      expect(msgdoc.message.message.agreementCID).eq(msg.agreementCID);
+      expect(msgdoc.message.message.authorityCID).eq(msg.authorityCID);
       expect(msgdoc.message.message.app).eq(msg.app);
       expect(msgdoc.message.message.timestamp).eq(msg.timestamp);
       expect(msgdoc.message.message.metadata).eq(msg.metadata);
@@ -556,7 +556,7 @@ describe('DAOSignApp', () => {
 
     it('ProofOfAgreement', async () => {
       const msg: ProofOfAgreementStruct = {
-        agreementCID: paddRigthStr('ProofOfAuthority proof cid'),
+        authorityCID: paddRigthStr('ProofOfAuthority proof cid'),
         signatureCIDs: [paddRigthStr('ProofOfSignature proof cid')],
         app: 'daosign',
         timestamp: Math.floor(Date.now() / 1000),
@@ -582,13 +582,13 @@ describe('DAOSignApp', () => {
         { name: 'version', type: 'string' },
       ]);
       cmp(msgdoc.message.types.ProofOfAgreement, [
-        { name: 'agreementCID', type: 'string' },
+        { name: 'authorityCID', type: 'string' },
         { name: 'signatureCIDs', type: 'string[]' },
         { name: 'app', type: 'string' },
         { name: 'timestamp', type: 'uint256' },
         { name: 'metadata', type: 'string' },
       ]);
-      expect(msgdoc.message.message.agreementCID).eq(msg.agreementCID);
+      expect(msgdoc.message.message.authorityCID).eq(msg.authorityCID);
       expect(msgdoc.message.message.signatureCIDs.length).eq(msg.signatureCIDs.length);
       expect(msgdoc.message.message.signatureCIDs[0]).eq(msg.signatureCIDs[0]);
       expect(msgdoc.message.message.app).eq(msg.app);
