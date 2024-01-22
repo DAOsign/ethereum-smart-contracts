@@ -50,6 +50,8 @@ pragma solidity ^0.8.19;
 struct EIP712Domain {
     string name;
     string version;
+    uint256 chainId;
+    address verifyingContract;
 }
 
 struct Signer {
@@ -126,7 +128,9 @@ struct EIP712ProofOfAgreement {
     ProofOfAgreement message;
 }
 
-bytes32 constant EIP712DOMAIN_TYPEHASH = keccak256('EIP712Domain(string name,string version)');
+bytes32 constant EIP712DOMAIN_TYPEHASH = keccak256(
+    'EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)'
+);
 bytes32 constant SIGNER_TYPEHASH = keccak256('Signer(address addr,string metadata)');
 bytes32 constant PROOF_OF_AUTHORITY_TYPEHASH = keccak256(
     'ProofOfAuthority(string name,address from,string agreementCID,Signer[] signers,string app,uint256 timestamp,string metadata)Signer(address addr,string metadata)'
@@ -249,7 +253,9 @@ abstract contract DAOSignEIP712 {
         bytes memory encoded = abi.encode(
             EIP712DOMAIN_TYPEHASH,
             keccak256(bytes(data.name)),
-            keccak256(bytes(data.version))
+            keccak256(bytes(data.version)),
+            data.chainId,
+            data.verifyingContract
         );
         return keccak256(encoded);
     }

@@ -16,6 +16,8 @@ describe('DAOSignEIP712', () => {
   const domain: EIP712DomainStruct = {
     name: 'daosign',
     version: '0.1.0',
+    chainId: 1,
+    verifyingContract: ethers.ZeroAddress,
   };
 
   let mocks: {
