@@ -4,6 +4,8 @@
 struct EIP712Domain {
   string name;
   string version;
+  uint256 chainId;
+  address verifyingContract;
 }
 ```
 
@@ -36,7 +38,7 @@ struct ProofOfAuthority {
 struct ProofOfSignature {
   string name;
   address signer;
-  string agreementCID;
+  string authorityCID;
   string app;
   uint256 timestamp;
   string metadata;
@@ -47,7 +49,7 @@ struct ProofOfSignature {
 
 ```solidity
 struct ProofOfAgreement {
-  string agreementCID;
+  string authorityCID;
   string[] signatureCIDs;
   string app;
   uint256 timestamp;

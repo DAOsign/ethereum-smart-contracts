@@ -27,13 +27,11 @@ struct SignedProofOfSignatureMsg {
 
 struct SignedProofOfAgreement {
     ProofOfAgreement message;
-    bytes signature;
     string proofCID;
 }
 
 struct SignedProofOfAgreementMsg {
     EIP712ProofOfAgreement message;
-    bytes signature;
 }
 
 interface IDAOSignApp {

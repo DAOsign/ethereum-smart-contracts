@@ -16,6 +16,8 @@ contract DAOSignApp is DAOSignEIP712, IDAOSignApp {
     constructor() {
         domain.name = 'daosign';
         domain.version = '0.1.0';
+        domain.chainId = 1;
+        domain.verifyingContract = address(0);
         DOMAIN_HASH = hash(domain);
         initEIP712Types();
     }
@@ -81,11 +83,7 @@ contract DAOSignApp is DAOSignEIP712, IDAOSignApp {
         string memory cid
     ) external view returns (SignedProofOfAgreementMsg memory) {
         SignedProofOfAgreement memory data = poags[cid];
-        return
-            SignedProofOfAgreementMsg({
-                message: toEIP712Message(data.message),
-                signature: data.signature
-            });
+        return SignedProofOfAgreementMsg({ message: toEIP712Message(data.message) });
     }
 
     function memcmp(bytes memory a, bytes memory b) internal pure returns (bool) {
@@ -115,9 +113,9 @@ contract DAOSignApp is DAOSignEIP712, IDAOSignApp {
         require(strcmp(data.message.app, 'daosign'), 'Invalid app name');
         require(strcmp(data.message.name, 'Proof-of-Signature'), 'Invalid proof name');
 
-        uint i = poauSignersIdx[data.message.agreementCID][data.message.signer];
+        uint i = poauSignersIdx[data.message.authorityCID][data.message.signer];
         require(
-            poaus[data.message.agreementCID].message.signers[i].addr == data.message.signer,
+            poaus[data.message.authorityCID].message.signers[i].addr == data.message.signer,
             'Invalid signer'
         );
 
@@ -128,20 +126,20 @@ contract DAOSignApp is DAOSignEIP712, IDAOSignApp {
         require(bytes(data.proofCID).length == IPFS_CID_LENGTH, 'Invalid proof CID');
         require(strcmp(data.message.app, 'daosign'), 'Invalid app name');
         require(
-            strcmp(poaus[data.message.agreementCID].message.name, 'Proof-of-Authority'),
+            strcmp(poaus[data.message.authorityCID].message.name, 'Proof-of-Authority'),
             'Invalid Proof-of-Authority name'
         );
         require(
-            poaus[data.message.agreementCID].message.signers.length ==
+            poaus[data.message.authorityCID].message.signers.length ==
                 data.message.signatureCIDs.length,
             'Invalid Proofs-of-Signatures length'
         );
         for (uint i = 0; i < data.message.signatureCIDs.length; i++) {
-            uint idx = poauSignersIdx[data.message.agreementCID][
+            uint idx = poauSignersIdx[data.message.authorityCID][
                 posis[data.message.signatureCIDs[i]].message.signer
             ];
             require(
-                poaus[data.message.agreementCID].message.signers[idx].addr ==
+                poaus[data.message.authorityCID].message.signers[idx].addr ==
                     posis[data.message.signatureCIDs[i]].message.signer,
                 'Invalid Proofs-of-Signature signer'
             );

@@ -31,13 +31,13 @@ pragma solidity ^0.8.19;
  *         ProofOfSignature: [
  *             { name: "name", type: "string" },
  *             { name: "signer", type: "address" },
- *             { name: "agreementCID", type: "string" },
+ *             { name: "authorityCID", type: "string" },
  *             { name: "app", type: "string" },
  *             { name: "timestamp", type: "uint256" },
  *             { name: "metadata", type: "string" },
  *         ],
  *         ProofOfAgreement: [
- *             { name: "agreementCID", type: "string" },
+ *             { name: "authorityCID", type: "string" },
  *             { name: "signatureCIDs", type: "string[]" },
  *             { name: "app", type: "string" },
  *             { name: "timestamp", type: "uint256" },
@@ -50,6 +50,8 @@ pragma solidity ^0.8.19;
 struct EIP712Domain {
     string name;
     string version;
+    uint256 chainId;
+    address verifyingContract;
 }
 
 struct Signer {
@@ -70,14 +72,14 @@ struct ProofOfAuthority {
 struct ProofOfSignature {
     string name;
     address signer;
-    string agreementCID;
+    string authorityCID;
     string app;
     uint256 timestamp;
     string metadata;
 }
 
 struct ProofOfAgreement {
-    string agreementCID;
+    string authorityCID;
     string[] signatureCIDs;
     string app;
     uint256 timestamp;
@@ -126,16 +128,18 @@ struct EIP712ProofOfAgreement {
     ProofOfAgreement message;
 }
 
-bytes32 constant EIP712DOMAIN_TYPEHASH = keccak256('EIP712Domain(string name,string version)');
+bytes32 constant EIP712DOMAIN_TYPEHASH = keccak256(
+    'EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)'
+);
 bytes32 constant SIGNER_TYPEHASH = keccak256('Signer(address addr,string metadata)');
 bytes32 constant PROOF_OF_AUTHORITY_TYPEHASH = keccak256(
     'ProofOfAuthority(string name,address from,string agreementCID,Signer[] signers,string app,uint256 timestamp,string metadata)Signer(address addr,string metadata)'
 );
 bytes32 constant PROOF_OF_SIGNATURE_TYPEHASH = keccak256(
-    'ProofOfSignature(string name,address signer,string agreementCID,string app,uint256 timestamp,string metadata)'
+    'ProofOfSignature(string name,address signer,string authorityCID,string app,uint256 timestamp,string metadata)'
 );
 bytes32 constant PROOF_OF_AGREEMENT_TYPEHASH = keccak256(
-    'ProofOfAgreement(string agreementCID,string[] signatureCIDs,string app,uint256 timestamp,string metadata)'
+    'ProofOfAgreement(string authorityCID,string[] signatureCIDs,string app,uint256 timestamp,string metadata)'
 );
 
 abstract contract DAOSignEIP712 {
@@ -201,7 +205,7 @@ abstract contract DAOSignEIP712 {
             kind: 'address'
         });
         proofOfSignatureDoc.types.ProofOfSignature[2] = EIP712PropertyType({
-            name: 'agreementCID',
+            name: 'authorityCID',
             kind: 'string'
         });
         proofOfSignatureDoc.types.ProofOfSignature[3] = EIP712PropertyType({
@@ -222,7 +226,7 @@ abstract contract DAOSignEIP712 {
         proofOfAgreementDoc.types.EIP712Domain[0] = domain0Doc;
         proofOfAgreementDoc.types.EIP712Domain[1] = domain1Doc;
         proofOfAgreementDoc.types.ProofOfAgreement[0] = EIP712PropertyType({
-            name: 'agreementCID',
+            name: 'authorityCID',
             kind: 'string'
         });
         proofOfAgreementDoc.types.ProofOfAgreement[1] = EIP712PropertyType({
@@ -249,7 +253,9 @@ abstract contract DAOSignEIP712 {
         bytes memory encoded = abi.encode(
             EIP712DOMAIN_TYPEHASH,
             keccak256(bytes(data.name)),
-            keccak256(bytes(data.version))
+            keccak256(bytes(data.version)),
+            data.chainId,
+            data.verifyingContract
         );
         return keccak256(encoded);
     }
@@ -290,7 +296,7 @@ abstract contract DAOSignEIP712 {
             PROOF_OF_SIGNATURE_TYPEHASH,
             keccak256(bytes(data.name)),
             data.signer,
-            keccak256(bytes(data.agreementCID)),
+            keccak256(bytes(data.authorityCID)),
             keccak256(bytes(data.app)),
             data.timestamp,
             keccak256(bytes(data.metadata))
@@ -309,7 +315,7 @@ abstract contract DAOSignEIP712 {
     function hash(ProofOfAgreement memory data) internal pure returns (bytes32) {
         bytes memory encoded = abi.encode(
             PROOF_OF_AGREEMENT_TYPEHASH,
-            keccak256(bytes(data.agreementCID)),
+            keccak256(bytes(data.authorityCID)),
             hash(data.signatureCIDs),
             keccak256(bytes(data.app)),
             data.timestamp,

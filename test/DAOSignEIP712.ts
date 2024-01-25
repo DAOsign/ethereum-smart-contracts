@@ -16,6 +16,8 @@ describe('DAOSignEIP712', () => {
   const domain: EIP712DomainStruct = {
     name: 'daosign',
     version: '0.1.0',
+    chainId: 1,
+    verifyingContract: ethers.ZeroAddress,
   };
 
   let mocks: {
@@ -94,7 +96,7 @@ describe('DAOSignEIP712', () => {
       const msg: ProofOfSignatureStruct = {
         name: 'name',
         signer: ethers.ZeroAddress,
-        agreementCID: 'agreementCID',
+        authorityCID: 'authorityCID',
         app: 'daosign',
         timestamp: 123,
         metadata: 'metadata',
@@ -111,7 +113,7 @@ describe('DAOSignEIP712', () => {
       cmp(eip712msg.types.ProofOfSignature, [
         { name: 'name', type: 'string' },
         { name: 'signer', type: 'address' },
-        { name: 'agreementCID', type: 'string' },
+        { name: 'authorityCID', type: 'string' },
         { name: 'app', type: 'string' },
         { name: 'timestamp', type: 'uint256' },
         { name: 'metadata', type: 'string' },
@@ -119,7 +121,7 @@ describe('DAOSignEIP712', () => {
       expect(eip712msg.primaryType).eq('ProofOfSignature');
       expect(eip712msg.message.name).eq(msg.name);
       expect(eip712msg.message.signer).eq(msg.signer);
-      expect(eip712msg.message.agreementCID).eq(msg.agreementCID);
+      expect(eip712msg.message.authorityCID).eq(msg.authorityCID);
       expect(eip712msg.message.app).eq(msg.app);
       expect(eip712msg.message.timestamp).eq(msg.timestamp);
       expect(eip712msg.message.metadata).eq(msg.metadata);
@@ -127,7 +129,7 @@ describe('DAOSignEIP712', () => {
 
     it('EIP712ProofOfAgreement', async () => {
       const msg: ProofOfAgreementStruct = {
-        agreementCID: 'agreementCID',
+        authorityCID: 'authorityCID',
         signatureCIDs: ['signatureCID0', 'signatureCID1'],
         app: 'daosign',
         timestamp: 123,
@@ -143,14 +145,14 @@ describe('DAOSignEIP712', () => {
         { name: 'version', type: 'string' },
       ]);
       cmp(eip712msg.types.ProofOfAgreement, [
-        { name: 'agreementCID', type: 'string' },
+        { name: 'authorityCID', type: 'string' },
         { name: 'signatureCIDs', type: 'string[]' },
         { name: 'app', type: 'string' },
         { name: 'timestamp', type: 'uint256' },
         { name: 'metadata', type: 'string' },
       ]);
       expect(eip712msg.primaryType).eq('ProofOfAgreement');
-      expect(eip712msg.message.agreementCID).eq(msg.agreementCID);
+      expect(eip712msg.message.authorityCID).eq(msg.authorityCID);
       expect(eip712msg.message.signatureCIDs.length).eq(msg.signatureCIDs.length);
       expect(eip712msg.message.signatureCIDs[0]).eq(msg.signatureCIDs[0]);
       expect(eip712msg.message.signatureCIDs[1]).eq(msg.signatureCIDs[1]);
@@ -182,7 +184,7 @@ describe('DAOSignEIP712', () => {
       const message: ProofOfSignatureStruct = {
         name: 'Proof-of-Signature',
         signer: signer.address,
-        agreementCID: 'agreementCID',
+        authorityCID: 'authorityCID',
         app: 'daosign',
         timestamp: (Date.now() / 1000) | 0,
         metadata: 'metadata',
@@ -195,7 +197,7 @@ describe('DAOSignEIP712', () => {
     it('ProofOfAgreement', async () => {
       const { privateKey, signer, app } = mocks;
       const message: ProofOfAgreementStruct = {
-        agreementCID: 'agreementCID',
+        authorityCID: 'authorityCID',
         signatureCIDs: ['signatureCID0', 'signatureCID1'],
         app: 'daosign',
         timestamp: (Date.now() / 1000) | 0,

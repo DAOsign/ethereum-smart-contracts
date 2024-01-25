@@ -41,7 +41,6 @@ struct SignedProofOfSignatureMsg {
 ```solidity
 struct SignedProofOfAgreement {
   struct ProofOfAgreement message;
-  bytes signature;
   string proofCID;
 }
 ```
@@ -51,7 +50,6 @@ struct SignedProofOfAgreement {
 ```solidity
 struct SignedProofOfAgreementMsg {
   struct EIP712ProofOfAgreement message;
-  bytes signature;
 }
 ```
 
