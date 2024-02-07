@@ -8,7 +8,8 @@ import 'solidity-docgen';
 import 'hardhat-contract-sizer';
 import './tasks';
 
-const { GOERLI_URL, ETHEREUM_MAINNET_URL, PRIVATE_KEY, ETHERSCAN_API_KEY } = process.env;
+const { SEPOLIA_URL, GOERLI_URL, ETHEREUM_MAINNET_URL, PRIVATE_KEY, ETHERSCAN_API_KEY } =
+  process.env;
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -38,6 +39,10 @@ const config: HardhatUserConfig = {
     },
     ethereum: {
       url: ETHEREUM_MAINNET_URL || '',
+      accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
+    },
+    sepolia: {
+      url: SEPOLIA_URL || '',
       accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
     },
   },
