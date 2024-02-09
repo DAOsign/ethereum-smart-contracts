@@ -1,10 +1,17 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.19;
 
-import { DAOSignApp } from '../DAOSignApp.sol';
-import { SignedProofOfAuthority, SignedProofOfSignature, SignedProofOfAgreement } from '../interfaces/IDAOSignApp.sol';
+import { SignedProofOfAuthority, SignedProofOfSignature, SignedProofOfAgreement, DAOSignApp } from '../DAOSignApp.sol';
 
 contract MockDAOSignApp is DAOSignApp {
+    constructor(
+        address _proofOfAuthority,
+        address _proofOfSignature,
+        address _proofOfAgreement,
+        address _proofOfVoid,
+        address _tradeFI
+    ) DAOSignApp(_proofOfAuthority, _proofOfSignature, _proofOfAgreement, _proofOfVoid, _tradeFI) {}
+
     function validateProofOfAuthority(
         SignedProofOfAuthority memory data
     ) public pure returns (bool) {

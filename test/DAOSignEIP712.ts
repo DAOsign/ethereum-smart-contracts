@@ -27,19 +27,41 @@ describe('DAOSignEIP712', () => {
   };
 
   async function deployProofsFixture() {
-    const [[signer], DAOSignEIP712] = await Promise.all([
+    const [
+      [signer],
+      DAOSignEIP712,
+      EIP721ProofOfAuthority,
+      EIP712ProofOfSignature,
+      EIP712ProofOfAgreement,
+      EIP712ProofOfVoid,
+    ] = await Promise.all([
       ethers.getSigners(),
       ethers.getContractFactory('MockDAOSignEIP712'),
+      ethers.getContractFactory('EIP721ProofOfAuthority'),
+      ethers.getContractFactory('EIP712ProofOfSignature'),
+      ethers.getContractFactory('EIP712ProofOfAgreement'),
+      ethers.getContractFactory('EIP712ProofOfVoid'),
     ]);
 
     const accounts = config.networks.hardhat.accounts as HardhatNetworkHDAccountsConfig;
     const wallet = ethers.Wallet.fromPhrase(accounts.mnemonic);
     const privateKey = Buffer.from(wallet.privateKey.slice(2), 'hex');
 
+    const proofOfAuthority = await EIP721ProofOfAuthority.deploy();
+    const proofOfSignature = await EIP712ProofOfSignature.deploy();
+    const proofOfAgreement = await EIP712ProofOfAgreement.deploy();
+    const proofOfVoid = await EIP712ProofOfVoid.deploy();
+
     return {
       privateKey,
       signer,
-      app: await DAOSignEIP712.deploy(domain),
+      app: await DAOSignEIP712.deploy(
+        domain,
+        await proofOfAuthority.getAddress(),
+        await proofOfSignature.getAddress(),
+        await proofOfAgreement.getAddress(),
+        await proofOfVoid.getAddress(),
+      ),
     };
   }
 

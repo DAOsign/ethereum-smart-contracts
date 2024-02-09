@@ -7,7 +7,7 @@ import {
   ProofOfAuthorityStruct,
   ProofOfSignatureStruct,
   ProofOfAgreementStruct,
-  SignedProofOfAuthority,
+  SignedProofOfAuthorityStruct,
 } from '../typechain-types/DAOSignApp.sol/DAOSignApp';
 import { cmp, paddRigthStr, signMessage } from './utils';
 import { MockDAOSignApp } from '../typechain-types';
@@ -20,20 +20,47 @@ describe('DAOSignApp', () => {
   };
 
   async function deployProofsFixture() {
-    const [[signer, signer2, someone], MockDAOSignAppFactory] = await Promise.all([
+    const [
+      [signer, signer2, someone],
+      MockDAOSignAppFactory,
+      MockTradeFIFactory,
+      EIP721ProofOfAuthority,
+      EIP712ProofOfSignature,
+      EIP712ProofOfAgreement,
+      EIP712ProofOfVoid,
+    ] = await Promise.all([
       ethers.getSigners(),
       ethers.getContractFactory('MockDAOSignApp'),
+      ethers.getContractFactory('MockTradeFI'),
+      ethers.getContractFactory('EIP721ProofOfAuthority'),
+      ethers.getContractFactory('EIP712ProofOfSignature'),
+      ethers.getContractFactory('EIP712ProofOfAgreement'),
+      ethers.getContractFactory('EIP712ProofOfVoid'),
     ]);
+
     const accounts = config.networks.hardhat.accounts as HardhatNetworkHDAccountsConfig;
     const wallet = ethers.Wallet.fromPhrase(accounts.mnemonic);
     const privateKey = Buffer.from(wallet.privateKey.slice(2), 'hex');
+
+    const tradeFi = await MockTradeFIFactory.deploy();
+    const proofOfAuthority = await EIP721ProofOfAuthority.deploy();
+    const proofOfSignature = await EIP712ProofOfSignature.deploy();
+    const proofOfAgreement = await EIP712ProofOfAgreement.deploy();
+    const proofOfVoid = await EIP712ProofOfVoid.deploy();
 
     return {
       privateKey,
       signer,
       signer2,
       someone,
-      app: await MockDAOSignAppFactory.deploy(),
+      tradeFi,
+      app: await MockDAOSignAppFactory.deploy(
+        await proofOfAuthority.getAddress(),
+        await proofOfSignature.getAddress(),
+        await proofOfAgreement.getAddress(),
+        await proofOfVoid.getAddress(),
+        await tradeFi.getAddress(),
+      ),
     };
   }
 
@@ -47,7 +74,7 @@ describe('DAOSignApp', () => {
     });
 
     it('error: Invalid proof CID', async () => {
-      const data: SignedProofOfAuthority = {
+      const data: SignedProofOfAuthorityStruct = {
         message: {
           name: 'Proof-of-Authority',
           from: signer.address,
@@ -65,7 +92,7 @@ describe('DAOSignApp', () => {
     });
 
     it('error: Invalid app name', async () => {
-      const data: SignedProofOfAuthority = {
+      const data: SignedProofOfAuthorityStruct = {
         message: {
           name: 'Proof-of-Authority',
           from: signer.address,
@@ -83,7 +110,7 @@ describe('DAOSignApp', () => {
     });
 
     it('error: Invalid proof name', async () => {
-      const data: SignedProofOfAuthority = {
+      const data: SignedProofOfAuthorityStruct = {
         message: {
           name: 'Proof-of-Signature',
           from: signer.address,
@@ -101,7 +128,7 @@ describe('DAOSignApp', () => {
     });
 
     it('error: Invalid agreement CID', async () => {
-      const data: SignedProofOfAuthority = {
+      const data: SignedProofOfAuthorityStruct = {
         message: {
           name: 'Proof-of-Authority',
           from: signer.address,
@@ -120,7 +147,7 @@ describe('DAOSignApp', () => {
 
     it('error: Invalid signer', async () => {
       // First
-      const data: SignedProofOfAuthority = {
+      const data: SignedProofOfAuthorityStruct = {
         message: {
           name: 'Proof-of-Authority',
           from: signer.address,
@@ -141,7 +168,7 @@ describe('DAOSignApp', () => {
       await expect(app.validateProofOfAuthority(data)).revertedWith('Invalid signer');
 
       // Last
-      const data2: SignedProofOfAuthority = {
+      const data2: SignedProofOfAuthorityStruct = {
         message: {
           name: 'Proof-of-Authority',
           from: signer.address,
@@ -163,7 +190,7 @@ describe('DAOSignApp', () => {
     });
 
     it('success', async () => {
-      const data: SignedProofOfAuthority = {
+      const data: SignedProofOfAuthorityStruct = {
         message: {
           name: 'Proof-of-Authority',
           from: signer.address,
@@ -190,7 +217,7 @@ describe('DAOSignApp', () => {
       ({ app, signer, someone } = await loadFixture(deployProofsFixture));
 
       // Mock store Proof-of-Authority
-      const data: SignedProofOfAuthority = {
+      const data: SignedProofOfAuthorityStruct = {
         message: {
           name: 'Proof-of-Authority',
           from: signer.address,
@@ -301,7 +328,7 @@ describe('DAOSignApp', () => {
       ({ app, signer, signer2 } = await loadFixture(deployProofsFixture));
 
       // Mock store Proof-of-Authority
-      const data: SignedProofOfAuthority = {
+      const data: SignedProofOfAuthorityStruct = {
         message: {
           name: 'Proof-of-Authority',
           from: signer.address,

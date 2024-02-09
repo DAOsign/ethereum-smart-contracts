@@ -1,30 +1,133 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.19;
 
-import { DAOSignEIP712, ProofOfAuthority, EIP712ProofOfAuthority, ProofOfSignature, EIP712ProofOfSignature, ProofOfAgreement, EIP712ProofOfAgreement } from './DAOSignEIP712.sol';
-import { IDAOSignApp, SignedProofOfAuthority, SignedProofOfSignature, SignedProofOfAgreement, SignedProofOfAuthorityMsg, SignedProofOfSignatureMsg, SignedProofOfAgreementMsg } from './interfaces/IDAOSignApp.sol';
+import { EIP712Domain, hash } from './messages/domain.sol';
+import { ProofOfAuthority, EIP712ProofOfAuthorityDocument, IEIP721ProofOfAuthority } from './messages/proof_of_authority.sol';
+import { ProofOfSignature, EIP712ProofOfSignatureDocument, IEIP712ProofOfSignature } from './messages/proof_of_signature.sol';
+import { ProofOfAgreement, EIP712ProofOfAgreementDocument, IEIP712ProofOfAgreement } from './messages/proof_of_agreement.sol';
+import { ProofOfVoid, EIP712ProofOfVoidDocument, IEIP712ProofOfVoid } from './messages/proof_of_void.sol';
+import { ITradeFI } from './interfaces/ITradeFI.sol';
 
-contract DAOSignApp is DAOSignEIP712, IDAOSignApp {
+struct SignedProofOfAuthority {
+    ProofOfAuthority message;
+    bytes signature;
+    string proofCID;
+}
+
+struct SignedProofOfAuthorityMsg {
+    EIP712ProofOfAuthorityDocument message;
+    bytes signature;
+}
+
+struct SignedProofOfSignature {
+    ProofOfSignature message;
+    bytes signature;
+    string proofCID;
+}
+
+struct SignedProofOfSignatureMsg {
+    EIP712ProofOfSignatureDocument message;
+    bytes signature;
+}
+
+struct SignedProofOfAgreement {
+    ProofOfAgreement message;
+    string proofCID;
+}
+
+struct SignedProofOfAgreementMsg {
+    EIP712ProofOfAgreementDocument message;
+}
+
+struct SignedProofOfVoid {
+    ProofOfVoid message;
+    bytes signature;
+    string proofCID;
+}
+
+struct SignedProofOfVoidMsg {
+    EIP712ProofOfVoidDocument message;
+    bytes signature;
+}
+
+interface IDAOSignApp {
+    event NewProofOfAuthority(SignedProofOfAuthority indexed data);
+    event NewProofOfSignature(SignedProofOfSignature indexed data);
+    event NewProofOfAgreement(SignedProofOfAgreement indexed data);
+    event NewProofOfVoid(SignedProofOfVoid indexed data);
+
+    function getProofOfAuthority(
+        string memory cid
+    ) external view returns (SignedProofOfAuthorityMsg memory);
+
+    function getProofOfSignature(
+        string memory cid
+    ) external view returns (SignedProofOfSignatureMsg memory);
+
+    function getProofOfAgreement(
+        string memory cid
+    ) external view returns (SignedProofOfAgreementMsg memory);
+
+    function getProofOfVoid(string memory cid) external view returns (SignedProofOfVoidMsg memory);
+
+    function storeProofOfAuthority(SignedProofOfAuthority memory data) external;
+
+    function storeProofOfSignature(SignedProofOfSignature memory data) external;
+
+    function storeProofOfAgreement(SignedProofOfAgreement memory data) external;
+
+    function storeProofOfVoid(SignedProofOfVoid memory data) external;
+}
+
+contract DAOSignApp is IDAOSignApp {
     uint256 internal constant IPFS_CID_LENGTH = 46;
+
+    EIP712Domain internal domain;
+    bytes32 internal domainHash;
+
+    IEIP721ProofOfAuthority internal proofOfAuthority;
+    IEIP712ProofOfSignature internal proofOfSignature;
+    IEIP712ProofOfAgreement internal proofOfAgreement;
+    IEIP712ProofOfVoid internal proofOfVoid;
+    ITradeFI private tradeFI;
 
     mapping(string => SignedProofOfAuthority) internal poaus;
     mapping(string => SignedProofOfSignature) internal posis;
     mapping(string => SignedProofOfAgreement) internal poags;
+    mapping(string => SignedProofOfVoid) internal pov;
+
+    mapping(string => bool) internal voided;
     mapping(string => address) internal proof2signer;
     mapping(string => mapping(address => uint256)) internal poauSignersIdx;
 
-    constructor() {
-        domain.name = 'daosign';
-        domain.version = '0.1.0';
-        domain.chainId = 1;
-        domain.verifyingContract = address(0);
-        DOMAIN_HASH = hash(domain);
-        initEIP712Types();
+    constructor(
+        address _proofOfAuthority,
+        address _proofOfSignature,
+        address _proofOfAgreement,
+        address _proofOfVoid,
+        address _tradeFI
+    ) {
+        domain = EIP712Domain({
+            name: 'daosign',
+            version: '0.1.0',
+            chainId: 1,
+            verifyingContract: address(0)
+        });
+        domainHash = hash(domain);
+        proofOfAuthority = IEIP721ProofOfAuthority(_proofOfAuthority);
+        proofOfSignature = IEIP712ProofOfSignature(_proofOfSignature);
+        proofOfAgreement = IEIP712ProofOfAgreement(_proofOfAgreement);
+        proofOfVoid = IEIP712ProofOfVoid(_proofOfVoid);
+        tradeFI = ITradeFI(_tradeFI);
     }
 
     function storeProofOfAuthority(SignedProofOfAuthority memory data) external {
-        require(recover(data.message, data.signature) == data.message.from, 'Invalid signature');
+        require(
+            proofOfAuthority.recover(domainHash, data.message, data.signature) == data.message.from,
+            'Invalid signature'
+        );
         require(validate(data), 'Invalid message');
+
         poaus[data.proofCID].message.name = data.message.name;
         poaus[data.proofCID].message.from = data.message.from;
         poaus[data.proofCID].message.agreementCID = data.message.agreementCID;
@@ -42,7 +145,11 @@ contract DAOSignApp is DAOSignEIP712, IDAOSignApp {
     }
 
     function storeProofOfSignature(SignedProofOfSignature memory data) external {
-        require(recover(data.message, data.signature) == data.message.signer, 'Invalid signature');
+        require(
+            proofOfSignature.recover(domainHash, data.message, data.signature) ==
+                data.message.signer,
+            'Invalid signature'
+        );
         require(validate(data), 'Invalid message');
 
         posis[data.proofCID] = data;
@@ -57,13 +164,25 @@ contract DAOSignApp is DAOSignEIP712, IDAOSignApp {
         emit NewProofOfAgreement(data);
     }
 
+    function storeProofOfVoid(SignedProofOfVoid memory data) external {
+        require(
+            proofOfVoid.recover(domainHash, data.message, data.signature) == tradeFI.getAdmin(),
+            'Invalid signature'
+        );
+        require(validate(data), 'Invalid message');
+
+        pov[data.proofCID] = data;
+        voided[data.message.authorityCID] = true;
+        emit NewProofOfVoid(data);
+    }
+
     function getProofOfAuthority(
         string memory cid
     ) external view returns (SignedProofOfAuthorityMsg memory) {
         SignedProofOfAuthority memory data = poaus[cid];
         return
             SignedProofOfAuthorityMsg({
-                message: toEIP712Message(data.message),
+                message: proofOfAuthority.toEIP712Message(domain, data.message),
                 signature: data.signature
             });
     }
@@ -74,7 +193,7 @@ contract DAOSignApp is DAOSignEIP712, IDAOSignApp {
         SignedProofOfSignature memory data = posis[cid];
         return
             SignedProofOfSignatureMsg({
-                message: toEIP712Message(data.message),
+                message: proofOfSignature.toEIP712Message(domain, data.message),
                 signature: data.signature
             });
     }
@@ -83,7 +202,19 @@ contract DAOSignApp is DAOSignEIP712, IDAOSignApp {
         string memory cid
     ) external view returns (SignedProofOfAgreementMsg memory) {
         SignedProofOfAgreement memory data = poags[cid];
-        return SignedProofOfAgreementMsg({ message: toEIP712Message(data.message) });
+        return
+            SignedProofOfAgreementMsg({
+                message: proofOfAgreement.toEIP712Message(domain, data.message)
+            });
+    }
+
+    function getProofOfVoid(string memory cid) external view returns (SignedProofOfVoidMsg memory) {
+        SignedProofOfVoid memory data = pov[cid];
+        return
+            SignedProofOfVoidMsg({
+                message: proofOfVoid.toEIP712Message(domain, data.message),
+                signature: data.signature
+            });
     }
 
     function memcmp(bytes memory a, bytes memory b) internal pure returns (bool) {
@@ -112,6 +243,7 @@ contract DAOSignApp is DAOSignEIP712, IDAOSignApp {
         require(bytes(data.proofCID).length == IPFS_CID_LENGTH, 'Invalid proof CID');
         require(strcmp(data.message.app, 'daosign'), 'Invalid app name');
         require(strcmp(data.message.name, 'Proof-of-Signature'), 'Invalid proof name');
+        require(!voided[data.message.authorityCID], 'ProofOfAuthority voided');
 
         uint i = poauSignersIdx[data.message.authorityCID][data.message.signer];
         require(
@@ -134,6 +266,8 @@ contract DAOSignApp is DAOSignEIP712, IDAOSignApp {
                 data.message.signatureCIDs.length,
             'Invalid Proofs-of-Signatures length'
         );
+        require(!voided[data.message.authorityCID], 'ProofOfAuthority voided');
+
         for (uint i = 0; i < data.message.signatureCIDs.length; i++) {
             uint idx = poauSignersIdx[data.message.authorityCID][
                 posis[data.message.signatureCIDs[i]].message.signer
@@ -144,6 +278,17 @@ contract DAOSignApp is DAOSignEIP712, IDAOSignApp {
                 'Invalid Proofs-of-Signature signer'
             );
         }
+        return true;
+    }
+
+    function validate(SignedProofOfVoid memory data) internal view returns (bool) {
+        require(bytes(data.proofCID).length == IPFS_CID_LENGTH, 'Invalid proof CID');
+        require(strcmp(data.message.app, 'daosign'), 'Invalid app name');
+        require(
+            strcmp(poaus[data.message.authorityCID].message.name, 'Proof-of-Authority'),
+            'Invalid Proof-of-Authority name'
+        );
+
         return true;
     }
 }
