@@ -8,8 +8,14 @@ import 'solidity-docgen';
 import 'hardhat-contract-sizer';
 import './tasks';
 
-const { SEPOLIA_URL, GOERLI_URL, ETHEREUM_MAINNET_URL, PRIVATE_KEY, ETHERSCAN_API_KEY } =
-  process.env;
+const {
+  SEPOLIA_URL,
+  GOERLI_URL,
+  ETHEREUM_MAINNET_URL,
+  PRIVATE_KEY,
+  ETHERSCAN_API_KEY,
+  ETHERSCAN_OPTIMISTIC_API_KEY,
+} = process.env;
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -30,7 +36,20 @@ const config: HardhatUserConfig = {
   },
   // To verify contracts on Etherscan
   etherscan: {
-    apiKey: ETHERSCAN_API_KEY,
+    apiKey: {
+      goerli: ETHERSCAN_API_KEY!,
+      sepolia: ETHERSCAN_OPTIMISTIC_API_KEY!,
+    },
+    customChains: [
+      {
+        network: 'sepolia',
+        chainId: 11155420,
+        urls: {
+          apiURL: 'https://api-sepolia-optimistic.etherscan.io/api',
+          browserURL: 'https://sepolia-optimism.etherscan.io/',
+        },
+      },
+    ],
   },
   networks: {
     hardhat: {
