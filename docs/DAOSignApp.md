@@ -362,30 +362,30 @@ function strcmp(string a, string b) internal pure returns (bool)
 ### validate
 
 ```solidity
-function validate(struct SignedProofOfAuthority data) public pure returns (bool)
+function validate(struct SignedProofOfAuthority data) internal pure returns (bool)
 ```
 
 ### validate
 
 ```solidity
-function validate(struct SignedProofOfSignature data) public view returns (bool)
+function validate(struct SignedProofOfSignature data) internal view returns (bool)
 ```
 
 ### validate
 
 ```solidity
-function validate(struct SignedProofOfAgreement data) public view returns (bool)
+function validate(struct SignedProofOfAgreement data) internal view returns (bool)
 ```
 
 ### validate
 
 ```solidity
-function validate(struct SignedProofOfVoid data) public view returns (bool)
+function validate(struct SignedProofOfVoid data) internal view returns (bool)
 ```
 
 ### validate
 
 ```solidity
-function validate(struct SignedProofOfCancel data) public pure returns (bool)
+function validate(struct SignedProofOfCancel data) internal pure returns (bool)
 ```
 

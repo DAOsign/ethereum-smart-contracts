@@ -278,7 +278,7 @@ contract DAOSignApp is IDAOSignApp {
         return memcmp(bytes(a), bytes(b));
     }
 
-    function validate(SignedProofOfAuthority memory data) public pure returns (bool) {
+    function validate(SignedProofOfAuthority memory data) internal pure returns (bool) {
         require(bytes(data.proofCID).length == IPFS_CID_LENGTH, 'Invalid proof CID');
         require(strcmp(data.message.app, 'daosign'), 'Invalid app name');
         require(strcmp(data.message.name, 'Proof-of-Authority'), 'Invalid proof name');
@@ -292,7 +292,7 @@ contract DAOSignApp is IDAOSignApp {
         return true;
     }
 
-    function validate(SignedProofOfSignature memory data) public view returns (bool) {
+    function validate(SignedProofOfSignature memory data) internal view returns (bool) {
         require(bytes(data.proofCID).length == IPFS_CID_LENGTH, 'Invalid proof CID');
         require(strcmp(data.message.app, 'daosign'), 'Invalid app name');
         require(strcmp(data.message.name, 'Proof-of-Signature'), 'Invalid proof name');
@@ -307,7 +307,7 @@ contract DAOSignApp is IDAOSignApp {
         return true;
     }
 
-    function validate(SignedProofOfAgreement memory data) public view returns (bool) {
+    function validate(SignedProofOfAgreement memory data) internal view returns (bool) {
         require(bytes(data.proofCID).length == IPFS_CID_LENGTH, 'Invalid proof CID');
         require(strcmp(data.message.app, 'daosign'), 'Invalid app name');
         require(
@@ -334,7 +334,7 @@ contract DAOSignApp is IDAOSignApp {
         return true;
     }
 
-    function validate(SignedProofOfVoid memory data) public view returns (bool) {
+    function validate(SignedProofOfVoid memory data) internal view returns (bool) {
         require(bytes(data.proofCID).length == IPFS_CID_LENGTH, 'Invalid proof CID');
         require(strcmp(data.message.app, 'daosign'), 'Invalid app name');
         require(
@@ -345,7 +345,7 @@ contract DAOSignApp is IDAOSignApp {
         return true;
     }
 
-    function validate(SignedProofOfCancel memory data) public pure returns (bool) {
+    function validate(SignedProofOfCancel memory data) internal pure returns (bool) {
         require(bytes(data.proofCID).length == IPFS_CID_LENGTH, 'Invalid proof CID');
         require(strcmp(data.message.app, 'daosign'), 'Invalid app name');
 
