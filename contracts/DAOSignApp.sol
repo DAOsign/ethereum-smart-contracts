@@ -6,6 +6,8 @@ import { ProofOfAuthority, EIP712ProofOfAuthorityDocument, IEIP721ProofOfAuthori
 import { ProofOfSignature, EIP712ProofOfSignatureDocument, IEIP712ProofOfSignature } from './messages/proof_of_signature.sol';
 import { ProofOfAgreement, EIP712ProofOfAgreementDocument, IEIP712ProofOfAgreement } from './messages/proof_of_agreement.sol';
 import { ProofOfVoid, EIP712ProofOfVoidDocument, IEIP712ProofOfVoid } from './messages/proof_of_void.sol';
+import { ProofOfCancel, EIP712ProofOfCancelDocument, IEIP712ProofOfCancel } from './messages/proof_of_cancel.sol';
+
 import { ITradeFI } from './interfaces/ITradeFI.sol';
 
 struct SignedProofOfAuthority {
@@ -50,11 +52,23 @@ struct SignedProofOfVoidMsg {
     bytes signature;
 }
 
+struct SignedProofOfCancel {
+    ProofOfCancel message;
+    bytes signature;
+    string proofCID;
+}
+
+struct SignedProofOfCancelMsg {
+    EIP712ProofOfCancelDocument message;
+    bytes signature;
+}
+
 interface IDAOSignApp {
     event NewProofOfAuthority(SignedProofOfAuthority indexed data);
     event NewProofOfSignature(SignedProofOfSignature indexed data);
     event NewProofOfAgreement(SignedProofOfAgreement indexed data);
     event NewProofOfVoid(SignedProofOfVoid indexed data);
+    event NewProofOfCancel(SignedProofOfCancel indexed data);
 
     function getProofOfAuthority(
         string memory cid
@@ -70,6 +84,10 @@ interface IDAOSignApp {
 
     function getProofOfVoid(string memory cid) external view returns (SignedProofOfVoidMsg memory);
 
+    function getProofOfCancel(
+        string memory cid
+    ) external view returns (SignedProofOfCancelMsg memory);
+
     function storeProofOfAuthority(SignedProofOfAuthority memory data) external;
 
     function storeProofOfSignature(SignedProofOfSignature memory data) external;
@@ -77,6 +95,8 @@ interface IDAOSignApp {
     function storeProofOfAgreement(SignedProofOfAgreement memory data) external;
 
     function storeProofOfVoid(SignedProofOfVoid memory data) external;
+
+    function storeProofOfCancel(SignedProofOfCancel memory data) external;
 }
 
 contract DAOSignApp is IDAOSignApp {
@@ -89,12 +109,14 @@ contract DAOSignApp is IDAOSignApp {
     IEIP712ProofOfSignature internal proofOfSignature;
     IEIP712ProofOfAgreement internal proofOfAgreement;
     IEIP712ProofOfVoid internal proofOfVoid;
+    IEIP712ProofOfCancel internal proofOfCancel;
     ITradeFI private tradeFI;
 
     mapping(string => SignedProofOfAuthority) internal poaus;
     mapping(string => SignedProofOfSignature) internal posis;
     mapping(string => SignedProofOfAgreement) internal poags;
     mapping(string => SignedProofOfVoid) internal pov;
+    mapping(string => SignedProofOfCancel) internal poc;
 
     mapping(string => bool) internal voided;
     mapping(string => address) internal proof2signer;
@@ -105,6 +127,7 @@ contract DAOSignApp is IDAOSignApp {
         address _proofOfSignature,
         address _proofOfAgreement,
         address _proofOfVoid,
+        address _proofOfCancel,
         address _tradeFI
     ) {
         domain = EIP712Domain({
@@ -118,6 +141,7 @@ contract DAOSignApp is IDAOSignApp {
         proofOfSignature = IEIP712ProofOfSignature(_proofOfSignature);
         proofOfAgreement = IEIP712ProofOfAgreement(_proofOfAgreement);
         proofOfVoid = IEIP712ProofOfVoid(_proofOfVoid);
+        proofOfCancel = IEIP712ProofOfCancel(_proofOfCancel);
         tradeFI = ITradeFI(_tradeFI);
     }
 
@@ -176,6 +200,24 @@ contract DAOSignApp is IDAOSignApp {
         emit NewProofOfVoid(data);
     }
 
+    function storeProofOfCancel(SignedProofOfCancel memory data) external {
+        require(
+            proofOfCancel.recover(domainHash, data.message, data.signature) == tradeFI.getAdmin(),
+            'Invalid signature'
+        );
+        require(validate(data), 'Invalid message');
+
+        for (uint i = 0; i < data.message.authorityCIDs.length; i++) {
+            require(
+                strcmp(poaus[data.message.authorityCIDs[i]].message.name, 'Proof-of-Authority'),
+                'Invalid Proof-of-Authority name'
+            );
+            voided[data.message.authorityCIDs[i]] = true;
+        }
+        poc[data.proofCID] = data;
+        emit NewProofOfCancel(data);
+    }
+
     function getProofOfAuthority(
         string memory cid
     ) external view returns (SignedProofOfAuthorityMsg memory) {
@@ -217,6 +259,17 @@ contract DAOSignApp is IDAOSignApp {
             });
     }
 
+    function getProofOfCancel(
+        string memory cid
+    ) external view returns (SignedProofOfCancelMsg memory) {
+        SignedProofOfCancel memory data = poc[cid];
+        return
+            SignedProofOfCancelMsg({
+                message: proofOfCancel.toEIP712Message(domain, data.message),
+                signature: data.signature
+            });
+    }
+
     function memcmp(bytes memory a, bytes memory b) internal pure returns (bool) {
         return (a.length == b.length) && (keccak256(a) == keccak256(b));
     }
@@ -225,7 +278,7 @@ contract DAOSignApp is IDAOSignApp {
         return memcmp(bytes(a), bytes(b));
     }
 
-    function validate(SignedProofOfAuthority memory data) internal pure returns (bool) {
+    function validate(SignedProofOfAuthority memory data) public pure returns (bool) {
         require(bytes(data.proofCID).length == IPFS_CID_LENGTH, 'Invalid proof CID');
         require(strcmp(data.message.app, 'daosign'), 'Invalid app name');
         require(strcmp(data.message.name, 'Proof-of-Authority'), 'Invalid proof name');
@@ -239,7 +292,7 @@ contract DAOSignApp is IDAOSignApp {
         return true;
     }
 
-    function validate(SignedProofOfSignature memory data) internal view returns (bool) {
+    function validate(SignedProofOfSignature memory data) public view returns (bool) {
         require(bytes(data.proofCID).length == IPFS_CID_LENGTH, 'Invalid proof CID');
         require(strcmp(data.message.app, 'daosign'), 'Invalid app name');
         require(strcmp(data.message.name, 'Proof-of-Signature'), 'Invalid proof name');
@@ -254,7 +307,7 @@ contract DAOSignApp is IDAOSignApp {
         return true;
     }
 
-    function validate(SignedProofOfAgreement memory data) internal view returns (bool) {
+    function validate(SignedProofOfAgreement memory data) public view returns (bool) {
         require(bytes(data.proofCID).length == IPFS_CID_LENGTH, 'Invalid proof CID');
         require(strcmp(data.message.app, 'daosign'), 'Invalid app name');
         require(
@@ -281,13 +334,20 @@ contract DAOSignApp is IDAOSignApp {
         return true;
     }
 
-    function validate(SignedProofOfVoid memory data) internal view returns (bool) {
+    function validate(SignedProofOfVoid memory data) public view returns (bool) {
         require(bytes(data.proofCID).length == IPFS_CID_LENGTH, 'Invalid proof CID');
         require(strcmp(data.message.app, 'daosign'), 'Invalid app name');
         require(
             strcmp(poaus[data.message.authorityCID].message.name, 'Proof-of-Authority'),
             'Invalid Proof-of-Authority name'
         );
+
+        return true;
+    }
+
+    function validate(SignedProofOfCancel memory data) public pure returns (bool) {
+        require(bytes(data.proofCID).length == IPFS_CID_LENGTH, 'Invalid proof CID');
+        require(strcmp(data.message.app, 'daosign'), 'Invalid app name');
 
         return true;
     }

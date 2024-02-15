@@ -72,6 +72,25 @@ struct SignedProofOfVoidMsg {
 }
 ```
 
+## SignedProofOfCancel
+
+```solidity
+struct SignedProofOfCancel {
+  struct ProofOfCancel message;
+  bytes signature;
+  string proofCID;
+}
+```
+
+## SignedProofOfCancelMsg
+
+```solidity
+struct SignedProofOfCancelMsg {
+  struct EIP712ProofOfCancelDocument message;
+  bytes signature;
+}
+```
+
 ## IDAOSignApp
 
 ### NewProofOfAuthority
@@ -98,6 +117,12 @@ event NewProofOfAgreement(struct SignedProofOfAgreement data)
 event NewProofOfVoid(struct SignedProofOfVoid data)
 ```
 
+### NewProofOfCancel
+
+```solidity
+event NewProofOfCancel(struct SignedProofOfCancel data)
+```
+
 ### getProofOfAuthority
 
 ```solidity
@@ -122,6 +147,12 @@ function getProofOfAgreement(string cid) external view returns (struct SignedPro
 function getProofOfVoid(string cid) external view returns (struct SignedProofOfVoidMsg)
 ```
 
+### getProofOfCancel
+
+```solidity
+function getProofOfCancel(string cid) external view returns (struct SignedProofOfCancelMsg)
+```
+
 ### storeProofOfAuthority
 
 ```solidity
@@ -144,6 +175,12 @@ function storeProofOfAgreement(struct SignedProofOfAgreement data) external
 
 ```solidity
 function storeProofOfVoid(struct SignedProofOfVoid data) external
+```
+
+### storeProofOfCancel
+
+```solidity
+function storeProofOfCancel(struct SignedProofOfCancel data) external
 ```
 
 ## DAOSignApp
@@ -190,6 +227,12 @@ contract IEIP712ProofOfAgreement proofOfAgreement
 contract IEIP712ProofOfVoid proofOfVoid
 ```
 
+### proofOfCancel
+
+```solidity
+contract IEIP712ProofOfCancel proofOfCancel
+```
+
 ### poaus
 
 ```solidity
@@ -214,6 +257,12 @@ mapping(string => struct SignedProofOfAgreement) poags
 mapping(string => struct SignedProofOfVoid) pov
 ```
 
+### poc
+
+```solidity
+mapping(string => struct SignedProofOfCancel) poc
+```
+
 ### voided
 
 ```solidity
@@ -235,7 +284,7 @@ mapping(string => mapping(address => uint256)) poauSignersIdx
 ### constructor
 
 ```solidity
-constructor(address _proofOfAuthority, address _proofOfSignature, address _proofOfAgreement, address _proofOfVoid, address _tradeFI) public
+constructor(address _proofOfAuthority, address _proofOfSignature, address _proofOfAgreement, address _proofOfVoid, address _proofOfCancel, address _tradeFI) public
 ```
 
 ### storeProofOfAuthority
@@ -262,6 +311,12 @@ function storeProofOfAgreement(struct SignedProofOfAgreement data) external
 function storeProofOfVoid(struct SignedProofOfVoid data) external
 ```
 
+### storeProofOfCancel
+
+```solidity
+function storeProofOfCancel(struct SignedProofOfCancel data) external
+```
+
 ### getProofOfAuthority
 
 ```solidity
@@ -286,6 +341,12 @@ function getProofOfAgreement(string cid) external view returns (struct SignedPro
 function getProofOfVoid(string cid) external view returns (struct SignedProofOfVoidMsg)
 ```
 
+### getProofOfCancel
+
+```solidity
+function getProofOfCancel(string cid) external view returns (struct SignedProofOfCancelMsg)
+```
+
 ### memcmp
 
 ```solidity
@@ -301,24 +362,30 @@ function strcmp(string a, string b) internal pure returns (bool)
 ### validate
 
 ```solidity
-function validate(struct SignedProofOfAuthority data) internal pure returns (bool)
+function validate(struct SignedProofOfAuthority data) public pure returns (bool)
 ```
 
 ### validate
 
 ```solidity
-function validate(struct SignedProofOfSignature data) internal view returns (bool)
+function validate(struct SignedProofOfSignature data) public view returns (bool)
 ```
 
 ### validate
 
 ```solidity
-function validate(struct SignedProofOfAgreement data) internal view returns (bool)
+function validate(struct SignedProofOfAgreement data) public view returns (bool)
 ```
 
 ### validate
 
 ```solidity
-function validate(struct SignedProofOfVoid data) internal view returns (bool)
+function validate(struct SignedProofOfVoid data) public view returns (bool)
+```
+
+### validate
+
+```solidity
+function validate(struct SignedProofOfCancel data) public pure returns (bool)
 ```
 

@@ -28,6 +28,7 @@ describe('DAOSignApp', () => {
       EIP712ProofOfSignature,
       EIP712ProofOfAgreement,
       EIP712ProofOfVoid,
+      EIP712ProofOfCancel,
     ] = await Promise.all([
       ethers.getSigners(),
       ethers.getContractFactory('MockDAOSignApp'),
@@ -36,6 +37,7 @@ describe('DAOSignApp', () => {
       ethers.getContractFactory('EIP712ProofOfSignature'),
       ethers.getContractFactory('EIP712ProofOfAgreement'),
       ethers.getContractFactory('EIP712ProofOfVoid'),
+      ethers.getContractFactory('EIP712ProofOfCancel'),
     ]);
 
     const accounts = config.networks.hardhat.accounts as HardhatNetworkHDAccountsConfig;
@@ -47,6 +49,7 @@ describe('DAOSignApp', () => {
     const proofOfSignature = await EIP712ProofOfSignature.deploy();
     const proofOfAgreement = await EIP712ProofOfAgreement.deploy();
     const proofOfVoid = await EIP712ProofOfVoid.deploy();
+    const proofOfCancel = await EIP712ProofOfCancel.deploy();
 
     return {
       privateKey,
@@ -59,6 +62,7 @@ describe('DAOSignApp', () => {
         await proofOfSignature.getAddress(),
         await proofOfAgreement.getAddress(),
         await proofOfVoid.getAddress(),
+        await proofOfCancel.getAddress(),
         await tradeFi.getAddress(),
       ),
     };

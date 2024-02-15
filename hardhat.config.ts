@@ -33,6 +33,9 @@ const config: HardhatUserConfig = {
     apiKey: ETHERSCAN_API_KEY,
   },
   networks: {
+    hardhat: {
+      allowUnlimitedContractSize: true,
+    },
     goerli: {
       url: GOERLI_URL || '',
       accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],

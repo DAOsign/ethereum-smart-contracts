@@ -9,8 +9,18 @@ contract MockDAOSignApp is DAOSignApp {
         address _proofOfSignature,
         address _proofOfAgreement,
         address _proofOfVoid,
+        address _proofOfCancel,
         address _tradeFI
-    ) DAOSignApp(_proofOfAuthority, _proofOfSignature, _proofOfAgreement, _proofOfVoid, _tradeFI) {}
+    )
+        DAOSignApp(
+            _proofOfAuthority,
+            _proofOfSignature,
+            _proofOfAgreement,
+            _proofOfVoid,
+            _proofOfCancel,
+            _tradeFI
+        )
+    {}
 
     function validateProofOfAuthority(
         SignedProofOfAuthority memory data

@@ -3,7 +3,7 @@
 ### constructor
 
 ```solidity
-constructor(address _proofOfAuthority, address _proofOfSignature, address _proofOfAgreement, address _proofOfVoid, address _tradeFI) public
+constructor(address _proofOfAuthority, address _proofOfSignature, address _proofOfAgreement, address _proofOfVoid, address _proofOfCancel, address _tradeFI) public
 ```
 
 ### validateProofOfAuthority
