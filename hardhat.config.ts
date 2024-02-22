@@ -9,6 +9,7 @@ import 'hardhat-contract-sizer';
 import './tasks';
 
 const {
+  TESTNET_SAPPHIRE_URL,
   SEPOLIA_URL,
   GOERLI_URL,
   ETHEREUM_MAINNET_URL,
@@ -65,6 +66,10 @@ const config: HardhatUserConfig = {
     },
     sepolia: {
       url: SEPOLIA_URL || '',
+      accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
+    },
+    testnetsapphire: {
+      url: TESTNET_SAPPHIRE_URL || '',
       accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
     },
   },
