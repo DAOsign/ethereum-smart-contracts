@@ -6,7 +6,7 @@ import { EIP712PropertyType, EIP712Domain, recover as eiprecover } from './domai
 bytes32 constant SIGNER_TYPEHASH = keccak256('Signer(address addr,string metadata)');
 
 bytes32 constant PROOF_OF_AUTHORITY_TYPEHASH = keccak256(
-    'ProofOfAuthority(string name,address from,string agreementCID,Signer[] signers,string app,uint256 timestamp,string metadata)Signer(address addr,string metadata)'
+    'ProofOfAuthority(string name,address from,string agreementCID,Signer[] signers,uint256 timestamp,string metadata)Signer(address addr,string metadata)'
 );
 
 struct Signer {
@@ -19,7 +19,6 @@ struct ProofOfAuthority {
     address from;
     string agreementCID;
     Signer[] signers;
-    string app;
     uint256 timestamp;
     string metadata;
 }
@@ -27,7 +26,7 @@ struct ProofOfAuthority {
 struct EIP712ProofOfAuthorityTypes {
     EIP712PropertyType[2] EIP712Domain;
     EIP712PropertyType[2] Signer;
-    EIP712PropertyType[7] ProofOfAuthority;
+    EIP712PropertyType[6] ProofOfAuthority;
 }
 
 struct EIP712ProofOfAuthorityDocument {
@@ -86,14 +85,10 @@ contract EIP721ProofOfAuthority is IEIP721ProofOfAuthority {
             kind: 'Signer[]'
         });
         proofOfAuthorityDoc.types.ProofOfAuthority[4] = EIP712PropertyType({
-            name: 'app',
-            kind: 'string'
-        });
-        proofOfAuthorityDoc.types.ProofOfAuthority[5] = EIP712PropertyType({
             name: 'timestamp',
             kind: 'uint256'
         });
-        proofOfAuthorityDoc.types.ProofOfAuthority[6] = EIP712PropertyType({
+        proofOfAuthorityDoc.types.ProofOfAuthority[5] = EIP712PropertyType({
             name: 'metadata',
             kind: 'string'
         });
@@ -120,7 +115,6 @@ contract EIP721ProofOfAuthority is IEIP721ProofOfAuthority {
             data.from,
             keccak256(bytes(data.agreementCID)),
             keccak256(signers),
-            keccak256(bytes(data.app)),
             data.timestamp,
             keccak256(bytes(data.metadata))
         );

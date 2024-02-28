@@ -76,7 +76,6 @@ describe('DAOSignEIP712', () => {
         from: ethers.ZeroAddress,
         agreementCID: 'agreementCID',
         signers: [{ addr: ethers.ZeroAddress, metadata: 'metadata' }],
-        app: 'daosign',
         timestamp: 123,
         metadata: 'metadata',
       };
@@ -98,7 +97,6 @@ describe('DAOSignEIP712', () => {
         { name: 'from', type: 'address' },
         { name: 'agreementCID', type: 'string' },
         { name: 'signers', type: 'Signer[]' },
-        { name: 'app', type: 'string' },
         { name: 'timestamp', type: 'uint256' },
         { name: 'metadata', type: 'string' },
       ]);
@@ -109,7 +107,6 @@ describe('DAOSignEIP712', () => {
       expect(eip712msg.message.signers.length).eq(msg.signers.length);
       expect(eip712msg.message.signers[0].addr).eq(msg.signers[0].addr);
       expect(eip712msg.message.signers[0].metadata).eq(msg.signers[0].metadata);
-      expect(eip712msg.message.app).eq(msg.app);
       expect(eip712msg.message.timestamp).eq(msg.timestamp);
       expect(eip712msg.message.metadata).eq(msg.metadata);
     });
@@ -119,7 +116,6 @@ describe('DAOSignEIP712', () => {
         name: 'name',
         signer: ethers.ZeroAddress,
         authorityCID: 'authorityCID',
-        app: 'daosign',
         timestamp: 123,
         metadata: 'metadata',
       };
@@ -136,7 +132,6 @@ describe('DAOSignEIP712', () => {
         { name: 'name', type: 'string' },
         { name: 'signer', type: 'address' },
         { name: 'authorityCID', type: 'string' },
-        { name: 'app', type: 'string' },
         { name: 'timestamp', type: 'uint256' },
         { name: 'metadata', type: 'string' },
       ]);
@@ -144,7 +139,6 @@ describe('DAOSignEIP712', () => {
       expect(eip712msg.message.name).eq(msg.name);
       expect(eip712msg.message.signer).eq(msg.signer);
       expect(eip712msg.message.authorityCID).eq(msg.authorityCID);
-      expect(eip712msg.message.app).eq(msg.app);
       expect(eip712msg.message.timestamp).eq(msg.timestamp);
       expect(eip712msg.message.metadata).eq(msg.metadata);
     });
@@ -153,7 +147,6 @@ describe('DAOSignEIP712', () => {
       const msg: ProofOfAgreementStruct = {
         authorityCID: 'authorityCID',
         signatureCIDs: ['signatureCID0', 'signatureCID1'],
-        app: 'daosign',
         timestamp: 123,
         metadata: 'metadata',
       };
@@ -169,7 +162,6 @@ describe('DAOSignEIP712', () => {
       cmp(eip712msg.types.ProofOfAgreement, [
         { name: 'authorityCID', type: 'string' },
         { name: 'signatureCIDs', type: 'string[]' },
-        { name: 'app', type: 'string' },
         { name: 'timestamp', type: 'uint256' },
         { name: 'metadata', type: 'string' },
       ]);
@@ -178,7 +170,6 @@ describe('DAOSignEIP712', () => {
       expect(eip712msg.message.signatureCIDs.length).eq(msg.signatureCIDs.length);
       expect(eip712msg.message.signatureCIDs[0]).eq(msg.signatureCIDs[0]);
       expect(eip712msg.message.signatureCIDs[1]).eq(msg.signatureCIDs[1]);
-      expect(eip712msg.message.app).eq(msg.app);
       expect(eip712msg.message.timestamp).eq(msg.timestamp);
       expect(eip712msg.message.metadata).eq(msg.metadata);
     });
@@ -192,7 +183,6 @@ describe('DAOSignEIP712', () => {
         from: signer.address,
         agreementCID: 'agreementCID',
         signers: [{ addr: signer.address, metadata: 'metadata' }],
-        app: 'daosign',
         timestamp: (Date.now() / 1000) | 0,
         metadata: 'metadata',
       };
@@ -207,7 +197,6 @@ describe('DAOSignEIP712', () => {
         name: 'Proof-of-Signature',
         signer: signer.address,
         authorityCID: 'authorityCID',
-        app: 'daosign',
         timestamp: (Date.now() / 1000) | 0,
         metadata: 'metadata',
       };
@@ -221,7 +210,6 @@ describe('DAOSignEIP712', () => {
       const message: ProofOfAgreementStruct = {
         authorityCID: 'authorityCID',
         signatureCIDs: ['signatureCID0', 'signatureCID1'],
-        app: 'daosign',
         timestamp: (Date.now() / 1000) | 0,
         metadata: 'metadata',
       };

@@ -10,7 +10,6 @@ bytes32 PROOF_OF_AGREEMENT_TYPEHASH
 struct ProofOfAgreement {
   string authorityCID;
   string[] signatureCIDs;
-  string app;
   uint256 timestamp;
   string metadata;
 }
@@ -21,7 +20,7 @@ struct ProofOfAgreement {
 ```solidity
 struct EIP712ProofOfAgreementTypes {
   struct EIP712PropertyType[2] EIP712Domain;
-  struct EIP712PropertyType[5] ProofOfAgreement;
+  struct EIP712PropertyType[4] ProofOfAgreement;
 }
 ```
 

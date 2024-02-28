@@ -27,7 +27,6 @@ struct ProofOfAuthority {
   address from;
   string agreementCID;
   struct Signer[] signers;
-  string app;
   uint256 timestamp;
   string metadata;
 }
@@ -39,7 +38,7 @@ struct ProofOfAuthority {
 struct EIP712ProofOfAuthorityTypes {
   struct EIP712PropertyType[2] EIP712Domain;
   struct EIP712PropertyType[2] Signer;
-  struct EIP712PropertyType[7] ProofOfAuthority;
+  struct EIP712PropertyType[6] ProofOfAuthority;
 }
 ```
 

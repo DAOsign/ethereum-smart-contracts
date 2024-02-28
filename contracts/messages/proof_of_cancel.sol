@@ -4,19 +4,18 @@ pragma solidity ^0.8.19;
 import { EIP712PropertyType, EIP712Domain, recover as eiprecover } from './domain.sol';
 
 bytes32 constant PROOF_OF_CANCEL_TYPEHASH = keccak256(
-    'ProofOfCancel(string[] authorityCIDs,string app,uint256 timestamp,string metadata)'
+    'ProofOfCancel(string[] authorityCIDs,uint256 timestamp,string metadata)'
 );
 
 struct ProofOfCancel {
     string[] authorityCIDs;
-    string app;
     uint256 timestamp;
     string metadata;
 }
 
 struct EIP712ProofOfCancelTypes {
     EIP712PropertyType[2] EIP712Domain;
-    EIP712PropertyType[4] ProofOfVoid;
+    EIP712PropertyType[3] ProofOfVoid;
 }
 
 struct EIP712ProofOfCancelDocument {
@@ -54,12 +53,11 @@ contract EIP712ProofOfCancel is IEIP712ProofOfCancel {
             name: 'authorityCIDs',
             kind: 'string[]'
         });
-        proofOfVoidDoc.types.ProofOfVoid[1] = EIP712PropertyType({ name: 'app', kind: 'string' });
-        proofOfVoidDoc.types.ProofOfVoid[2] = EIP712PropertyType({
+        proofOfVoidDoc.types.ProofOfVoid[1] = EIP712PropertyType({
             name: 'timestamp',
             kind: 'uint256'
         });
-        proofOfVoidDoc.types.ProofOfVoid[3] = EIP712PropertyType({
+        proofOfVoidDoc.types.ProofOfVoid[2] = EIP712PropertyType({
             name: 'metadata',
             kind: 'string'
         });
@@ -77,7 +75,6 @@ contract EIP712ProofOfCancel is IEIP712ProofOfCancel {
         bytes memory encoded = abi.encode(
             PROOF_OF_CANCEL_TYPEHASH,
             keccak256(bytes(authorityCIDs)),
-            keccak256(bytes(data.app)),
             data.timestamp,
             keccak256(bytes(data.metadata))
         );

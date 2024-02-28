@@ -11,7 +11,6 @@ struct ProofOfSignature {
   string name;
   address signer;
   string authorityCID;
-  string app;
   uint256 timestamp;
   string metadata;
 }
@@ -22,7 +21,7 @@ struct ProofOfSignature {
 ```solidity
 struct EIP712ProofOfSignatureTypes {
   struct EIP712PropertyType[2] EIP712Domain;
-  struct EIP712PropertyType[6] ProofOfSignature;
+  struct EIP712PropertyType[5] ProofOfSignature;
 }
 ```
 

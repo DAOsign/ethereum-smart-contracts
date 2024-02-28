@@ -4,20 +4,19 @@ pragma solidity ^0.8.19;
 import { EIP712PropertyType, EIP712Domain, recover as eiprecover } from './domain.sol';
 
 bytes32 constant PROOF_OF_AGREEMENT_TYPEHASH = keccak256(
-    'ProofOfAgreement(string authorityCID,string[] signatureCIDs,string app,uint256 timestamp,string metadata)'
+    'ProofOfAgreement(string authorityCID,string[] signatureCIDs,uint256 timestamp,string metadata)'
 );
 
 struct ProofOfAgreement {
     string authorityCID;
     string[] signatureCIDs;
-    string app;
     uint256 timestamp;
     string metadata;
 }
 
 struct EIP712ProofOfAgreementTypes {
     EIP712PropertyType[2] EIP712Domain;
-    EIP712PropertyType[5] ProofOfAgreement;
+    EIP712PropertyType[4] ProofOfAgreement;
 }
 
 struct EIP712ProofOfAgreementDocument {
@@ -63,14 +62,10 @@ contract EIP712ProofOfAgreement is IEIP712ProofOfAgreement {
             kind: 'string[]'
         });
         proofOfAgreementDoc.types.ProofOfAgreement[2] = EIP712PropertyType({
-            name: 'app',
-            kind: 'string'
-        });
-        proofOfAgreementDoc.types.ProofOfAgreement[3] = EIP712PropertyType({
             name: 'timestamp',
             kind: 'uint256'
         });
-        proofOfAgreementDoc.types.ProofOfAgreement[4] = EIP712PropertyType({
+        proofOfAgreementDoc.types.ProofOfAgreement[3] = EIP712PropertyType({
             name: 'metadata',
             kind: 'string'
         });
@@ -89,7 +84,6 @@ contract EIP712ProofOfAgreement is IEIP712ProofOfAgreement {
             PROOF_OF_AGREEMENT_TYPEHASH,
             keccak256(bytes(data.authorityCID)),
             keccak256(signatureCIDs),
-            keccak256(bytes(data.app)),
             data.timestamp,
             keccak256(bytes(data.metadata))
         );

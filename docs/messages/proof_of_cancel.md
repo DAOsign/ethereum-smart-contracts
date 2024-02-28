@@ -9,7 +9,6 @@ bytes32 PROOF_OF_CANCEL_TYPEHASH
 ```solidity
 struct ProofOfCancel {
   string[] authorityCIDs;
-  string app;
   uint256 timestamp;
   string metadata;
 }
@@ -20,7 +19,7 @@ struct ProofOfCancel {
 ```solidity
 struct EIP712ProofOfCancelTypes {
   struct EIP712PropertyType[2] EIP712Domain;
-  struct EIP712PropertyType[4] ProofOfVoid;
+  struct EIP712PropertyType[3] ProofOfVoid;
 }
 ```
 

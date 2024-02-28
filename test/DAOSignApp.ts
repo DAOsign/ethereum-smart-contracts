@@ -95,24 +95,6 @@ describe('DAOSignApp', () => {
       await expect(app.validateProofOfAuthority(data)).revertedWith('Invalid proof CID');
     });
 
-    it('error: Invalid app name', async () => {
-      const data: SignedProofOfAuthorityStruct = {
-        message: {
-          name: 'Proof-of-Authority',
-          from: signer.address,
-          agreementCID: paddRigthStr('agreement file cid'),
-          signers: [{ addr: signer.address, metadata: 'some metadata' }],
-          app: 'DAOsign',
-          timestamp: Math.floor(Date.now() / 1000),
-          metadata: 'proof metadata',
-        },
-        signature: Buffer.from(''),
-        proofCID: 'Qmeura2H46RCpDRHDHgnQ5QVk7iKnZANDhfLmSKCkDr5vv',
-      };
-
-      await expect(app.validateProofOfAuthority(data)).revertedWith('Invalid app name');
-    });
-
     it('error: Invalid proof name', async () => {
       const data: SignedProofOfAuthorityStruct = {
         message: {
@@ -254,23 +236,6 @@ describe('DAOSignApp', () => {
       await expect(app.validateProofOfSignature(data)).rejectedWith('Invalid proof CID');
     });
 
-    it('error: Invalid app name', async () => {
-      const data = {
-        message: {
-          name: 'Proof-of-Signature',
-          signer: signer.address,
-          authorityCID: paddRigthStr('POA CID'),
-          app: 'daosign ',
-          timestamp: Math.floor(Date.now() / 1000),
-          metadata: '{}',
-        },
-        signature: Buffer.from(''),
-        proofCID: paddRigthStr('POS CID'),
-      };
-
-      await expect(app.validateProofOfSignature(data)).rejectedWith('Invalid app name');
-    });
-
     it('error: Invalid proof name', async () => {
       const data = {
         message: {
@@ -396,22 +361,6 @@ describe('DAOSignApp', () => {
       await expect(app.storeProofOfAgreement(data)).revertedWith('Invalid proof CID');
     });
 
-    it('error: Invalid app name', async () => {
-      const data = {
-        message: {
-          authorityCID: paddRigthStr('POA CID'),
-          signatureCIDs: [paddRigthStr('POS CID 1'), paddRigthStr('POS CID 2')],
-          app: 'daosign s',
-          timestamp: Math.floor(Date.now() / 1000),
-          metadata: 'proof metadata',
-        },
-        signature: Buffer.from(''),
-        proofCID: paddRigthStr('POAG CID'),
-      };
-
-      await expect(app.storeProofOfAgreement(data)).revertedWith('Invalid app name');
-    });
-
     it('error: Invalid Proof-of-Authority name', async () => {
       const data = {
         message: {
@@ -498,7 +447,6 @@ describe('DAOSignApp', () => {
         metadata: 'proof metadata',
       };
       const sig = signMessage(mocks.privateKey, 'ProofOfAuthority', msg);
-
       const tx = mocks.app.storeProofOfAuthority({
         message: msg,
         signature: sig,
@@ -525,7 +473,6 @@ describe('DAOSignApp', () => {
         { name: 'from', type: 'address' },
         { name: 'agreementCID', type: 'string' },
         { name: 'signers', type: 'Signer[]' },
-        { name: 'app', type: 'string' },
         { name: 'timestamp', type: 'uint256' },
         { name: 'metadata', type: 'string' },
       ]);
@@ -535,7 +482,6 @@ describe('DAOSignApp', () => {
       expect(msgdoc.message.message.agreementCID).eq(msg.agreementCID);
       expect(msgdoc.message.message.signers.length).eq(msg.signers.length);
       expect(msgdoc.message.message.signers[0].addr).eq(msg.signers[0].addr);
-      expect(msgdoc.message.message.app).eq(msg.app);
       expect(msgdoc.message.message.timestamp).eq(msg.timestamp);
       expect(msgdoc.message.message.metadata).eq(msg.metadata);
     });
@@ -545,12 +491,10 @@ describe('DAOSignApp', () => {
         name: 'Proof-of-Signature',
         signer: mocks.signer.address,
         authorityCID: paddRigthStr('ProofOfAuthority proof cid'),
-        app: 'daosign',
         timestamp: Math.floor(Date.now() / 1000),
         metadata: 'proof metadata',
       };
       const sig = signMessage(mocks.privateKey, 'ProofOfSignature', msg);
-
       const tx = mocks.app.storeProofOfSignature({
         message: msg,
         signature: sig,
@@ -572,7 +516,6 @@ describe('DAOSignApp', () => {
         { name: 'name', type: 'string' },
         { name: 'signer', type: 'address' },
         { name: 'authorityCID', type: 'string' },
-        { name: 'app', type: 'string' },
         { name: 'timestamp', type: 'uint256' },
         { name: 'metadata', type: 'string' },
       ]);
@@ -580,7 +523,6 @@ describe('DAOSignApp', () => {
       expect(msgdoc.message.message.name).eq(msg.name);
       expect(msgdoc.message.message.signer).eq(msg.signer);
       expect(msgdoc.message.message.authorityCID).eq(msg.authorityCID);
-      expect(msgdoc.message.message.app).eq(msg.app);
       expect(msgdoc.message.message.timestamp).eq(msg.timestamp);
       expect(msgdoc.message.message.metadata).eq(msg.metadata);
     });
@@ -589,11 +531,9 @@ describe('DAOSignApp', () => {
       const msg: ProofOfAgreementStruct = {
         authorityCID: paddRigthStr('ProofOfAuthority proof cid'),
         signatureCIDs: [paddRigthStr('ProofOfSignature proof cid')],
-        app: 'daosign',
         timestamp: Math.floor(Date.now() / 1000),
         metadata: 'proof metadata',
       };
-
       const tx = mocks.app.storeProofOfAgreement({
         message: msg,
         proofCID: paddRigthStr('ProofOfAgreement proof cid'),
@@ -612,14 +552,12 @@ describe('DAOSignApp', () => {
       cmp(msgdoc.message.types.ProofOfAgreement, [
         { name: 'authorityCID', type: 'string' },
         { name: 'signatureCIDs', type: 'string[]' },
-        { name: 'app', type: 'string' },
         { name: 'timestamp', type: 'uint256' },
         { name: 'metadata', type: 'string' },
       ]);
       expect(msgdoc.message.message.authorityCID).eq(msg.authorityCID);
       expect(msgdoc.message.message.signatureCIDs.length).eq(msg.signatureCIDs.length);
       expect(msgdoc.message.message.signatureCIDs[0]).eq(msg.signatureCIDs[0]);
-      expect(msgdoc.message.message.app).eq(msg.app);
       expect(msgdoc.message.message.timestamp).eq(msg.timestamp);
       expect(msgdoc.message.message.metadata).eq(msg.metadata);
     });

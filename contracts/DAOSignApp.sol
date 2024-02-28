@@ -155,7 +155,6 @@ contract DAOSignApp is IDAOSignApp {
         poaus[data.proofCID].message.name = data.message.name;
         poaus[data.proofCID].message.from = data.message.from;
         poaus[data.proofCID].message.agreementCID = data.message.agreementCID;
-        poaus[data.proofCID].message.app = data.message.app;
         poaus[data.proofCID].message.timestamp = data.message.timestamp;
         poaus[data.proofCID].message.metadata = data.message.metadata;
         for (uint i = 0; i < data.message.signers.length; i++) {
@@ -280,7 +279,6 @@ contract DAOSignApp is IDAOSignApp {
 
     function validate(SignedProofOfAuthority memory data) internal pure returns (bool) {
         require(bytes(data.proofCID).length == IPFS_CID_LENGTH, 'Invalid proof CID');
-        require(strcmp(data.message.app, 'daosign'), 'Invalid app name');
         require(strcmp(data.message.name, 'Proof-of-Authority'), 'Invalid proof name');
         require(
             bytes(data.message.agreementCID).length == IPFS_CID_LENGTH,
@@ -294,7 +292,6 @@ contract DAOSignApp is IDAOSignApp {
 
     function validate(SignedProofOfSignature memory data) internal view returns (bool) {
         require(bytes(data.proofCID).length == IPFS_CID_LENGTH, 'Invalid proof CID');
-        require(strcmp(data.message.app, 'daosign'), 'Invalid app name');
         require(strcmp(data.message.name, 'Proof-of-Signature'), 'Invalid proof name');
         require(!voided[data.message.authorityCID], 'ProofOfAuthority voided');
 
@@ -309,7 +306,6 @@ contract DAOSignApp is IDAOSignApp {
 
     function validate(SignedProofOfAgreement memory data) internal view returns (bool) {
         require(bytes(data.proofCID).length == IPFS_CID_LENGTH, 'Invalid proof CID');
-        require(strcmp(data.message.app, 'daosign'), 'Invalid app name');
         require(
             strcmp(poaus[data.message.authorityCID].message.name, 'Proof-of-Authority'),
             'Invalid Proof-of-Authority name'
@@ -336,7 +332,6 @@ contract DAOSignApp is IDAOSignApp {
 
     function validate(SignedProofOfVoid memory data) internal view returns (bool) {
         require(bytes(data.proofCID).length == IPFS_CID_LENGTH, 'Invalid proof CID');
-        require(strcmp(data.message.app, 'daosign'), 'Invalid app name');
         require(
             strcmp(poaus[data.message.authorityCID].message.name, 'Proof-of-Authority'),
             'Invalid Proof-of-Authority name'
@@ -347,7 +342,6 @@ contract DAOSignApp is IDAOSignApp {
 
     function validate(SignedProofOfCancel memory data) internal pure returns (bool) {
         require(bytes(data.proofCID).length == IPFS_CID_LENGTH, 'Invalid proof CID');
-        require(strcmp(data.message.app, 'daosign'), 'Invalid app name');
 
         return true;
     }
