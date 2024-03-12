@@ -8,7 +8,15 @@ import 'solidity-docgen';
 import 'hardhat-contract-sizer';
 import './tasks';
 
-const { GOERLI_URL, ETHEREUM_MAINNET_URL, PRIVATE_KEY, ETHERSCAN_API_KEY } = process.env;
+const {
+  TESTNET_SAPPHIRE_URL,
+  SEPOLIA_URL,
+  GOERLI_URL,
+  ETHEREUM_MAINNET_URL,
+  PRIVATE_KEY,
+  ETHERSCAN_API_KEY,
+  ETHERSCAN_OPTIMISTIC_API_KEY,
+} = process.env;
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -29,15 +37,39 @@ const config: HardhatUserConfig = {
   },
   // To verify contracts on Etherscan
   etherscan: {
-    apiKey: ETHERSCAN_API_KEY,
+    apiKey: {
+      goerli: ETHERSCAN_API_KEY!,
+      sepolia: ETHERSCAN_OPTIMISTIC_API_KEY!,
+    },
+    customChains: [
+      {
+        network: 'sepolia',
+        chainId: 11155420,
+        urls: {
+          apiURL: 'https://api-sepolia-optimistic.etherscan.io/api',
+          browserURL: 'https://sepolia-optimism.etherscan.io/',
+        },
+      },
+    ],
   },
   networks: {
+    hardhat: {
+      allowUnlimitedContractSize: true,
+    },
     goerli: {
       url: GOERLI_URL || '',
       accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
     },
     ethereum: {
       url: ETHEREUM_MAINNET_URL || '',
+      accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
+    },
+    sepolia: {
+      url: SEPOLIA_URL || '',
+      accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
+    },
+    testnetsapphire: {
+      url: TESTNET_SAPPHIRE_URL || '',
       accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
     },
   },

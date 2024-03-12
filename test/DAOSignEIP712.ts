@@ -16,7 +16,7 @@ describe('DAOSignEIP712', () => {
   const domain: EIP712DomainStruct = {
     name: 'daosign',
     version: '0.1.0',
-    chainId: 0,
+    chainId: 1,
     verifyingContract: ethers.ZeroAddress,
   };
 
@@ -27,19 +27,41 @@ describe('DAOSignEIP712', () => {
   };
 
   async function deployProofsFixture() {
-    const [[signer], DAOSignEIP712] = await Promise.all([
+    const [
+      [signer],
+      DAOSignEIP712,
+      EIP721ProofOfAuthority,
+      EIP712ProofOfSignature,
+      EIP712ProofOfAgreement,
+      EIP712ProofOfVoid,
+    ] = await Promise.all([
       ethers.getSigners(),
       ethers.getContractFactory('MockDAOSignEIP712'),
+      ethers.getContractFactory('EIP721ProofOfAuthority'),
+      ethers.getContractFactory('EIP712ProofOfSignature'),
+      ethers.getContractFactory('EIP712ProofOfAgreement'),
+      ethers.getContractFactory('EIP712ProofOfVoid'),
     ]);
 
     const accounts = config.networks.hardhat.accounts as HardhatNetworkHDAccountsConfig;
     const wallet = ethers.Wallet.fromPhrase(accounts.mnemonic);
     const privateKey = Buffer.from(wallet.privateKey.slice(2), 'hex');
 
+    const proofOfAuthority = await EIP721ProofOfAuthority.deploy();
+    const proofOfSignature = await EIP712ProofOfSignature.deploy();
+    const proofOfAgreement = await EIP712ProofOfAgreement.deploy();
+    const proofOfVoid = await EIP712ProofOfVoid.deploy();
+
     return {
       privateKey,
       signer,
-      app: await DAOSignEIP712.deploy(domain),
+      app: await DAOSignEIP712.deploy(
+        domain,
+        await proofOfAuthority.getAddress(),
+        await proofOfSignature.getAddress(),
+        await proofOfAgreement.getAddress(),
+        await proofOfVoid.getAddress(),
+      ),
     };
   }
 
@@ -54,7 +76,6 @@ describe('DAOSignEIP712', () => {
         from: ethers.ZeroAddress,
         agreementCID: 'agreementCID',
         signers: [{ addr: ethers.ZeroAddress, metadata: 'metadata' }],
-        app: 'daosign',
         timestamp: 123,
         metadata: 'metadata',
       };
@@ -66,8 +87,6 @@ describe('DAOSignEIP712', () => {
       cmp(eip712msg.types.EIP712Domain, [
         { name: 'name', type: 'string' },
         { name: 'version', type: 'string' },
-        { name: 'chainId', type: 'uint256' },
-        { name: 'verifyingContract', type: 'address' },
       ]);
       cmp(eip712msg.types.Signer, [
         { name: 'addr', type: 'address' },
@@ -78,7 +97,6 @@ describe('DAOSignEIP712', () => {
         { name: 'from', type: 'address' },
         { name: 'agreementCID', type: 'string' },
         { name: 'signers', type: 'Signer[]' },
-        { name: 'app', type: 'string' },
         { name: 'timestamp', type: 'uint256' },
         { name: 'metadata', type: 'string' },
       ]);
@@ -89,7 +107,6 @@ describe('DAOSignEIP712', () => {
       expect(eip712msg.message.signers.length).eq(msg.signers.length);
       expect(eip712msg.message.signers[0].addr).eq(msg.signers[0].addr);
       expect(eip712msg.message.signers[0].metadata).eq(msg.signers[0].metadata);
-      expect(eip712msg.message.app).eq(msg.app);
       expect(eip712msg.message.timestamp).eq(msg.timestamp);
       expect(eip712msg.message.metadata).eq(msg.metadata);
     });
@@ -98,8 +115,7 @@ describe('DAOSignEIP712', () => {
       const msg: ProofOfSignatureStruct = {
         name: 'name',
         signer: ethers.ZeroAddress,
-        agreementCID: 'agreementCID',
-        app: 'daosign',
+        authorityCID: 'authorityCID',
         timestamp: 123,
         metadata: 'metadata',
       };
@@ -111,31 +127,26 @@ describe('DAOSignEIP712', () => {
       cmp(eip712msg.types.EIP712Domain, [
         { name: 'name', type: 'string' },
         { name: 'version', type: 'string' },
-        { name: 'chainId', type: 'uint256' },
-        { name: 'verifyingContract', type: 'address' },
       ]);
       cmp(eip712msg.types.ProofOfSignature, [
         { name: 'name', type: 'string' },
         { name: 'signer', type: 'address' },
-        { name: 'agreementCID', type: 'string' },
-        { name: 'app', type: 'string' },
+        { name: 'authorityCID', type: 'string' },
         { name: 'timestamp', type: 'uint256' },
         { name: 'metadata', type: 'string' },
       ]);
       expect(eip712msg.primaryType).eq('ProofOfSignature');
       expect(eip712msg.message.name).eq(msg.name);
       expect(eip712msg.message.signer).eq(msg.signer);
-      expect(eip712msg.message.agreementCID).eq(msg.agreementCID);
-      expect(eip712msg.message.app).eq(msg.app);
+      expect(eip712msg.message.authorityCID).eq(msg.authorityCID);
       expect(eip712msg.message.timestamp).eq(msg.timestamp);
       expect(eip712msg.message.metadata).eq(msg.metadata);
     });
 
     it('EIP712ProofOfAgreement', async () => {
       const msg: ProofOfAgreementStruct = {
-        agreementCID: 'agreementCID',
+        authorityCID: 'authorityCID',
         signatureCIDs: ['signatureCID0', 'signatureCID1'],
-        app: 'daosign',
         timestamp: 123,
         metadata: 'metadata',
       };
@@ -147,22 +158,18 @@ describe('DAOSignEIP712', () => {
       cmp(eip712msg.types.EIP712Domain, [
         { name: 'name', type: 'string' },
         { name: 'version', type: 'string' },
-        { name: 'chainId', type: 'uint256' },
-        { name: 'verifyingContract', type: 'address' },
       ]);
       cmp(eip712msg.types.ProofOfAgreement, [
-        { name: 'agreementCID', type: 'string' },
+        { name: 'authorityCID', type: 'string' },
         { name: 'signatureCIDs', type: 'string[]' },
-        { name: 'app', type: 'string' },
         { name: 'timestamp', type: 'uint256' },
         { name: 'metadata', type: 'string' },
       ]);
       expect(eip712msg.primaryType).eq('ProofOfAgreement');
-      expect(eip712msg.message.agreementCID).eq(msg.agreementCID);
+      expect(eip712msg.message.authorityCID).eq(msg.authorityCID);
       expect(eip712msg.message.signatureCIDs.length).eq(msg.signatureCIDs.length);
       expect(eip712msg.message.signatureCIDs[0]).eq(msg.signatureCIDs[0]);
       expect(eip712msg.message.signatureCIDs[1]).eq(msg.signatureCIDs[1]);
-      expect(eip712msg.message.app).eq(msg.app);
       expect(eip712msg.message.timestamp).eq(msg.timestamp);
       expect(eip712msg.message.metadata).eq(msg.metadata);
     });
@@ -176,7 +183,6 @@ describe('DAOSignEIP712', () => {
         from: signer.address,
         agreementCID: 'agreementCID',
         signers: [{ addr: signer.address, metadata: 'metadata' }],
-        app: 'daosign',
         timestamp: (Date.now() / 1000) | 0,
         metadata: 'metadata',
       };
@@ -190,8 +196,7 @@ describe('DAOSignEIP712', () => {
       const message: ProofOfSignatureStruct = {
         name: 'Proof-of-Signature',
         signer: signer.address,
-        agreementCID: 'agreementCID',
-        app: 'daosign',
+        authorityCID: 'authorityCID',
         timestamp: (Date.now() / 1000) | 0,
         metadata: 'metadata',
       };
@@ -203,9 +208,8 @@ describe('DAOSignEIP712', () => {
     it('ProofOfAgreement', async () => {
       const { privateKey, signer, app } = mocks;
       const message: ProofOfAgreementStruct = {
-        agreementCID: 'agreementCID',
+        authorityCID: 'authorityCID',
         signatureCIDs: ['signatureCID0', 'signatureCID1'],
-        app: 'daosign',
         timestamp: (Date.now() / 1000) | 0,
         metadata: 'metadata',
       };

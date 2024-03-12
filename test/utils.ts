@@ -43,7 +43,7 @@ export function signMessage(
       domain: {
         name: 'daosign',
         version: '0.1.0',
-        chainId: 0,
+        chainId: 1,
         verifyingContract: ethers.ZeroAddress,
       },
       types: {
@@ -62,22 +62,19 @@ export function signMessage(
           { name: 'from', type: 'address' },
           { name: 'agreementCID', type: 'string' },
           { name: 'signers', type: 'Signer[]' },
-          { name: 'app', type: 'string' },
           { name: 'timestamp', type: 'uint256' },
           { name: 'metadata', type: 'string' },
         ],
         ProofOfSignature: [
           { name: 'name', type: 'string' },
           { name: 'signer', type: 'address' },
-          { name: 'agreementCID', type: 'string' },
-          { name: 'app', type: 'string' },
+          { name: 'authorityCID', type: 'string' },
           { name: 'timestamp', type: 'uint256' },
           { name: 'metadata', type: 'string' },
         ],
         ProofOfAgreement: [
-          { name: 'agreementCID', type: 'string' },
+          { name: 'authorityCID', type: 'string' },
           { name: 'signatureCIDs', type: 'string[]' },
-          { name: 'app', type: 'string' },
           { name: 'timestamp', type: 'uint256' },
           { name: 'metadata', type: 'string' },
         ],
