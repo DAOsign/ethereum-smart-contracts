@@ -83,3 +83,24 @@ task('deploy', 'Deploy DAOSign application').setAction(async function (_, { ethe
   const daoSignProxy = await daoSignProxyTx.waitForDeployment();
   console.log(`DAOSign proxy: ${await daoSignProxy.getAddress()}`);
 });
+
+task('deploy-strorage', 'Deploy DAOSign storage').setAction(async function (_, { ethers }) {
+  const [[owner], DAOSignProxy, DAOSignStorage] = await Promise.all([
+    ethers.getSigners(),
+    ethers.getContractFactory('DAOSignProxy'),
+    ethers.getContractFactory('DAOSignStorage'),
+  ]);
+
+  const daoSignStorageTx = await DAOSignStorage.connect(owner).deploy(owner.address);
+  console.log(`DAOSign storage transaction: ${daoSignStorageTx.deploymentTransaction()?.hash}`);
+  const daoSignStore = await daoSignStorageTx.waitForDeployment();
+  console.log(`DAOSign storage: ${await daoSignStore.getAddress()}`);
+
+  const daoSignProxyTx = await DAOSignProxy.connect(owner).deploy(
+    await daoSignStore.getAddress(),
+    owner.address,
+  );
+  console.log(`DAOSign proxy transaction: ${daoSignProxyTx.deploymentTransaction()?.hash}`);
+  const daoSignProxy = await daoSignProxyTx.waitForDeployment();
+  console.log(`DAOSign proxy: ${await daoSignProxy.getAddress()}`);
+});
