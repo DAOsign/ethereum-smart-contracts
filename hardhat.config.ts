@@ -10,6 +10,7 @@ import './tasks';
 
 const {
   TESTNET_SAPPHIRE_URL,
+  OPTIMISTIC_SEPOLIA_URL,
   SEPOLIA_URL,
   GOERLI_URL,
   ETHEREUM_MAINNET_URL,
@@ -24,7 +25,7 @@ const config: HardhatUserConfig = {
     settings: {
       optimizer: {
         enabled: true,
-        runs: 1000,
+        runs: 2000,
       },
     },
   },
@@ -39,11 +40,12 @@ const config: HardhatUserConfig = {
   etherscan: {
     apiKey: {
       goerli: ETHERSCAN_API_KEY!,
-      sepolia: ETHERSCAN_OPTIMISTIC_API_KEY!,
+      sepolia: ETHERSCAN_API_KEY!,
+      optimisticsepolia: ETHERSCAN_OPTIMISTIC_API_KEY!,
     },
     customChains: [
       {
-        network: 'sepolia',
+        network: 'optimisticsepolia',
         chainId: 11155420,
         urls: {
           apiURL: 'https://api-sepolia-optimistic.etherscan.io/api',
@@ -66,6 +68,12 @@ const config: HardhatUserConfig = {
     },
     sepolia: {
       url: SEPOLIA_URL || '',
+      accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
+      gas: 'auto',
+      gasPrice: 'auto',
+    },
+    optimisticsepolia: {
+      url: OPTIMISTIC_SEPOLIA_URL || '',
       accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
     },
     testnetsapphire: {
